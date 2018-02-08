@@ -1,0 +1,24 @@
+.t_row {
+    width: auto;
+    padding: 0;
+    margin: 0;
+}
+
+.t_margin {
+    margin-left: 15px;
+}
+
+.r_border {
+    border-right: 1px solid #ccb;
+}
+
+.b_border {
+    border-bottom: 1px solid #ccc;
+}
+
+.margin-top {
+    margin-top: 35px;
+}
+.login-panel{
+    margin-top: 25%;
+}

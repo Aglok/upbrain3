@@ -1,0 +1,11 @@
+.import-file {
+    display: none;
+}
+#import-form button{
+    position: relative;
+}
+#loadImg{
+    display: none;
+    position: absolute;
+    z-index: 3
+}

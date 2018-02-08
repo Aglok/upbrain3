@@ -1,0 +1,127 @@
+/* jQuery Growl
+  * Copyright 2015 Kevin Sylvestre
+  * 1.2.5
+  */
+#growls {
+    zindex: 50000;
+    position: fixed;
+}
+
+#growls.default {
+    top: 10px;
+    right: 10px;
+}
+
+#growls.tl {
+    top: 10px;
+    left: 10px;
+}
+
+#growls.tr {
+    top: 10px;
+    right: 10px;
+}
+
+#growls.bl {
+    bottom: 10px;
+    left: 10px;
+}
+
+#growls.br {
+    bottom: 10px;
+    right: 10px;
+}
+
+#growls.tc {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+}
+
+#growls.bc {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+}
+
+#growls.tc .growl, #growls.bc .growl {
+    marginleft: auto;
+    marginright: auto;
+}
+
+.growl {
+    opacity: 0.8;
+    filter: alpha(opacity=80);
+    position: relative;
+    borderradius: 4px;
+    webkittransition: all 0.4s easeinout;
+    moztransition: all 0.4s easeinout;
+    transition: all 0.4s easeinout;
+}
+
+.growl.growlincoming {
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+
+.growl.growloutgoing {
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+
+.growl.growlsmall {
+    width: 200px;
+    padding: 5px;
+    margin: 5px;
+}
+
+.growl.growlmedium {
+    width: 250px;
+    padding: 10px;
+    margin: 10px;
+}
+
+.growl.growllarge {
+    width: 300px;
+    padding: 15px;
+    margin: 15px;
+}
+
+.growl.growldefault {
+    color: #FFF;
+    background: #7f8c8d;
+}
+
+.growl.growlerror {
+    color: #FFF;
+    background: #C0392B;
+}
+
+.growl.growlnotice {
+    color: #FFF;
+    background: #2ECC71;
+}
+
+.growl.growlwarning {
+    color: #FFF;
+    background: #F39C12;
+}
+
+.growl .growlclose {
+    cursor: pointer;
+    float: right;
+    fontsize: 14px;
+    lineheight: 18px;
+    fontweight: normal;
+    fontfamily: helvetica, verdana, sansserif;
+}
+
+.growl .growltitle {
+    fontsize: 18px;
+    lineheight: 24px;
+}
+
+.growl .growlmessage {
+    fontsize: 14px;
+    lineheight: 18px;
+}

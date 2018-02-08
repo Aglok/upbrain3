@@ -1,0 +1,78 @@
+a {
+    color: #676673;
+}
+
+a:hover {
+    color: #383840;
+}
+
+span, small {
+    color: #B8B8BF;
+}
+
+.content {
+    width: 600px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 5px;
+}
+
+nav {
+    width: auto;
+    margin: 0 auto;
+    text-align: center;
+}
+
+nav ul {
+    padding: 0;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+nav li {
+    list-style: none;
+    display: inline-block;
+    padding: 10px 5px;
+    margin: 0 20px;
+}
+
+.posts-list {
+    padding: 0;
+}
+
+.posts-list li {
+    list-style: none;
+    border-bottom: 1px dotted #B8B8BF;
+    padding-bottom: 10px;
+    margin-top: 20px;
+    margin-bottom: 60px;
+}
+
+.posts-list li > span, .post-block > span {
+    width: 100%;
+    text-align: center;
+    display: inline-block;
+    border-bottom: 1px dotted #B8B8BF;
+    height: 10px;
+}
+
+.posts-list li > span small, .post-block > span small {
+    background-color: #F2F2F2;
+    padding: 10px;
+}
+
+.posts-list h2 {
+    text-align: center;
+
+}
+
+.posts-list a {
+    text-decoration: none;
+    padding: 10px 20px;
+}

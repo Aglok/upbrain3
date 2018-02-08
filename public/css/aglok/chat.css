@@ -1,0 +1,110 @@
+progress,
+progress::-webkit-progress-bar,
+progress::-webkit-progress-value,
+progress::-moz-progress-bar {
+    background-color: #f3f3f3;
+    border: 0;
+    height: 18px;
+    border-radius: 9px;
+}
+
+span.delete {
+    position: absolute;
+    top: 2%;
+    left: 79%;
+}
+
+progress.progressbar {
+    position: absolute;
+    top: 85%;
+    right: 9%;
+    width: 90px;
+}
+
+#preview-photo > li {
+    position: relative;
+}
+
+.im_upload_wrap.fl_r {
+    position: absolute;
+    z-index: 110;
+    padding: 0px;
+    margin-top: 25px;
+    left: 2px;
+    bottom: 4px;
+}
+
+div#im_upload {
+    background: url(../../images/icons/attach_photo_2.png) center 4px no-repeat;
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+    position: relative;
+    opacity: 0.7;
+}
+
+input#images {
+    opacity: 0.01;
+    filter: alpha(opacity=1);
+    font-size: 6.54em !important;
+    right: 0px;
+    margin: 0px;
+    padding: 0px;
+    cursor: pointer;
+    position: absolute;
+}
+
+textarea#message {
+    padding: 5px 10px 5px 35px;
+    font-size: 14px;
+    height: 53px;
+}
+
+ul#preview-photo {
+    margin-top: 10px;
+}
+
+.panel-footer {
+    overflow: hidden;
+}
+
+.btn-group-sm > .btn, .btn-sm {
+    padding: 15px 10px;
+    font-size: 14px;
+}
+
+.users .list-group-item:first-child {
+    border-top-left-radius: 0;
+    border-top-width: 0;
+}
+
+.users .list-group-item:last-child {
+    border-bottom-right-radius: 0;
+}
+
+.users .list-group-item {
+    border-right-width: 0
+}
+
+.users, .users > .panel-body {
+    padding: 0;
+}
+
+.recipients {
+    display: none;
+}
+
+.checked-users {
+    background-color: #C4C4C4;
+}
+
+img.avatar {
+    width: 60px;
+}
+
+/*Для анимации загрузки*/
+#loadImg {
+    position: absolute;
+    display: none;
+    z-index: 3;
+}

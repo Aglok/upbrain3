@@ -1,0 +1,44 @@
+.for_pdf{
+    /*width: 1240px;*/
+    margin: 15px 20px 15px 20px;
+}
+.for_pdf_list{
+    /*width: 1246px;*/
+    margin: 15px 20px 15px 20px;
+}
+.for_pdf_list > table{
+    margin-top: 15px;
+    font-size: 12px;
+}
+.for_pdf_list > .table > tbody > tr > td, .for_pdf_list > .table > tfoot > tr > td{
+    padding: 2px;
+    border-left: 1px solid #ddd;
+    position: relative;
+    text-align: center;
+}
+.for_pdf_list .form-control{
+    display: inline-block;
+    width: 200px;
+}
+.table-striped>tbody>tr:nth-child(odd)>td, .table-striped>tbody>tr:nth-child(odd)>th {
+    background-color: #FFFFFF !important;
+}
+
+.SVG_Display{
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
+    font-size: 60%;
+    width: 100%;
+    position: relative;
+    z-index: 9999;
+}
+.table > tbody > tr:last-child{height: 100px}
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {
+    /* padding: 8px; */
+    /* line-height: 1.42857143; */
+    vertical-align: middle!important;
+    /*border-top: 1px solid #ddd;*/
+}

@@ -1,0 +1,13 @@
+#create_mission ul.list_tasks input, #list_artifacts ul li input{
+    display: none;
+}
+#create_mission ul.list_tasks > li.selected {
+    background-color: #C4C4C4;
+}
+#list_artifacts ul li.selected img{
+    opacity: 0.5;
+}
+#create_mission ul.list_tasks, #list_artifacts{
+    margin-top:25px;
+}
+#normalize{display: none}

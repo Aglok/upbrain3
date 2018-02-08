@@ -1,0 +1,41 @@
+.btn-group:not(:first-child) {
+    margin-right: 4px;
+}
+
+.btn-group:first-child {
+    margin-right: 0px;
+}
+
+.table input {
+    width: 50px;
+}
+
+/*.table tr td:first-child input{width: 60%;}*/
+.table input.text {
+    width: 100%;
+    height: 20px;
+}
+
+.table > tbody > tr.selected {
+    background-color: #C4C4C4;
+}
+
+.table-striped > tbody > tr.selected:nth-child(odd) > td, .table-striped > tbody > tr.selected:nth-child(odd) > th {
+    background-color: #C4C4C4;
+}
+
+.table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
+    background: none;
+}
+
+.table-striped > tbody > tr input.process {
+    display: none;
+}
+
+.process_menu_off {
+    display: none;
+}
+
+.process_margin_off {
+    margin: 0 !important;
+}
