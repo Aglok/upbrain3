@@ -1,1 +1,1 @@
-Upbrain - образовательная платформа на Laravel 5.5, Sleeping Owl 4
+Upbrain - образовательная платформа на Laravel 5.6, Sleeping Owl 4
