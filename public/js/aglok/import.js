@@ -56,7 +56,7 @@ $(function () {
 
                         return new Promise(function (resolve) {
 
-                            var progressBar = $('.progressbar');
+                            let progressBar = $('.progressbar');
 
                             $.ajax({
                                 type: 'POST',
@@ -67,7 +67,7 @@ $(function () {
 
                                 xhr: function(){
 
-                                    var xhr = $.ajaxSettings.xhr();
+                                    let xhr = $.ajaxSettings.xhr();
 
                                     xhr.upload.addEventListener('progress', function(event) {
 

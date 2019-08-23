@@ -8,6 +8,26 @@ use Cmgmyr\Messenger\Models\Thread;
 use Cmgmyr\Messenger\Models\Participant;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
+/**
+ * App\Models\Message
+ *
+ * @property int $id
+ * @property int $thread_id
+ * @property int $user_id
+ * @property string $body
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Cmgmyr\Messenger\Models\Participant[] $participants
+ * @property-read \Cmgmyr\Messenger\Models\Thread $thread
+ * @property-read \App\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Message whereBody($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Message whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Message whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Message whereThreadId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Message whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Message whereUserId($value)
+ * @mixin \Eloquent
+ */
 class Message extends Eloquent
 {
     /**

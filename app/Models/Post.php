@@ -4,6 +4,44 @@ use App\User;
 use illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Post
+ *
+ * @property int $id
+ * @property string $title
+ * @property string $text
+ * @property string|null $image
+ * @property string|null $alt
+ * @property string $text_html
+ * @property int|null $user_id
+ * @property string|null $keywords
+ * @property string|null $description
+ * @property string|null $link
+ * @property int|null $published
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property string|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Comment[] $comments
+ * @property-read mixed $cut
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Tag[] $tags
+ * @property-read \App\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post postForId()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereAlt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereKeywords($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereLink($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post wherePublished($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereTextHtml($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereUserId($value)
+ * @mixin \Eloquent
+ */
 class Post extends Model
 {
 

@@ -18,7 +18,7 @@ $(function () {
     // Отправляет ajax запросом данные формы
     let SendForm = function sendForm(form_selector) {
 
-        $(form_selector +' .btn').on('click', function (e) {
+        $(form_selector +' .btn').one('click', function (e) {
 
             e.preventDefault();
 
@@ -26,15 +26,20 @@ $(function () {
                 name = $(form_selector + ' input[name=name]').val(),
                 phone = $(form_selector + ' input[name=phone]').val(),
                 email = $(form_selector + ' input[name=email]').val();
-            if(!name){
-                infoChat(form, 'Напишите пожалуйста Ваше имя.');
-                return;
+
+            if(typeof name !== 'undefined'){
+                if(!name){
+                    infoChat(form, 'Напишите пожалуйста Ваше имя.');
+                    return;
+                }
+            }
+            if(typeof phone !== 'undefined'){
+                if(!phone){
+                    infoChat(form,'Напишите пожалуйста Ваш телефон.');
+                    return;
+                }
             }
 
-            if(!phone){
-                infoChat(form,'Напишите пожалуйста Ваш телефон.');
-                return;
-            }
             if(typeof email !== 'undefined'){
                 if(!email){
                     infoChat(form,'Напишите пожалуйста Вашу почту.');
@@ -50,7 +55,12 @@ $(function () {
                 data: data_form,
 
                 success: function () {
-                    infoChat(form,'Ваши данные успешно оправлены, ожидайте мы вам перезвоним!');
+                    if(typeof phone !== 'undefined'){
+                        infoChat(form,'Ваши данные успешно оправлены, ожидайте мы вам перезвоним!');
+                    }else{
+                        infoChat(form,'Ваши данные успешно оправлены, на Вашу почту придёт информация!');
+                    }
+
                     if ($('.modal').hasClass('show')) {
                         $(form_selector +' .btn').val('Закрыть').attr('data-dismiss', 'modal');
                     }

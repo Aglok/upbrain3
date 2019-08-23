@@ -1,13 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: artemperlov
- * Date: 23.05.16
- * Time: 0:50
- */
+
 namespace App\Services;
 
 use Config;
+use Pusher\Pusher;
 
 class PusherWrapper
 {
@@ -18,7 +14,7 @@ class PusherWrapper
         $app_id = Config::get('pusher.appId');
         $app_key = Config::get('pusher.appKey');
         $app_secret = Config::get('pusher.appSecret');
-        $this->pusher = new \Pusher($app_key, $app_secret, $app_id);
+        $this->pusher = new Pusher($app_key, $app_secret, $app_id);
     }
 
     public function __call($name, $args)

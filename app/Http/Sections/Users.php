@@ -9,6 +9,8 @@ use AdminColumn;
 use AdminDisplay;
 use AdminForm;
 use AdminFormElement;
+use AdminColumnEditable;
+use AdminDisplayFilter;
 
 /**
  * Class Users
@@ -24,7 +26,7 @@ class Users extends Section
      *
      * @var bool
      */
-    protected $checkAccess = false;
+    protected $checkAccess = true;
 
     /**
      * @var string
@@ -39,17 +41,28 @@ class Users extends Section
     /**
      * @return DisplayInterface
      */
-    public function onDisplay()
+    public function onDisplay($scopes = null)
     {
-        return AdminDisplay::table()
-            ->with('roles')
+
+        $display = AdminDisplay::table()
+            ->setApply(function($query) {$query->where('active', 1);})
+//            ->setFilters(AdminDisplayFilter::scope('active'))
+            ->with(['roles', 'user_subjects'])
             ->setHtmlAttribute('class', 'table-primary')
             ->setColumns([
                     AdminColumn::image('avatar')->setWidth('80px'),
-                    AdminColumn::link('fullname', 'Username'),
+                    AdminColumn::link('fullname', 'Имя'),
                     AdminColumn::email('email', 'Email')->setWidth('150px'),
-                    AdminColumn::lists('roles.label', 'Roles')->setWidth('200px'),
+                    AdminColumn::lists('roles.label', 'Роли')->setWidth('200px'),
+                    AdminColumn::lists('user_subjects.name', 'Предметы')->setWidth('200px'),
+                    AdminColumnEditable::checkbox('active', 'Активирован')
             ])->paginate(20);
+
+        if($scopes){
+            $display->setScopes($scopes);
+        }
+
+        return $display;
     }
 
     /**
@@ -59,20 +72,18 @@ class Users extends Section
      */
     public function onEdit($id = null)
     {
-        if(is_null($id))
-            $passwordElem = AdminFormElement::password('password', 'Password')->required();
-        else
-            $passwordElem = AdminFormElement::password('password', 'Password')->allowEmptyValue();
-
         return AdminForm::panel()->addBody([
-            AdminFormElement::text('name', 'Username')->required(),
-            $passwordElem,
-            //AdminFormElement::password('password', 'Password')->allowEmptyValue()->required()->addValidationRule('min:6'),
+            AdminFormElement::checkbox('active', 'Активировать'),
+            AdminFormElement::text('name', 'Имя')->required(),
+            AdminFormElement::text('surname', 'Фамилия')->required(),
+            AdminFormElement::password('password', 'Password')->required()->addValidationRule('min:6'),
             AdminFormElement::text('email', 'E-mail')->required()->addValidationRule('email'),
             AdminFormElement::text('description', 'О себе'),
             AdminFormElement::multiselect('roles', 'Roles', \App\Role::class)->setDisplay('name'),
+            AdminFormElement::multiselect('user_subjects', 'Предметы', \App\Models\Subject::class)->setDisplay('name'),
             AdminFormElement::image('avatar', 'Avatar'),
-            AdminColumn::image('avatar')->setWidth('150px')
+            AdminColumn::image('avatar')->setWidth('150px'),
+            AdminFormElement::select('sex', 'Пол')->setEnum(['M', 'W'])
         ]);
     }
 

@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NewsletterMail;
+use App\Models\Contact;
 use App\Models\Newsletter;
-use App\Models\Newsletter_User;
-use DB;
+use App\Models\UserNewsletter;
 use App\User;
 use Request;
 use Response;
@@ -23,18 +24,21 @@ class NewsletterController extends Controller
     {
         $columns = [
             'id' => '' ,
-            'full_name' => 'Имя' ,
+            'firstname' => 'Имя' ,
+            'lastname' => 'Фамилия' ,
             'email' => 'Почта' ,
             'group' => 'Группа' ,
+            'type_of_training' => 'Тип обучения' ,
            // 'is_sent' => 'Состояние',
         ];
 
-        $rows = DB::table('users as u')
-            //->leftJoin('newsletters_users', 'u.id', '=', 'newsletters_users.user_id')
-            ->select(['u.id','u.name','u.surname','u.email','u.group'])
-            ->orderBy('id', 'ASC')
-            ->get();
+//        $rows = DB::table('users as u')
+//            //->leftJoin('newsletters_users', 'u.id', '=', 'newsletters_users.user_id')
+//            ->select(['u.id','u.name','u.surname','u.email','u.group'])
+//            ->orderBy('id', 'ASC')
+//            ->get();
 
+        $rows = Contact::select('id' , 'firstname', 'lastname' , 'email', 'subjects', 'type_of_training')->get();
         $count = User::count();
 
         $view = view('admin.newsletters.newsletters', [
@@ -102,32 +106,14 @@ class NewsletterController extends Controller
                 $name = $recipient->name;
 
                 //Вытаскиваем Имя из строки Имя Фамилия
-                $name = explode(' ', $name);
+                //$name = explode(' ', $name);
                 
                 $email = $recipient->email;
-                $group = $recipient->group;
+                //$group = $recipient->group;
 
-                Mail::later($timeSend, 'admin.email.tasks',
-                    [
-                    'name' => $name[1],
-                    'body' => $body,
-                    ],
-                    function($message) use ($mail_from, $subject, $email, $path_files, $dir) {
-                        
-                        $message->from($mail_from, 'Артём Валерьевич');
-                        $message->to($email)->subject($subject);
+                Mail::to($email)->later($timeSend, new NewsletterMail($name, $body, $email, $mail_from, $subject, $path_files, $dir));
 
-                        if($path_files && $dir){
-                            $path_files_array = explode('|', $path_files);
-
-                            for ($i=0; $i < count($path_files_array); $i++){
-                                $message->attach($dir.'/'.$path_files_array[$i]);
-                            }
-                        }
-                    }
-                );
-
-                Newsletter_User::create([
+                UserNewsletter::create([
                     'user_id' => $user_id,
                     'newsletter_id' => $newsletter->id,
                     'is_sent' => 1,
@@ -142,7 +128,7 @@ class NewsletterController extends Controller
     public function genNameFile($n, $file){
 
         $fileName = date("dmy_His").'_'.$n;
-        
+
         return $fileName . '.' . $file->getClientOriginalExtension();
     }
 }

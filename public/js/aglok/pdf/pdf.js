@@ -39,7 +39,6 @@ $(function(){
 
         var pdfWidth = document.documentElement.clientWidth;
         var pdfHeight = pdfWidth*1.4;
-        console.log(pdfWidth);
         //Также при экспортировании ширина экрана браузера должна совпадать с шириной pdf документа
         var pdf = new jsPDF(orientation, 'pt', [pdfWidth, pdfHeight]);// pt - px; ширина 1240, высота 1754 размер a4 при 150 dpi
 
@@ -72,16 +71,16 @@ $(function(){
         var height = 0;
         var width = 0;
         //Количество страниц дробное число
-        var n = heightTable/pdfPageHeight+1;
+        var n = heightTable/pdfPageHeight;
         //сколько страниц а4 получится округление на увеличение
-        var page = Number.isInteger(n) ? n : Math.floor(n)+1;
-        console.log(page);
+            var page = Number.isInteger(n) ? n : Math.floor(n)+1;
+            console.log(page, heightTable, pdfPageHeight, n, typeof n);
         //Текущая страница
         var currentPage = 1;
 
         var createTablePartial = function(){
 
-            var table_temp = $('<table></table>');
+            var table_temp = $('<table><tbody></tbody></table>');
 
             rows.each(function(i, row){
 
@@ -98,7 +97,7 @@ $(function(){
                     height += parseInt(tdFormula.clientHeight);
                     width += parseInt(tdFormula.clientWidth);
 
-                    //Условие когда строки всмещаются в страницу a4
+                    //Условие когда строки вмещаются в страницу a4
                     if(height <= pdfPageHeight) {
 
                         row.setAttribute('class', 'look');
@@ -113,7 +112,7 @@ $(function(){
                 }
 
             });
-
+            console.log(table_temp);
             return table_temp;
         };
 
@@ -126,8 +125,8 @@ $(function(){
 
             //Отрисовываем новую таблицу и получаем список строк для текущей страницы
             var tablePartial = createTablePartial().find('tbody').html();
-
-            //Прячем все строки не вошедшие в страницу
+            console.log(tablePartial);
+            //Прячем все строки невошедшие в страницу
             table.find('tbody > tr:not(.look)').css('display', 'none');
             //Вставляем строки в таблицу вошедшие в страницу
             table.find('tbody').append(tablePartial);
@@ -152,6 +151,7 @@ $(function(){
                             console.log(currentPage);
                             //Вставляем скриншот canvas в визуальную pdf страницу ввиде изображения, если размеры не подходят, то изображение сжимается или растягивается.
                             //Поэтому необходимо точно подобрать размер изображения и размер pdf страницы
+                            console.log(widthCanvas, height, heightCanvas);
                             pdf.addImage(canvas, 'jpg', marginLeft, marginTop, widthCanvas, height);
                         }else{
                             //Размеры изображения по величине страницы

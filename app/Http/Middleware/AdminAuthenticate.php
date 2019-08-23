@@ -20,7 +20,7 @@ class AdminAuthenticate
     {
         $auth = Auth::guard($guard);
 
-        //dd($auth);
+        //dd(\Session::all());
         if (Auth::guard($guard)->guest()) {
             if ($request->ajax() || $request->wantsJson()) {
                 return response('Unauthorized.', 401);
@@ -29,8 +29,9 @@ class AdminAuthenticate
             }
         }
 
-        if (!$auth->user()->isManager() || !$auth->user()->isSuperAdmin()) {
-            return redirect()->guest('home');
+        //dd($auth->user()->isManager());
+        if (!$auth->user()->isManager() && !$auth->user()->isSuperAdmin()) {
+            return redirect()->guest('home_users');
         }
 
         return $next($request);

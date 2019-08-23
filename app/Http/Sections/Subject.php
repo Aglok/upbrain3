@@ -45,8 +45,7 @@ class Subject extends Section
             ->setHtmlAttribute('class', 'table-primary')
             ->setColumns([
                 AdminColumn::link('name', 'Название'),
-                AdminColumn::link('category.name', 'Категория'),
-                AdminColumn::link('code', 'Код'),
+                AdminColumn::link('alias', 'Код'),
             ]);
     }
 
@@ -60,10 +59,7 @@ class Subject extends Section
         return AdminForm::panel()->addBody([
 
             AdminFormElement::text('name', 'Название'),
-            AdminFormElement::select('category_id', 'Категория')
-                ->setModelForOptions(\App\Models\Category_Subject::class)
-                ->setDisplay('name')->required(),
-            AdminFormElement::text('code', 'Код')
+            AdminFormElement::text('alias', 'Код')
         ]);
     }
 

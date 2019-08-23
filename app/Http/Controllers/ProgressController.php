@@ -12,5 +12,7 @@ class ProgressController extends Controller
      */
 
     public function getTableProgress($subject)
-    {}
+    {
+
+    }
 }

@@ -4,7 +4,6 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Http\Controllers\CommentsController as Comments;
-use KodiCMS\Assets\Html;
 
 class BlogController extends Controller
 {

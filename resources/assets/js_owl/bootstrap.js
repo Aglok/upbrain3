@@ -7,6 +7,9 @@ window.Admin = new Admin(
     window.GlobalConfig || {}
 )
 
+window.axios = require('axios');
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
 window.Admin.Events = require('./components/events');
 
 require('./libs/jquery')
@@ -27,6 +30,8 @@ require('./libs/sweetalert')
 require('./libs/dependent-dropdown')
 
 require('./libs/vuejs')
+
+require('./custom/vuex')
 /**
  * Best open source admin dashboard & control panel theme.
  * Built on top of Bootstrap 3, AdminLTE provides a range of

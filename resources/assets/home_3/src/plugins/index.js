@@ -1,0 +1,7 @@
+import './axios'
+import './chartist'
+import './vuetify'
+import './silentbox'
+import './moment'
+import './swal'
+// import './mathjax'

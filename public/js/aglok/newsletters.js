@@ -26,41 +26,44 @@ $(function () {
         selector.find('.alert').removeClass('hidden').fadeOut(10000).text(text);
     }
 
-    var array = [];//вспомогательный массив для преобразования в json и отправки на сервер
-    var col = ['id', 'name', 'email', 'group', 'state'];
-    var progressBar = $('.progressbar');
+    let array = [];//вспомогательный массив для преобразования в json и отправки на сервер
+    let col = ['id', 'name', 'surname', 'email', 'group', 'state'];
+    let progressBar = $('.progressbar');
 
 
     $('button.btn-primary').on('click', function(){
 
         $('input:checkbox:checked').closest('tr').each(function(j, tr){
 
-            var users = {};//объект будет содержать информацию о пользователях для рассылки
+            let users = {};//объект будет содержать информацию о пользователях для рассылки
+            for(let i=0; i<tr.children.length; i++){
 
-            for(var i=0; i<tr.children.length; i++){
-
-                var node = tr.children[i].firstChild;//первый узел внутри <td></td>
-                var el = tr.children[i].firstElementChild;//первый элемент внутри <td></td>
+                let node = tr.children[i].firstChild;//первый узел внутри <td></td>
+                let el = tr.children[i].firstElementChild;//первый элемент внутри <td></td>
 
                 if(el){
                     users[col[i]] = el.value;
                 }
 
-                if(!node.data.trim()) continue;
+                //if(!node.value.trim()) continue;
+                console.log(node);
 
                 //Проверяем тип узла => text
-                if(node.nodeType == 3){
-                    users[col[i]] = node.data.trim();
-                }
+                if(node){
+                    if(node.nodeType == 3){
+                        users[col[i]] = node.nodeValue.trim();
+                    }
+                }else
+                    continue;
             }
             array[j] = users;//Записываем объект в массив
         });
 
-        var jsonListRecipients = JSON.stringify(array);
+        let jsonListRecipients = JSON.stringify(array);
 
         //Валидация данных формы
-        var mail_from = $('#create-mail-from').val(),//От кого
-            create_subject = $('#create-subject').val(),//Тема письма
+        let mail_from = $('#create-mail-from').val(),//От кого
+            create_subject = $('#create-subject').val();//Тема письма
             create_body = CKEDITOR.instances['create-body'].getData(); //Тело письма
 
         //Проверяем выбраны ли ученики!
@@ -90,8 +93,8 @@ $(function () {
 
 
         //Получим все данные с формы
-        var form = document.getElementById('newsletters-form');
-        var data = new FormData(form);
+        let form = document.getElementById('newsletters-form');
+        let data = new FormData(form);
         data.append('jsonListRecipients', jsonListRecipients);
         data.append('body', create_body);
 
@@ -111,14 +114,14 @@ $(function () {
             contentType: false,
             xhr: function(){
 
-                var xhr = $.ajaxSettings.xhr();
+                let xhr = $.ajaxSettings.xhr();
                 xhr.upload.addEventListener('progress',function() {
 
                     if(event.lengthComputable){
 
                         progressBar.each(function(){
 
-                            var percent = Math.ceil(event.loaded/event.total*100);
+                            let percent = Math.ceil(event.loaded/event.total*100);
                             progressBar.val(percent);
 
                         });

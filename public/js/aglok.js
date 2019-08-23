@@ -487,11 +487,11 @@ $(function () {
             console.log(PE);
 
             //Выбрать элемент с указанным id
-            var elSelect = $('label[for='+param.idNameSelect+']');
+            var elLabel = $('label[for='+param.idNameSelect+']');
 
             if ($('select').is('#' + param.idNameSelect)) {
-                elSelect.nextAll().remove();//<div class="btn-group>...</div> удаляет все элементы после указанного elSelect
-                elSelect.remove();//<select id='users'>...</select>
+                elLabel.nextAll().remove();//<div class="btn-group>...</div> удаляет все элементы после указанного elSelect
+                elLabel.remove();//<select id='users'>...</select>
             }
             var select = $('<select/>', {
                 id: param.idNameSelect,
@@ -565,7 +565,7 @@ $(function () {
             if(!input) continue;
             var attr = input.getAttribute('name');
 
-            if(attr == 'subject_id') task[attr] = input.getAttribute('data-num');
+            if(attr == 'section_id') task[attr] = input.getAttribute('data-num');
             else task[attr] = input.value;
         }
     }
@@ -630,7 +630,7 @@ $(function () {
         data.task = array;
         data.user = user;
 
-        //Добавляем строку и объекты D, C, B, A  в data и подсчитываем сумму очков и золота по grade и subject
+        //Добавляем строку и объекты D, C, B, A  в data и подсчитываем сумму очков и золота по grade и section
         buildHtml();
 
         //Проверка на выбранные списки
@@ -655,7 +655,7 @@ $(function () {
         });
     });
     //Функция считает сумму значений столбцов по experience и gold и добавляет в конец таблицы строки
-    function sumParamHtml(arr, text, bool, subject){
+    function sumParamHtml(arr, text, bool, section){
         var sumExp = 0;//сумма золота
         var sumGold = 0;//сумма опыта
         var count = arr.length;//количество решённых задач
@@ -667,28 +667,28 @@ $(function () {
             sumExp += +(arr[i].experience * (1+k));//Добавляется 10-50% к задаче в зависимости от рейтинга(1-5) и характеристик вещей
             sumGold += +arr[i].gold;//Добавляется % к задаче в зависимости от характеристик вещей
             if(bool)
-                subject.push(arr[i].subject_id);
+                section.push(arr[i].section_id);
         }
 
         if(!bool){
             //Для вывода уникального значения кода предмета из данных
             var re = /[^.](\d){0,5}$|(\d(?:\.\d){0,5})/i;
-            var subject_id = text.match(re);
-            console.log(subject_id);
+            var section_id = text.match(re);
+            console.log(section_id);
             //return;
 
             //Создаём объекты данных для передачи на сервер
             if(/D/.test(text)){
-                var grade_D = new Grade('D',sumExp, sumGold, count, subject_id[0]);
+                var grade_D = new Grade('D',sumExp, sumGold, count, section_id[0]);
                 data.D.push(grade_D);
             }else if(/C/.test(text)){
-                var grade_C = new Grade('C',sumExp, sumGold, count, subject_id[0]);
+                var grade_C = new Grade('C',sumExp, sumGold, count, section_id[0]);
                 data.C.push(grade_C);
             }else if(/B/.test(text)){
-                var grade_B = new Grade('B',sumExp, sumGold, count, subject_id[0]);
+                var grade_B = new Grade('B',sumExp, sumGold, count, section_id[0]);
                 data.B.push(grade_B);
             }else if(/A/.test(text)){
-                var grade_A = new Grade('A',sumExp, sumGold, count, subject_id[0]);
+                var grade_A = new Grade('A',sumExp, sumGold, count, section_id[0]);
                 data.A.push(grade_A);
             }
         }
@@ -703,43 +703,43 @@ $(function () {
     }
     //Функция делает html пристройку к таблице
     //для вывода суммы значений
-    //по фильтру данных(grade и subject_id)
+    //по фильтру данных(grade и section_id)
     function buildHtml(){
         var newArray = array.slice();
-        var subject = [];
+        var section = [];
         data.D = [];//массивы для хранения данных суммы опыта и монет
         data.C = [];
         data.B = [];
         data.A = [];
 
-        sumParamHtml(newArray, 'Всего', true, subject);
+        sumParamHtml(newArray, 'Всего', true, section);
 
-        var uniqueSubject = uniqueArray(subject);
+        var uniqueSection = uniqueArray(section);
 
-        for(var i=0; i<uniqueSubject.length; i++){
+        for(var i=0; i<uniqueSection.length; i++){
 
-            var arr = filterArray(newArray, 'subject_id', uniqueSubject[i]);
+            var arr = filterArray(newArray, 'section_id', uniqueSection[i]);
 
             var D = filterArray(arr,'grade','D');
             var C = filterArray(arr,'grade','C');
             var B = filterArray(arr,'grade','B');
             var A = filterArray(arr,'grade','A');
 
-            (D.length) ? sumParamHtml(D, 'D grade '+'раздел № '+uniqueSubject[i], false):false;
-            (C.length) ? sumParamHtml(C, 'C grade '+'раздел № '+uniqueSubject[i], false):false;
-            (B.length) ? sumParamHtml(B, 'B grade '+'раздел № '+uniqueSubject[i], false):false;
-            (A.length) ? sumParamHtml(A, 'A grade '+'раздел № '+uniqueSubject[i], false):false;
+            (D.length) ? sumParamHtml(D, 'D grade '+'раздел № '+uniqueSection[i], false):false;
+            (C.length) ? sumParamHtml(C, 'C grade '+'раздел № '+uniqueSection[i], false):false;
+            (B.length) ? sumParamHtml(B, 'B grade '+'раздел № '+uniqueSection[i], false):false;
+            (A.length) ? sumParamHtml(A, 'A grade '+'раздел № '+uniqueSection[i], false):false;
         }
 
     }
 
     //Вспомогательная функция создаёт объект для сохранения данных о суммарных данных
-    function Grade(grade, sumExp, sumGold, count, subject_id){
+    function Grade(grade, sumExp, sumGold, count, section_id){
         this.grade = grade;
         this.sumExp = sumExp;
         this.sumGold = sumGold;
         this.sumTask = count;
-        this.subject_id = subject_id;
+        this.section_id = section_id;
     }
 
     //Вспомогательная функция выбирает уникальные значения массива
@@ -819,9 +819,9 @@ $(function () {
 });
 
 
-// $(function() {
-//     $('#side-menu').metisMenu();
-// });
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+});
 
 //Loads the correct sidebar on window load,
 //collapses the sidebar on window resize.

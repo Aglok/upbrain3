@@ -24,6 +24,9 @@ Route::get('process/{subject}/{set_id}', ['as' => '{subject}/{set_id}','uses'=>'
 Route::post('process/{subject}/save', ['as' => 'save','uses'=>'\App\Http\Controllers\ProcessController@saveProcess']);
 /* Список задач */
 Route::get('setoftask/{subject}', ['as' => 'setoftask', 'uses' => 'App\Http\Controllers\ProcessController@getSetOfTasks']);
+Route::post('tasks_cart/{subject}', ['as' => 'tasks_cart', 'uses' => 'App\Http\Controllers\CartController@getSetOfTasks']);
+Route::post('tasks_cart/save/{subject}', ['as' => 'tasks_cart_save', 'uses' => 'App\Http\Controllers\CartController@saveSetOfTasks']);
+Route::post('tasks_cart/detach/{subject}', ['as' => 'tasks_cart_detach', 'uses' => 'App\Http\Controllers\CartController@detachSetOfTask']);
 
 /* Таблица рейтинга */
 Route::get('user_home/{subject}/{user_id}', ['as' => 'user_home', 'uses' => '\App\Http\Controllers\UserHomeController@userProfile']);
@@ -32,7 +35,7 @@ Route::get('users_table/{subject}/user_upgrade_skills', ['as' => 'user_upgrade_s
 /* Импорт */
 Route::get('import', ['as' => 'import', 'uses' => '\App\Http\Controllers\ImportController@getIndex']);
 Route::post('importExcel', ['as' => 'importExcel', 'uses' => '\App\Http\Controllers\ImportController@importExcel']);
-
+Route::get('parse_html', ['as' => 'parse_html', 'uses' => '\App\Http\Controllers\ImportController@getContent']);
 /* Экспорт */
 Route::get('setoftask/pdfviewtasks/{subject}/{set_id}', ['as' => 'pdfviewtasks', 'uses' => '\App\Http\Controllers\ExportController@pdfView']);
 Route::get('setoftask/pdfviewlist/{subject}/{set_id}', ['as' => 'pdfviewlist', 'uses' => '\App\Http\Controllers\ExportController@pdfView']);
@@ -60,4 +63,14 @@ Route::get('test/{mission_id}', ['as' => 'test', 'uses' => '\App\Http\Controller
 Route::post('ckeditor/upload', [
     'as'   => 'upload.image.s3',
     'uses' => "\App\Http\Controllers\ImageController@storeAdmin"
+]);
+
+/*Получение списка exams_result*/
+Route::post('exam_results/{id}', [
+    'as'   => 'exams_results',
+    'uses' => "\App\Http\Controllers\ExamsController@examResults"
+]);
+Route::post('exam_answer/{id}', [
+    'as'   => 'exam_answer',
+    'uses' => "\App\Http\Controllers\ExamsController@examAnswers"
 ]);

@@ -49,8 +49,8 @@ return [
                 'icon'  => '',
                 'url'   => 'admin/users_table/physics',
                 'priority' =>'2'
-            ],
-        ]
+            ]
+        ],
     ],
     [
         'title' => 'Интерфейс',
@@ -59,20 +59,31 @@ return [
         'pages' => [
             
             //2 уровень Создать задания
-            [
+/*            [
                 'title' => 'Создать задания',
                 'url'   => route('list_missions'),
                 'priority' =>'1'
-            ],
-            (new Page(\App\Models\User_Mission::class))
+            ],*/
+            (new Page(\App\Models\Mission::class))
+                ->setTitle('Создать задания')
+                ->setPriority(1)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();}),
+            (new Page(\App\Models\UserMission::class))
                 ->setTitle('Задания учеников')
-                ->setPriority(2),
-            (new Page(\App\Models\Image_Of_Character::class))
+                ->setPriority(2)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();}),
+            (new Page(\App\Models\ImageOfCharacter::class))
                 ->setTitle('Создать образ')
-                ->setPriority(3),
-            (new Page(\App\Models\User_Body::class))
+                ->setPriority(3)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();}),
+            (new Page(\App\Models\UserBody::class))
                 ->setTitle('Образы учеников')
-                ->setPriority(4),
+                ->setPriority(4)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();}),
 
             //3 уровень - Артифакты
             [
@@ -82,21 +93,27 @@ return [
                     (new Page(\App\Models\Artifact::class))
                         ->setTitle('Создать артифакт')
                         ->setPriority(1),
-                    (new Page(\App\Models\Artifact_Type::class))
+                    (new Page(\App\Models\ArtifactType::class))
                         ->setTitle('Тип артифакта')
-                        ->setPriority(2),
-                    (new Page(\App\Models\User_Artifact::class))
+                        ->setPriority(2)
+                        ->setAccessLogic(function() {
+                            return auth()->user()->isSuperAdmin();}),
+                    (new Page(\App\Models\UserArtifact::class))
                         ->setTitle('Артифакты учеников')
-                        ->setPriority(3),
+                        ->setPriority(3)
+                        ->setAccessLogic(function() {
+                            return auth()->user()->isSuperAdmin();}),
                     (new Page(\App\Models\Rarity::class))
                         ->setTitle('Редкость')
-                        ->setPriority(4),
+                        ->setPriority(4)
+                        ->setAccessLogic(function() {
+                            return auth()->user()->isSuperAdmin();}),
                 ],
             ],
-            (new Page(\App\Models\Class_Person::class))
+            (new Page(\App\Models\ClassPerson::class))
                 ->setTitle('Создать классы')
                 ->setPriority(5),
-            (new Page(\App\Models\User_Class::class))
+            (new Page(\App\Models\UserClass::class))
                 ->setTitle('Классы учеников')
                 ->setPriority(6),
 
@@ -119,16 +136,16 @@ return [
 
                     //3 уровень Математика
 
-                    (new Page(\App\Models\Category_Subject::class))
+                    (new Page(\App\Models\CategoryMath::class))
                         ->setTitle('Разделы')
                         ->setPriority(1),
-                    (new Page(\App\Models\Subject::class))
+                    (new Page(\App\Models\SectionsMath::class))
                         ->setTitle('Темы')
                         ->setPriority(2),
-                    (new Page(\App\Models\Task::class))
+                    (new Page(\App\Models\TaskMath::class))
                         ->setTitle('Задачи')
                         ->setPriority(3),
-                    (new Page(\App\Models\Set_Of_Task::class))
+                    (new Page(\App\Models\SetOfTaskMath::class))
                         ->setTitle('Набор задач')
                         ->setPriority(4),
                 ]
@@ -143,26 +160,38 @@ return [
 
                     //3 уровень Физика
 
-                    (new Page(\App\Models\Category_Subject_Physics::class))
+                    (new Page(\App\Models\CategoryPhysics::class))
                         ->setTitle('Разделы')
-                        ->setPriority(1),
-                    (new Page(\App\Models\Subject_Physics::class))
+                        ->setPriority(1)
+                        ->setAccessLogic(function() {
+                            return auth()->user()->isSuperAdmin();}),
+                    (new Page(\App\Models\SectionsPhysics::class))
                         ->setTitle('Темы')
-                        ->setPriority(2),
-                    (new Page(\App\Models\Task_Physics::class))
+                        ->setPriority(2)
+                        ->setAccessLogic(function() {
+                            return auth()->user()->isSuperAdmin();}),
+                    (new Page(\App\Models\TaskPhysics::class))
                         ->setTitle('Задачи')
-                        ->setPriority(3),
-                    (new Page(\App\Models\Set_Of_Task_Physics::class))
+                        ->setPriority(3)
+                        ->setAccessLogic(function() {
+                            return auth()->user()->isSuperAdmin();}),
+                    (new Page(\App\Models\SetOfTaskPhysics::class))
                         ->setTitle('Набор задач')
-                        ->setPriority(4),
+                        ->setPriority(4)
+                        ->setAccessLogic(function() {
+                            return auth()->user()->isSuperAdmin();}),
                 ]
             ],
             (new Page(\App\Models\Stage::class))
                 ->setTitle('Этапы')
-                ->setPriority(3),
+                ->setPriority(3)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();}),
             (new Page(\App\Models\Progress::class))
                 ->setTitle('Достижения')
-                ->setPriority(4),
+                ->setPriority(4)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();}),
             [
                 'title' => 'Импорт',
                 'icon' => '',
@@ -179,16 +208,24 @@ return [
         'pages' => [
             (new Page(\App\Models\Page::class))
                 ->setTitle('Страницы')
-                ->setPriority(0),
+                ->setPriority(0)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();}),
             (new Page(\App\Models\Menu::class))
                 ->setTitle('Меню')
-                ->setPriority(1),
+                ->setPriority(1)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();}),
             (new Page(\App\Models\Post::class))
                 ->setTitle('Посты')
-                ->setPriority(2),
+                ->setPriority(2)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();}),
             (new Page(\App\Models\Tag::class))
                 ->setTitle('Теги')
                 ->setPriority(3)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();})
         ]
     ],
     [
@@ -204,7 +241,7 @@ return [
                 'pages' => [
 
                     //3 уровень процесс математика
-                        (new Page(\App\Models\Process::class))
+                        (new Page(\App\Models\ProcessMath::class))
                             ->setTitle('Процесс')
                             ->setPriority(0),
                         [
@@ -223,7 +260,7 @@ return [
                 'pages' => [
 
                     //3 уровень процесс физика
-                    (new Page(\App\Models\Process_Physics::class))
+                    (new Page(\App\Models\ProcessPhysics::class))
                         ->setTitle('Процесс')
                         ->setPriority(0),
                     [
@@ -232,6 +269,33 @@ return [
                         'priority' =>'1',
                         'url' => 'admin/setoftask/physics'
                     ]
+                ]
+            ],
+            //2 уровень экзамены
+            [
+                'title' => 'Пробный экзамен',
+                'priority' =>'2',
+                'pages' => [
+                    (new Page(\App\Models\Exam::class))
+                        ->setTitle('Экзамены')
+                        ->setPriority(0)
+                        ->setAccessLogic(function() {
+                            return auth()->user()->isSuperAdmin();}),
+                    (new Page(\App\Models\ExamSubject::class))
+                        ->setTitle('Предметы')
+                        ->setPriority(1)
+                        ->setAccessLogic(function() {
+                            return auth()->user()->isSuperAdmin();}),
+                    (new Page(\App\Models\ExamAnswer::class))
+                        ->setTitle('Ответы')
+                        ->setPriority(2)
+                        ->setAccessLogic(function() {
+                            return auth()->user()->isSuperAdmin();}),
+                    (new Page(\App\Models\ExamResult::class))
+                        ->setTitle('Результаты')
+                        ->setPriority(3)
+                        ->setAccessLogic(function() {
+                            return auth()->user()->isSuperAdmin();}),
                 ]
             ]
         ]
@@ -242,11 +306,24 @@ return [
         'priority' =>'7',
         'pages' => [
             (new Page(\App\User::class))
-                ->setIcon('fa fa-user')
-                ->setPriority(0),
+                ->setPriority(0)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();}),
             (new Page(\App\Role::class))
-                ->setIcon('fa fa-group')
                 ->setPriority(1)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();}),
+            (new Page(\App\Models\Contact::class))
+                ->setTitle('Контакты')
+                ->setPriority(2)
+                ->setAccessLogic(function() {
+                    return auth()->user()->isSuperAdmin();}),
+            [
+                'title' => 'Рассылка писем',
+                'icon' => '',
+                'priority' =>'3',
+                'url' => 'admin/mail'
+            ]
         ]
     ]
 ];

@@ -56,16 +56,23 @@ class Pages extends Section
             'Общее' => new \SleepingOwl\Admin\Form\FormElements([
                 AdminFormElement::text('title', 'Заголовок'),
                 AdminFormElement::text('title_4U', 'Заголовок 4U'),
+                AdminFormElement::text('style', 'Дополнительный стиль блока')->setHelpText('Прописать css внутри style=""'),
+                AdminFormElement::text('style_title', 'Дополнительный стиль заголовока')->setHelpText('Прописать css внутри style=""'),
+                AdminFormElement::text('style_title_4U', 'Дополнительный стиль заголовока 4U')->setHelpText('Прописать css внутри style=""'),
                 AdminFormElement::text('keywords', 'Ключевые слова'),
                 AdminFormElement::text('description', 'Описание'),
                 AdminFormElement::text('link', 'ЧПУ - ссылка на станицу'),
-                AdminFormElement::checkbox('no_blocks', 'Убрать все блоки на страницу'),
+                AdminFormElement::text('type', 'Тип страницы')->setHelpText('Webinar, Service, trial_exam, intensive_exam: будет влиять на форму оборатной связи и шаблон рассылки. <br> ege, oge: влияет на вывод блоков отдельных страниц'),
+                AdminFormElement::checkbox('no_blocks_title', 'Убрать все заголоки'),
+                AdminFormElement::checkbox('no_blocks', 'Убрать все блоки на странице'),
+                AdminFormElement::text('class_image_header', 'css класс для шапки сайта'),
                 AdminFormElement::multiselect('menus', 'Меню', \App\Models\Menu::class)
                     ->setDisplay('title')
                     ->setSortable(false),
                 AdminFormElement::wysiwyg('text', 'Текст страницы', 'simplemde'),
             ]),
             'Блок с драконом' => new \SleepingOwl\Admin\Form\FormElements([
+                AdminFormElement::text('subject', 'Код предмета')->setHtmlAttribute('placeholder', 'math')->setHelpText('math, physics, russian, informatics, english, chemistry, history, biology, social_sciences: необходимо для отображени в блоках, где указывается наименование предмета'),
                 AdminFormElement::text('subject_title', 'Название блока')->setHtmlAttribute('placeholder', 'Курсы ЕГЭ по ...'),
                 AdminFormElement::image('subject_image', 'изображение с драконом')
                     ->setUploadPath(function($file){

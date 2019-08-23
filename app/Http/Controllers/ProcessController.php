@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\Presenters\TaskPresent;
 use App\User;
 use App\Models\Stage;
 use DB;
@@ -21,7 +22,7 @@ class ProcessController extends Controller
 //    {
 //        //Задать в роутерах переменный параметр subject
 //        //Необходимо получать параметр subject по запросу чтобы генерировать динамическое изменение моделей по указанному предмету
-//        // (Subject_Physics, Task_Physics....) создать переменную префикс Task.'_'.ucfirst($subject) и task.'_'.$subject
+//        // (Sections_Physics, Task_Physics....) создать переменную префикс Task.'_'.ucfirst($subject) и task.'_'.$subject
 //        parent::__construct($queryState);
 //    }
 
@@ -35,6 +36,7 @@ class ProcessController extends Controller
     {
 
         $_subject = Subjects::_Subject($subject);
+        $modelSetOfTask = 'App\Models\SetOfTask'.ucfirst($subject);
 
         //Набор названия столбцов для таблицы: возможно брать список из таблицы и перевод включать в lang
         $columns = [
@@ -50,12 +52,16 @@ class ProcessController extends Controller
             'comment' => 'Комментарий'
         ];
 
-        $rows = DB::table('tasks'.$_subject.' as t')
-            ->leftJoin('subjects'.$_subject, 't.subject_id', '=', 'subjects'.$_subject.'.id')
-            ->select(['t.id','t.number_task','t.task','t.original_number','t.experience','t.gold', 't.grade','subjects'.$_subject.'.name','t.subject_id'])
-            ->where('set_of_task_id', '=', $set_id)
-            ->orderBy('t.number_task', 'ASC')
-            ->get();
+//        $rows = DB::table('tasks'.$_subject.' as t')
+//            ->leftJoin('sections'.$_subject, 't.section_id', '=', 'sections'.$_subject.'.id')
+//            ->select(['t.id','t.number_task','t.task','t.original_number','t.experience','t.gold', 't.grade','sections'.$_subject.'.name','t.section_id'])
+//            ->where('set_of_task_id', '=', $set_id)
+//            ->orderBy('t.number_task', 'ASC')
+//            ->get();
+
+
+        $set_of_tasks = new TaskPresent($modelSetOfTask::find($set_id), $subject);
+        $tasks = $set_of_tasks->tasks();
 
         //$set_desc = DB::table('set_of_tasks')->select('description')->where('id', $set_id)->first();
 
@@ -66,7 +72,7 @@ class ProcessController extends Controller
         $view = view('admin.process.table', [
             'count' => $count,
             'columns' => $columns,
-            'rows' => $rows,
+            'rows' => $tasks,
             'groups' => $groups,
             'set_id' => $set_id,
             'subject' => $subject
@@ -122,7 +128,7 @@ class ProcessController extends Controller
                             if (!$arr[0])
                                 return $response->json(['Нашлись задачи которые уже есть в БД ученика id=' . $user, $arr[1]]);
 
-                            DB::table('processes' . $_subject)->insert([
+                            DB::table('processes'.$_subject)->insert([
                                 'user_id' => $user,
                                 'stage_id' => $stage,
                                 'number_task' => $number_task,
@@ -144,11 +150,11 @@ class ProcessController extends Controller
                             $sumExp = $value[$i]->sumExp;
                             $sumGold = $value[$i]->sumGold;
                             $sumTask = $value[$i]->sumTask;
-                            $subject_id = $value[$i]->subject_id;
+                            $section_id = $value[$i]->section_id;
 
 
                             DB::table('grade'.$_subject)->insert([
-                                'subject_id' => $subject_id,
+                                'section_id' => $section_id,
                                 'user_id' => $user,
                                 'grade_char' => $grade_char,
                                 'sum_tasks' => $sumTask,
@@ -275,9 +281,10 @@ class ProcessController extends Controller
         $count = DB::table('set_of_tasks'.$_subject)->count();
 
         $rows = DB::table('tasks'.$_subject.' as t')
-            ->leftJoin('set_of_tasks'.$_subject, 't.set_of_task_id', '=', 'set_of_tasks'.$_subject.'.id')
-            ->select(DB::raw('count(*) as tasks_count, set_of_tasks'.$_subject.'.name, t.set_of_task_id as set_id, sum(t.experience) as sum_exp, sum(t.gold) as sum_gold'))
-            ->groupBy('set_of_task_id')
+            ->leftJoin('set_of_task'.$_subject.' as stt', 't.id', '=', 'stt.task_id')
+            ->leftJoin('set_of_tasks'.$_subject, 'stt.set_of_task_id', '=', 'set_of_tasks'.$_subject.'.id')
+            ->select(DB::raw('count(*) as tasks_count, set_of_tasks'.$_subject.'.name, stt.set_of_task_id as set_id, sum(t.experience) as sum_exp, sum(t.gold) as sum_gold'))
+            ->groupBy('stt.set_of_task_id')
             ->orderBy('set_of_tasks'.$_subject.'.id', 'ASC')
             ->get();
 

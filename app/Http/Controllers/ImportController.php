@@ -5,6 +5,8 @@ use Excel;
 use DB;
 use Hash;
 use AdminSection;
+use App\Helpers\ParserSh;
+use Symfony\Component\DomCrawler\Crawler;
 
 class ImportController extends Controller
 {
@@ -15,8 +17,7 @@ class ImportController extends Controller
     public function getIndex()
     {
         $view = view('admin.import.import', [1]);
-        $view = AdminSection::view($view->renderSections()["innerContent"], '');
-        return $view;
+        return AdminSection::view($view->renderSections()["innerContent"], '');
     }
 
     /**
@@ -44,11 +45,11 @@ class ImportController extends Controller
 
                 switch ($table_name) {
 
-                    case 'subjects':
+                    case 'sections_math':
 
                         $data->each(function ($sheet) {
 
-                            if ($sheet->getTitle() == 'subjects') {
+                            if ($sheet->getTitle() == 'sections_math') {
 
                                 foreach ($sheet as $key => $value) {
                                     $insert[] = [
@@ -59,11 +60,11 @@ class ImportController extends Controller
                                 }
 
                                 if (!empty($insert)) {
-                                    DB::table('subjects')->insert($insert);
+                                    DB::table('sections_math')->insert($insert);
                                 }
                             }
 
-                            if ($sheet->getTitle() == 'categories_subjects') {
+                            if ($sheet->getTitle() == 'categories_math') {
 
                                 foreach ($sheet as $key => $value) {
                                     $insert[] = [
@@ -74,17 +75,17 @@ class ImportController extends Controller
                                 }
 
                                 if (!empty($insert)) {
-                                    DB::table('categories_subjects')->insert($insert);
+                                    DB::table('categories_math')->insert($insert);
                                 }
                             }
                         });
                         break;
 
-                    case 'subjects_physics':
+                    case 'sections_physics':
 
                         $data->each(function ($sheet) {
 
-                            if ($sheet->getTitle() == 'subjects_physics') {
+                            if ($sheet->getTitle() == 'sections_physics') {
 
                                 foreach ($sheet as $key => $value) {
                                     $insert[] = [
@@ -96,11 +97,11 @@ class ImportController extends Controller
 
                                 //dd($insert);
                                 if (!empty($insert)) {
-                                    DB::table('subjects_physics')->insert($insert);
+                                    DB::table('sections_physics')->insert($insert);
                                 }
                             }
 
-                            if ($sheet->getTitle() == 'categories_subjects_physics') {
+                            if ($sheet->getTitle() == 'categories_physics') {
 
                                 foreach ($sheet as $key => $value) {
                                     $insert[] = [
@@ -111,16 +112,16 @@ class ImportController extends Controller
                                 }
 
                                 if (!empty($insert)) {
-                                    DB::table('categories_subjects_physics')->insert($insert);
+                                    DB::table('categories_physics')->insert($insert);
                                 }
                             }
                         });
                         break;
 
-                    case 'tasks':
+                    case 'tasks_math':
                         
                         //выбираем последнюю в таблице по номеру задачу
-                        $last_task = DB::table('tasks')->latest('number_task')->first();
+                        $last_task = DB::table('tasks_math')->latest('number_task')->first();
 
                         foreach ($data as $key => $value) {
 
@@ -141,17 +142,17 @@ class ImportController extends Controller
                                 'experience' => $value->experience,
                                 'gold' => $value->gold,
                                 'grade' => $value->grade,
-                                'subject_id' => $value->subject_id,
+                                'section_id' => $value->section_id,
                                 'answer' => $value->answer,
                                 'detail' => $value->detail,
-                                'set_of_task_id' => $value->set_of_task_id,
+                                //'set_of_task_id' => $value->set_of_task_id,
                                 'original_number' => $value->original_number,
                                 'book' => $value->book
                             ];
                         }
 
                         if (!empty($insert)) {
-                            DB::table('tasks')->insert($insert);
+                            DB::table('tasks_math')->insert($insert);
                         }
 
                         break;
@@ -182,7 +183,7 @@ class ImportController extends Controller
                                 'experience' => $value->experience,
                                 'gold' => $value->gold,
                                 'grade' => $value->grade,
-                                'subject_id' => $value->subject_id,
+                                'section_id' => $value->section_id,
                                 'answer' => $value->answer,
                                 'detail' => $value->detail,
                                 'set_of_task_id' => $value->set_of_task_id,
@@ -227,9 +228,9 @@ class ImportController extends Controller
 
                         break;
 
-                    case 'processes':
+                    case 'processes_math':
 
-                        $last_process_time = DB::table('processes')->latest('id')->value('created_at');
+                        $last_process_time = DB::table('processes_math')->latest('id')->value('created_at');
 
                         foreach ($data as $key => $value) {
 
@@ -258,7 +259,7 @@ class ImportController extends Controller
                                 $progress = explode('-', $progresses);
                                 $progress_alias = $progress[0];
                                 $progress_experience = $progress[1];
-                                $progress_id = DB::table('progress')->where('alias', $progress_alias)->value('id');
+                                $progress_id = DB::table('progresses_math')->where('alias', $progress_alias)->value('id');
 
                                 $insert_progress[] = [
                                     'progress_id' => $progress_id,
@@ -269,7 +270,7 @@ class ImportController extends Controller
                         }
 
                         if (!empty($insert)) {
-                            DB::table('processes')->insert($insert);
+                            DB::table('processes_math')->insert($insert);
                         }
 
                         if (!empty($insert_progress)) {
@@ -312,5 +313,39 @@ class ImportController extends Controller
             }
         }
         return 'Успешно! Данные импортированы.';
+    }
+
+    /**
+     * Get content from html.
+     *
+     * @param $parser object parser settings
+     * @param $link string link to html page
+     *
+     * @return array with parsing data
+     * @throws \Exception
+     */
+
+    public function getContent(ParserSh $parser)
+    {
+        // Get html remote text.
+        $html = file_get_contents($parser->link);
+        // Create new instance for parser.
+        $crawler = new Crawler(null, $parser->link);
+        $crawler->addHtmlContent($html, 'UTF-8');
+        // Get title text.
+        $content = [];
+
+        $childNodesTasks = $crawler
+            ->filter('body > section div.container > div.catalog-menu__scroller > div.row #tasks > div');
+
+        $childNodesTask = $childNodesTasks->filter('div > div.row > div > a');
+        foreach ($childNodesTask as $childNodesTitle){
+            foreach($childNodesTitle->childNodes as $childNode){
+                    if($childValue = trim($childNode->nodeValue)){
+                        $content[] = str_replace(["\t","\r","\n", "\""],'',$childValue);
+                    }
+                }
+            }
+        return $content;
     }
 }

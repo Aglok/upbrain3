@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\FormRegistrationMail;
 use Illuminate\Http\Request;
 use App\Models\Contact;
 use App\Models\User_Vk;
+use App\Mail\MeetMail;
+use App\Mail\TrialExamMail;
+use App\Mail\CoursesMail;
 
 class ContactController extends Controller
 {
@@ -57,15 +61,17 @@ class ContactController extends Controller
             $name = $request->get('name');
             $phone = $request->get('phone');
             $email = $request->get('email');
-            $friend = $request->get('friend');
+            $special_offer = $request->get('special_offer');
+            $type = $request->get('type');
+            $subject = $request->get('subject');
 
             if(!$email) $email = 'email@upbrain.ru';
-            if($friend)
-                $friend = 'С другом';
+            if($special_offer)
+                $special_offer = 'Хочет получить специальное предложение от 2х предметов';
             else
-                $friend = 'Без друга';
+                $special_offer = '';
 
-            $body = 'Имя: ' . $name . ' Почта: ' . $email . ' Телефон: ' . $phone  . ' Привести друга: ' . $friend;
+            $body =  ($type ? $type.': ' :''). ($subject ? $subject.': ' :'').'Имя: ' . $name . ' Почта: ' . $email . ' Телефон: ' . $phone  . ' Дополнительно: ' . $special_offer;
 
             $mail_to = 'email@upbrain.ru';
 
@@ -74,12 +80,89 @@ class ContactController extends Controller
                 $message->to($mail_to)->subject('Письмо для upbrain.ru');
             });
 
+            if(!isset($type)) $type  = '';
+
+            if($type == 'Webinar')
+                \Mail::to($email)->send(new MeetMail($email));
+            elseif($type == 'ege' || $type == 'oge')
+                \Mail::to($email)->send(new CoursesMail($email, $type, $subject));
+            elseif($type == 'trial_exam' || $type == 'intensive_exam')
+                \Mail::to($email)->send(new TrialExamMail($email));
+            else
+                \Mail::to($email)->send(new CoursesMail($email, $type, $subject));
+
            Contact::create(
                 [
-                    'name' => $name,
+                    'firstname' => $name,
                     'phone'   => $phone,
                     'email'      => $email,
-                    'friend'    => $friend
+                    'special_offer'    => $special_offer,
+                    'type' => $type
+                ]
+            );
+            return response()->json($request->all());
+        }
+    }
+
+    public function getForm(){
+        return view('form_registration');
+    }
+
+    public function saveForm(Request $request){
+        if($request->ajax()) {
+            $name = $request->get('name');
+            $surname = $request->get('surname');
+            $patronymic = $request->get('patronymic');
+            $phone = $request->get('phone');
+            $email = $request->get('email');
+            $subjects = $request->get('subjects');
+            $type_of_training = $request->get('type_of_training');
+            $hei = $request->get('hei');
+            $points = $request->get('points');
+            $place = $request->get('place');
+            $additionally = $request->get('additionally');
+
+            $subjects = implode(',', $subjects);
+            $type_of_training = implode(',', $type_of_training);
+
+            if(!$email) $email = 'email@upbrain.ru';
+
+            $body =
+                ' Имя: ' . $name .'; ' .
+                ' Фамилия: ' . $surname .'; ' .
+                ($surname ? ' Фамилия: ' . $surname.'; ':'') .
+                ($patronymic ? ' Отчество: ' . $patronymic.'; ':'') .
+                ' Почта: ' . $email.'; ' .
+                ' Телефон: ' . $phone.'; ' .
+                ($subjects ? ' Предметы: ' . $subjects.'; ':'') .
+                ($type_of_training ? ' Тип обучения: ' . $type_of_training.'; ':'') .
+                ($hei ? ' ВУЗ: ' . $hei .'; ':'') .
+                ($points ? ' Баллы: ' . $points.'; ':'') .
+                ($place ? ' Место: ' . $place.'; ':'') .
+                ($additionally ? ' Дополнительно: ' . $additionally.'; ':'');
+
+            $mail_to = 'email@upbrain.ru';
+
+            \Mail::raw($body, function ($message) use ($mail_to, $email, $name, $body) {
+                $message->from($email, $name);
+                $message->to($mail_to)->subject('Письмо для upbrain.ru');
+            });
+
+            \Mail::to($email)->send(new FormRegistrationMail($email));
+
+            Contact::create(
+                [
+                    'firstname' => $name,
+                    'lastname' => $surname,
+                    'patronymic' => $patronymic,
+                    'phone'   => $phone,
+                    'email'      => $email,
+                    'subjects'      => $subjects,
+                    'type_of_training'      => $type_of_training,
+                    'hei'      => $hei,
+                    'points'      => $points,
+                    'place'      => $place,
+                    'additionally'      => $additionally,
                 ]
             );
             return response()->json($request->all());

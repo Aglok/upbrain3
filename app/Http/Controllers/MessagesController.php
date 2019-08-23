@@ -14,6 +14,7 @@ use App\User;
 use Request;
 use Response;
 use App\Helpers\Common as Common;
+use Illuminate\Support\Facades\Storage;
 
 class MessagesController extends Controller
 {

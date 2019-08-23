@@ -4,6 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Tag
+ *
+ * @property int $id
+ * @property string|null $name
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Post[] $posts
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Tag whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Tag whereName($value)
+ * @mixin \Eloquent
+ */
 class Tag extends Model
 {
     public $timestamps = false;

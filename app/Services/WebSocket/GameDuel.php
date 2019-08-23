@@ -6,7 +6,7 @@
  *  4. При каждом ходе происходит запись в БД и также сверка данный об игре, на движение в следующий шаг
  */
 namespace App\Services\WebSocket;
-use App\Models\Task;
+use App\Models\TaskMath;
 use Ratchet\ConnectionInterface;
 use App\Models\Game_Duel;
 class GameDuel extends RatchetInterface
@@ -61,7 +61,7 @@ class GameDuel extends RatchetInterface
                         $this->found_players = $this->choosePlayersForGameDuel($this->players, 2);
 
                         //dd($this->players);
-                        $tasks = Task::select('id', 'number_task', 'grade', 'task', 'answer', 'detail')->where('grade', 'D')->get();
+                        $tasks = TaskMath::select('id', 'number_task', 'grade', 'task', 'answer', 'detail')->where('grade', 'D')->get();
                         $task = array_rand($tasks);
                         if(!empty($this->found_players[0]) && !empty($this->found_players[1])){
                             $this->users[$from->resourceId]->send('От кого:'. $this->found_players[0]->id.'. Кому - первому в списке: '. $this->found_players[1]->id.'. По времени '. date('m:s', $msg->date));

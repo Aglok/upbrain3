@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Grade
+ *
+ * @mixin \Eloquent
+ */
 class Grade extends Model
 {
     protected $table = 'grade';

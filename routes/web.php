@@ -42,7 +42,7 @@ Route::get('subject/{id}', [
 Route::group(['prefix' => 'blog'], function(){
     Route::get('/', ['as' => 'posts_list', 'uses' => 'BlogController@showBlogList']);
     Route::get('list', ['as' => 'json_blog_list', 'uses' => 'BlogController@jsonBlogList']);
-    Route::get('{id}', ['as' => 'post', 'uses' => 'BlogController@showPost'])->where('id', '[0-9]+');// регулярное выражение для параметра проверки link
+    Route::get('{id}/{link?}', ['as' => 'post', 'uses' => 'BlogController@showPost'])->where('id', '[0-9]+');// регулярное выражение для параметра проверки link
     Route::get('tag/{name}/{id}', ['as' => 'tag', 'uses' => 'BlogController@showPostsForTag']);
     Route::get('author/{name}/{id}', ['as' => 'author', 'uses' => 'BlogController@showPostsOfAuthor']);
     Route::post('/{post_id}', ['as' => 'save_comments', 'uses' => 'CommentsController@saveComment'])->where('post_id', '[0-9]+');
@@ -51,9 +51,16 @@ Route::group(['prefix' => 'blog'], function(){
 
 //Регистрация
 Route::group(['middleware' => 'auth'], function(){
+    Route::get('home_users', function(){
+        return view('test');
+    });
+
+    Route::get('test', function(){
+        return view('test1');
+    });
+
     Route::group(['middleware' => 'admin'], function(){
         //тут роуты только для админа + авторизация
-        Route::get('/add', 'BlogController@addPost');
     });
 });
 
@@ -72,12 +79,21 @@ Route::group(['prefix' => 'messages', 'before' => 'auth'], function () {
     Route::post('{id}', ['as' => 'messages.update', 'uses' => 'MessagesController@update']);
 });
 
-Route::get('home', ['as' => 'home', 'uses' => 'HomeController@index']);
+//New education game
+Route::post('profile/exam/{id?}', ['as' => 'exam', 'uses' => 'ExamsController@examUserInfo']);
+Route::post('profile/interface/{subject}', ['as' => 'interface', 'uses' => 'UserHomeController@userProfileBuild']);
+Route::post('profile/table_tasks/{subject}/{mission_id}', ['as' => 'mission_id', 'uses' => 'UserMissionController@getTasks']);
+Route::post('profile/all', ['as' => 'complete_profile', 'uses' => 'UserHomeController@userProfileBuildAllSubjects']);
+Route::post('profile/item', ['as' => 'equip', 'uses' => 'UserHomeController@userEquipArtifact']);
+
 Route::get('home/users_rating/{subject}', ['as' => 'users_rating', 'uses' => 'UserHomeController@userTableRating']);
 Route::get('home/user_solved_tasks', ['as' => 'user_solved_tasks', 'uses' => 'UserHomeController@userShowTasksSolved']);
 Route::get('home/user_home/{subject}/{user_id}', ['as' => 'rating_math/{user_id}','uses'=>'\App\Http\Controllers\UserHomeController@userProfileRating']);
 Route::get('home/game_duel', ['as' => 'game_duel', 'uses' => 'GameDuelController@index']);
 
-Route::get('test', function(){
-    return view('test');
-});
+//Form регистрация школьников и родителей
+Route::get('form', ['as' => 'form', 'uses' => 'ContactController@getForm']);
+Route::post('from_registration', ['as' => 'from_registration', 'uses' => 'ContactController@saveForm']);
+
+
+Route::get('json_tasks', ['as' => 'json_t', 'uses' => 'ExportController@getJsonTasks']);
