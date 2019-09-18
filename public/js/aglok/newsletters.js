@@ -31,7 +31,7 @@ $(function () {
     let progressBar = $('.progressbar');
 
 
-    $('button.btn-primary').on('click', function(){
+    $('#button-send-newsletters').on('click', function(){
 
         $('input:checkbox:checked').closest('tr').each(function(j, tr){
 

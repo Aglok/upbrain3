@@ -32,30 +32,16 @@
                     <td>{{ $tasks->sum_gold }}</td>
 
                     <?php
-                        $images_chars = UserI::getImageCharacter($tasks->user_id);
-                        $artifacts = UserI::getArtifactPerson($tasks->user_id);
+                        $images_char = UserI::getActiveImageCharacter($tasks->user_id);
+                        $artifacts = UserI::getArtifactsPerson($tasks->user_id);
                         $user_classes = UserI::getUserClass($tasks->user_id);
-                        $user_progresses = UserI::getUserProgress($tasks->user_id);
+                        $user_progresses = UserI::getUserProgress($tasks->user_id, $subject);
                     ?>
                     {{--Отображение образов учеников--}}
-                    @if(!$images_chars[0])
-                            <td>
-                                <img src="{!! asset('images/items/person/default/'.$images_chars[1].'.gif') !!}"
-                                     title="Силуэт" width="40" height="68">
-                            </td>
-                    @else
-                        @foreach ($images_chars[0] as $image_char)
-                            <td>
-                                @if($images_chars[1] == 'man')
-                                    <img src="{!! asset($image_char->small_image_m) !!}"
-                                        title="Рождение" width="40" height="68">
-                                @else
-                                    <img src="{!! asset($image_char->small_image_w) !!}"
-                                         title="Рождение" width="40" height="68">
-                                @endif
-                            </td>
-                        @endforeach
-                    @endif
+                        <td>
+                            <img src="{!! asset($images_char->image) !!}" title="Рождение" width="40" height="68">
+                        </td>
+
                     <td>{!! UserI::convertExpInLvl($tasks->sum_exp)!!}</td>
                     {{--Отображение трофеев учеников--}}
                     <td>
@@ -74,19 +60,14 @@
                         @endforeach
                     </td>
                     <td>
-                        @foreach($user_classes as $user_class)
-                            @if($tasks->sex == 'M')
-                                <img src="{!! asset($user_class->icon_man) !!}"
-                                     alt="{{$user_class->name}}"
-                                     title="{{$user_class->description}}"
-                                     data-toggle="tooltip" data-placement="top">
-                            @else
-                                <img src="{!! asset($user_class->icon_woman) !!}"
-                                     alt="{{$user_class->name}}"
-                                     title="{{$user_class->description}}"
-                                     data-toggle="tooltip" data-placement="top">
-                            @endif
-                        @endforeach
+                        @if(gettype($user_classes) != 'string')
+                            <img src="{!! asset($user_classes->image) !!}"
+                             alt="{{$user_classes->name}}"
+                             title="{{$user_classes->description}}"
+                             data-toggle="tooltip" data-placement="top">
+                        @else
+                            {{$user_classes}}
+                        @endif
                     </td>
                 </tr>
             @endforeach

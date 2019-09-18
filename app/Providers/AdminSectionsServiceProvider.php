@@ -29,6 +29,7 @@ class AdminSectionsServiceProvider extends ServiceProvider
         \App\Models\ExamAnswer::class => 'App\Http\Sections\ExamAnswers',
         \App\Models\ExamResult::class => 'App\Http\Sections\ExamResults',
         \App\Models\ExamSubject::class => 'App\Http\Sections\ExamSubjects',
+        \App\Models\Feature::class => 'App\Http\Sections\Features',
         \App\Models\GameDuel::class => 'App\Http\Sections\GameDuels',
         \App\Models\GradePhysics::class => 'App\Http\Sections\GradePhysics',
         \App\Models\GradeMath::class => 'App\Http\Sections\GradeMaths',
@@ -62,6 +63,7 @@ class AdminSectionsServiceProvider extends ServiceProvider
         \App\Models\UserNewsletter::class => 'App\Http\Sections\UserNewsletter',
         \App\Models\UserProgress::class => 'App\Http\Sections\UserProgresses',
         \App\Models\UserTrophy::class => 'App\Http\Sections\UserTrophies',
+        \App\Models\UserProperty::class => 'App\Http\Sections\UserProperties',
     ];
 
     /**

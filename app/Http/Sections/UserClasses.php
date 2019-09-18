@@ -48,10 +48,7 @@ class UserClasses extends Section
             ->setColumns([
                 AdminColumn::custom('', function(\App\Models\UserClass $user_class) {
 
-                    if($user_class->user->sex == 'M')
-                        $image = $user_class->class_person->icon_man;
-                    else
-                        $image = $user_class->class_person->icon_woman;
+                    $image = $user_class->class_person->image;
 
                     return '<a href="/'.$image.'" data-toggle="lightbox">
                     <img src="/'.$image.'" width="" class="thumbnail">
@@ -64,7 +61,6 @@ class UserClasses extends Section
 
     /**
      * @param int $id
-     *
      * @return FormInterface
      */
     public function onEdit($id)
@@ -73,9 +69,15 @@ class UserClasses extends Section
             AdminFormElement::select('user_id', 'Ученик')
                 ->setModelForOptions(\App\User::class)
                 ->setDisplay('full_name')->required(),
-            AdminFormElement::select('class_person_id', 'Класс героя')
+            AdminFormElement::dependentselect('class_person_id', 'Класс героя')
                 ->setModelForOptions(\App\Models\ClassPerson::class)
-                ->setDisplay('name')->required()
+                ->setDisplay('name')
+                ->setDataDepends(['user_id'])
+                ->setLoadOptionsQueryPreparer(function ($element, $query) {
+                    $user = \App\User::find($element->getDependValue('user_id'))->first();
+                    return $query->where('sex', $user->sex);
+                })
+                ->required()
         ]);
     }
 

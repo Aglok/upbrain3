@@ -1,6 +1,6 @@
 $(function(){
     $('#user_upgrade_skills').on('click', function(){
-        //console.log(location.href);
+        console.log(location.href);
         $.ajax({
             type: 'GET',
             url: location.href+'/user_upgrade_skills',

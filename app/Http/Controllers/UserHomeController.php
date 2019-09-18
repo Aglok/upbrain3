@@ -2,13 +2,11 @@
 
 use App\Helpers\UserInterface as UserI;
 use App\Models\Artifact;
-use App\Models\GradePhysics;
-use App\Models\Mission;
 use App\Models\Progress;
 use App\Models\UserProgress;
 use App\User;
+use Auth;
 use DB;
-use App\Models\GradeMath;
 use Illuminate\Http\Request;
 use App\Helpers\JoinSubjects as Subjects;;
 use AdminSection;
@@ -26,10 +24,10 @@ class UserHomeController extends Controller
       */
      public $surname;
     /**
-     * @var string
-     * Название предмета
+     * @var integer
+     * id ученика
      */
-     //public $subject = '';
+     public $user_id;
      /**
       * @var integer
       * Общее количество опыта
@@ -79,31 +77,14 @@ class UserHomeController extends Controller
               'sum_gold' => 'Сумма монет',
           ];
 
-         //if($subject == 'math') {
-
-             $rows = DB::table('grade'.$_subject.' as gr')
+         //TODO:: перейти с DB::table, на ORM запросы
+         //TODO:: создать динамически модель взависимости о subject и получить связи
+         $rows = DB::table('grade'.$_subject.' as gr')
                  ->leftJoin('users', 'gr.user_id', '=', 'users.id')
                  ->select(DB::raw('count(*) as count, gr.user_id as user_id, users.name as name, users.surname as surname, sum(gr.sum_exp) as sum_exp, sum(gr.sum_gold) as sum_gold, sex'))
                  ->groupBy('user_id')
                  ->orderBy('sum_exp', 'DESC')
                  ->get();
-
-         //}
-//         elseif($subject == 'physics'){
-//
-//             $rows = DB::table('grade_physics as gr')
-//                 ->leftJoin('users', 'gr.user_id', '=', 'users.id')
-//                 ->select(DB::raw('count(*) as count, gr.user_id as user_id, users.name as name, users.surname as surname, sum(gr.sum_exp) as sum_exp, sum(gr.sum_gold) as sum_gold, sex'))
-//                 ->groupBy('user_id')
-//                 ->orderBy('sum_exp', 'DESC')
-//                 ->get();
-//         }
-
-//         $rows = DB::select('select users.id as user_id, users.name as name, users.surname as surname, grm.sum_exp as sum_exp, grm.sum_gold as sum_gold, grp.sum_exp_phys, grp.sum_gold_phys, sex from users
-//                            left join (select gr.user_id, sum(gr.sum_exp) as sum_exp, sum(gr.sum_gold) as sum_gold from `grade` as gr group by gr.user_id) grm on grm.user_id = users.id
-//                            left join (select gr_p.user_id, sum(gr_p.sum_exp) as sum_exp_phys, sum(gr_p.sum_gold) as sum_gold_phys from `grade_physics` as gr_p group by gr_p.user_id) grp on grp.user_id = users.id
-//                            where sum_exp <> 0 or sum_exp_phys <> 0 and users.group <> 0 or users.group_physics <> 0
-//                            order by sum_exp desc');
 
          $view = view($this->template_user_table, [
                'columns' => $columns,
@@ -121,13 +102,19 @@ class UserHomeController extends Controller
 
      /**
       * @var string - принимает название предмета
-      * @var integer - id пользователя
+      * @var integer|null - id пользователя
       * Строим массив объектов из по параметрам предмета и id юзера
       * @return \View
       * */
       public function userProfile($subject, $user_id = null){
 
           $data = $this->userProfileBuild($subject, $user_id);
+
+          $data['user_class'] = UserI::getUserClass($user_id);
+          $data['bodies'] = UserI::getActiveImageCharacter($user_id);
+          $data['user_id'] = $user_id;
+          $data['artifacts'] = UserI::getArtifactsPerson($user_id);
+
           $view = view($this->template_profile, $data);
 
           if($this->isAdmin){
@@ -145,7 +132,7 @@ class UserHomeController extends Controller
        * */
       public function userProfileBuildAllSubjects($user_id=null){
 
-          if(!$user_id) $user_id = \Auth::id();
+          if(!$user_id) $user_id = Auth::id();
           $user_subjects = [];//массива предметов содержащий все характеристики ученика
 
           foreach (Subjects::listSubject() as $s){
@@ -159,13 +146,12 @@ class UserHomeController extends Controller
               $user_subjects['subjects'][$s] = $user_subject;
           }
 
-          $user_class = UserI::getUserClass($user_id);
-
-          $user_subjects['body'] = UserI::getImageCharacter($user_id);
-          $user_subjects['artifacts'] = UserI::getArtifactPerson($user_id);
-          $user_subjects['slots'] = UserI::getSlotsPerson();
           $user_subjects['user_id'] = $user_id;
-          $user_subjects['user_class'] = count($user_class) ? $user_class[0]: "Класс героя не выбран";
+          $user_subjects['bodies'] = UserI::getImageCharacter($user_id);
+          $user_subjects['items'] = UserI::getItemsPerson($user_id, 0);
+          $user_subjects['slots'] = UserI::getSlotsPerson($user_id);
+          $user_subjects['user_class'] = UserI::getUserClass($user_id);
+          $user_subjects['user_property'] = UserI::getUserProperty($user_id);
 
           return response()->json(collect($user_subjects));
       }
@@ -175,54 +161,40 @@ class UserHomeController extends Controller
          * Строим массив объектов из по параметрам предмета и id юзера
          * @return array
       **/
-      //TODO:: перейти с DB::table, на ORM запросы
-      //TODO:: создать динамически модель взависимости о subject и получить связи
+
       public function userProfileBuild($subject, $user_id = null)
       {
           //Для личного кабинета post запрос, не требует передачи параметра $user_id
-          if(!$user_id) $user_id = \Auth::id();
+          if(!$user_id) $user_id = Auth::id();
 
+          $user = User::find($user_id);
           $_subject = Subjects::_Subject($subject);
+          $grade_func = 'grade'.$_subject;
+          $stages_func = 'stages'.$_subject;
 
-          $skills = DB::table('grade'.$_subject.' as gr')
-              ->leftJoin('users', 'gr.user_id', '=', 'users.id')
-              ->select(DB::raw('sum(gr.sum_exp) as sum_exp, sum(gr.sum_gold) as sum_gold, sum(gr.sum_tasks) as sum_tasks, gr.grade_char, users.name as name, users.surname as surname, users.sex as sex'))
-              ->where('user_id', '=', $user_id)
+          $grades = $user->$grade_func()
+              ->select(DB::raw('sum(sum_exp) as sum_exp, sum(sum_gold) as sum_gold, sum(sum_tasks) as sum_tasks, grade_char'))
               ->groupBy('grade_char')
               ->orderBy('grade_char', 'DESC')
               ->get();
 
           //Расчёт общей суммы опыта и монет
-          $sum_exp = 0;
-          $sum_gold = 0;
-          $name = '';
-          $surname = '';
+          $sum_exp = $grades->sum('sum_exp');
+          $sum_gold = $grades->sum('sum_gold');
+          $sum_tasks = $grades->sum('sum_tasks');
+          $name = $user->name;
+          $surname = $user->surname;
+          $sex = $user->sex;
 
-          if(!count($skills))
-            $sex = User::find($user_id)->value('sex');
+          $sum_res = compact('sum_exp', 'sum_gold', 'sum_tasks', 'name', 'surname', 'sex');
 
-          foreach ($skills as $skill) {
 
-               $sum_exp += $skill->sum_exp;
-               $sum_gold += $skill->sum_gold;
-               $name = $skill->name;
-               $surname = $skill->surname;
-               $sex = $skill->sex;
-          }
-          $sum_res = compact('sum_exp', 'sum_gold', 'name', 'surname', 'sex');
-
-          //Записываем в доступные свойства класса
-          $this->sum_exp = $sum_exp;
-          $this->sum_gold = $sum_gold;
-
-          $this->lvl = UserI::convertExpInLvl($sum_exp);//записывает свойство $lvl
-
-          $stages = DB::table('processes'.$_subject.' as pr')
-              ->leftJoin('stages', 'pr.stage_id', '=', 'stages.id')
-              ->select(DB::raw('count(*) as count, sum(pr.experience) as sum_exp, sum(pr.gold) as sum_gold, stages.alias as alias, stages.description as description, stages.id as stage_id'))
-              ->where('user_id', '=', $user_id)
+          //Отношение ко многим Stage через модель Process
+          $stages = $user->$stages_func()
+              ->select(DB::raw('count(*) as count, sum(experience) as sum_exp, sum(gold) as sum_gold, stage_id, alias, description'))
               ->groupBy('stage_id')
               ->get();
+
 
           //Получаем необходимые данные для интерфейса
           $user_progresses = UserI::getUserProgress($user_id, $subject);
@@ -233,10 +205,10 @@ class UserHomeController extends Controller
 
 
           $data = [
-              'skills' => $skills,
+              'grades' => $grades,
               'stages' => $stages,
               'sum_res' => $sum_res,
-              'lvl' => $this->lvl,
+              'lvl' => UserI::convertExpInLvl($sum_exp),//записывает свойство $lvl,
               'missions_artifacts' => $missions_artifacts,
               'user_progresses' => $user_progresses,
               'user_missions' => $user_missions,
@@ -291,9 +263,10 @@ class UserHomeController extends Controller
         $grades = ['D', 'C', 'B', 'A'];
 
         $_subject = Subjects::_Subject($subject);
+        $modelGrade = 'App\Models\Grade'.ucfirst($subject);
 
         //Обновление данных и генерирования progress
-        //$progressUpdate = $this->buildProgress($subject);
+        $progressUpdate = $this->buildProgress($subject);
 
         //Возьмём последние даты из таблиц grade и processes для сравнения
         $last_record_grade = DB::table('grade'.$_subject)->latest('id')->value('created_at');
@@ -323,9 +296,8 @@ class UserHomeController extends Controller
 
                 foreach ($grade_chars as $grade_char):
 
-                    if($subject == 'math'){
-
-                        GradeMath::create([
+                        //TODO::создать динамическую генерацию модели от subject
+                        $modelGrade::create([
                             'section_id' => $grade_char->section_id,
                             'user_id' => $grade_char->user_id,
                             'sum_tasks' => $grade_char->count,
@@ -334,20 +306,6 @@ class UserHomeController extends Controller
                             'sum_exp' => $grade_char->sum_exp,
                             'sum_gold' => $grade_char->sum_gold
                         ]);
-
-                    }elseif ($subject == 'physics'){
-
-                        GradePhysics::create([
-                            'section_id' => $grade_char->section_id,
-                            'user_id' => $grade_char->user_id,
-                            'sum_tasks' => $grade_char->count,
-                            'number_lesson' => $grade_char->number_lesson,
-                            'grade_char' => $grade,
-                            'sum_exp' => $grade_char->sum_exp,
-                            'sum_gold' => $grade_char->sum_gold
-                        ]);
-                    }
-
                 endforeach;
             endforeach;
 
@@ -367,16 +325,12 @@ class UserHomeController extends Controller
      */
     public function buildProgress($subject)
     {
-
+        $arr = [];
         $_subject = Subjects::_Subject($subject);
-
-        $progresses = DB::table('progresses as pr')
-            ->select('id' ,'name', 'type', 'rank', 'quality','list_grade', 'list_categories_id', 'list_count_tasks', 'description', 'image')
-            ->get();
+        $progresses = Progress::all();
 
         $arrayStat = [];
         $arrayUsers = [];
-        //$arr = [];
 
         foreach ($progresses as $progress):
 
@@ -385,22 +339,23 @@ class UserHomeController extends Controller
             foreach ($array_count_tasks as $list_count_task):
                 //Разбиваем строку вида D:1 на массив из двух элементов
                 $array_count_task = explode(':', $list_count_task);
+
                 $grade = $array_count_task[0];
                 $count_task = $array_count_task[1];
-
                 //Создаём запрос чтобы вытащить данные из статистики таблицы grade, сгруппированные по s.category_id, gr.grade_char, user_id
                 $stats = DB::select('
-                            select g.sum_t, g.grade_char, g.section_id, g.user_id, g.category_id from
-                            (select sum(t.sum_t) as sum_t, t.grade_char, t.section_id, t.user_id, t.category_id from
-                            (select count(*) as count_tasks, sum(sum_tasks) as sum_t, gr.grade_char, gr.section_id, gr.user_id, s.category_id, gr.sum_tasks from grade'.$_subject.' as gr
+                            select g.sum_t, g.grade_char, g.user_id from
+                            (select sum(t.sum_t) as sum_t, t.grade_char, t.user_id from
+                            (select count(*) as count_tasks, sum(sum_tasks) as sum_t, gr.grade_char, gr.user_id from grade'.$_subject.' as gr
                             left join users on gr.user_id = users.id 
                             left join sections'.$_subject.' as s on s.id = gr.section_id
                             where s.category_id in ('.$progress->list_categories_id.') and gr.grade_char in ("'.$grade.'")
-                            group by s.category_id, gr.grade_char, user_id) as t 
-                            group by user_id) as g where g.sum_t >= '.$count_task.' order by g.user_id asc');
-               // var_dump([$grade, $count_task, ]);
+                            group by s.category_id, gr.section_id, gr.grade_char, user_id) as t 
+                            group by grade_char, user_id) as g where g.sum_t >= '.$count_task.' order by g.user_id asc');
+
                 if(!empty($stats)){
                     foreach($stats as $stat):
+
                         $user_id = $stat->user_id;
                         $sum_t = $stat->sum_t;
                         $grade = $stat->grade_char;
@@ -412,7 +367,7 @@ class UserHomeController extends Controller
                 }
             endforeach;
         endforeach;
-       //dd($arrayStat);
+
         //Проводим сравнение с данными таблицей progress, на совпадение статистики
         foreach ($progresses as $progress):
 
@@ -423,38 +378,21 @@ class UserHomeController extends Controller
 
                 //Если юзера нет с параметрами progress, далее не рассматриваем
                 if(!empty($arrayStat[$progress->type][$progress->rank][$user])){
-
+                    //array_push($arr, (Object)['user_id' => $user, 'type' => $progress->type, 'rank' => $progress->rank, 'quality' => $progress->quality, 'stats' => $arrayStat[$progress->type][$progress->rank][$user]]);
                     //Основная проверка на длину массива, содержащего собранные данные пользователя для определения ранга в достижениях
                     if(count($arrayStat[$progress->type][$progress->rank][$user]) == $count) {
-                        //array_push($arr, (Object)['user_id' => $user, 'rank' => $progress->rank, 'quality' => $progress->quality]);
 
-                        $user_progresses = DB::table('users_progress as u_prg')
-                            ->leftJoin('progresses as prg', 'u_prg.progress_id', '=', 'prg.id' )
-                            ->select('u_prg.user_id', 'u_prg.progress_quality')
-                            ->where('prg.id',$progress->id)
-                            ->where('u_prg.user_id', $user)
-                            ->get();
+                        $user_progresses = User::find($user)->progresses();
+                        $user_progress = $user_progresses->get()->where('id', $progress->id)->first();
 
-                        if(!empty($user_progresses)){
-                            foreach ($user_progresses as $user_progress):
-
-                                if($user_progress->progress_quality < $progress->quality){
-                                    UserProgress::where('id', $user_progress->id)
-                                        ->update([
-                                            'progress_id' => $progress->id,
-                                            'user_id' => $user,
-                                            'progress_quality' => $progress->quality,
-                                        ]);
-                                }else{
-                                    continue;
-                                }
-                            endforeach;
+                        if(!empty($user_progress)){
+                            if($user_progress->pivot->progress_quality < $progress->quality){
+                                $user_progresses->updateExistingPivot($progress->id, ['progress_quality' => $progress->quality]);
+                            }else{
+                                continue;
+                            }
                         }else{
-                            UserProgress::create([
-                                'progress_id' => $progress->id,
-                                'user_id' => $user,
-                                'progress_quality' => $progress->quality,
-                            ]);
+                            $user_progresses->attach($progress->id, ['progress_quality' => $progress->quality]);
                         }
                     }
                 }
@@ -493,6 +431,8 @@ class UserHomeController extends Controller
 
             $grade = $request->get('grade');
 
+            //TODO::одинаковые запросы
+            //TODO::перейти на ORM
             $rows = DB::table('processes'.$_subject.' as pr')
                 ->leftJoin('tasks'.$_subject.' as t', 'pr.number_task', '=', 't.number_task')
                 ->leftJoin('set_of_task'.$_subject.' as stt', 't.id', '=', 'stt.task_id')
@@ -529,8 +469,42 @@ class UserHomeController extends Controller
         return $view;
     }
 
-    //Тестируем функции
+    /**
+     * @var Request $request object
+     * @return string
+     * Функция получает запрос от drug and drop действия action, artifact_id
+     * Обновляет Pivot таблицу
+     * И отправляет обновлённые данные слотов, предметов и образов ученика
+     * */
     public function userEquipArtifact(Request $request){
-        dd($request->get('action'));
+
+
+        $user_subjects = [];
+        $user_id = Auth::id();
+
+        $action = $request->get('action');
+        $artifact_id = $request->get('artifact_id');
+
+        if($action == 'item_off'){
+            $this->updatePivotArtifact($user_id, $artifact_id, 0);
+        }
+
+        if($action == 'item_on'){
+            $this->updatePivotArtifact($user_id, $artifact_id, 1);
+        }
+
+
+        $user_subjects['bodies'] = UserI::getImageCharacter($user_id);
+        $user_subjects['items'] = UserI::getItemsPerson($user_id, 0);
+        $user_subjects['slots'] = UserI::getSlotsPerson($user_id);
+        $user_subjects['user_property'] = UserI::getUserProperty($user_id);
+
+        return response()->json(collect($user_subjects));
+
+    }
+
+
+    public function updatePivotArtifact($user_id, $artifact_id, $equip = 0){
+        User::find($user_id)->artifacts()->updateExistingPivot($artifact_id, ['equip' => $equip]);
     }
 }

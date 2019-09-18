@@ -2,8 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\ClassPerson;
+use App\Observers\ClassPersonObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Collection;
+use App\User;
+use App\Observers\UserObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
                 return new $class($model);
             });
         });
+
+        //Создаём обсервер для прослушивания модели User
+        User::observe(UserObserver::class);
+        ClassPerson::observe(ClassPersonObserver::class);
 
     }
 

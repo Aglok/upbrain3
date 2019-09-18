@@ -76,7 +76,7 @@ $(function () {
                 if (attr == 'experience') {
 
                     //Условие если изменения произошли, то возвращаем первоначальные значения
-                    if  (PE.change)
+                    if (PE.change)
                         input.value = PE.oldValue[j].experience;
                     else
                         oldValue.experience = input.value;//Самый первый раз, сохраняем значения без изменения
@@ -212,7 +212,6 @@ $(function () {
             var id = $(this).val();
             //Запускаем запрос ajax и строим select
             ajaxSelect(url , id);
-
         });
     }
 

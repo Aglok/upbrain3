@@ -93,6 +93,9 @@ return [
                     (new Page(\App\Models\Artifact::class))
                         ->setTitle('Создать артифакт')
                         ->setPriority(1),
+                    (new Page(\App\Models\Feature::class))
+                        ->setTitle('Расширения')
+                        ->setPriority(1),
                     (new Page(\App\Models\ArtifactType::class))
                         ->setTitle('Тип артифакта')
                         ->setPriority(2)

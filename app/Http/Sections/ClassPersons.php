@@ -45,20 +45,17 @@ class ClassPersons extends Section
         return AdminDisplay::table()->
         setHtmlAttribute('class', 'table-primary')
             ->setColumns([
-                AdminColumn::image('icon_man', 'icon_man'),
-                AdminColumn::image('icon_woman', 'icon_woman'),
+                AdminColumn::image('image', 'Образ'),
                 AdminColumn::link('name', 'Name'),
                 AdminColumn::text('description', 'Описание'),
                 AdminColumn::link('attack', 'Атака'),
-                AdminColumn::link('defense', 'Защита'),
-                AdminColumn::link('magic', 'Магия'),
+                AdminColumn::link('shield', 'Защита'),
+                AdminColumn::link('damage', 'Урон'),
+                AdminColumn::link('hp', 'HP'),
+                AdminColumn::link('mp', 'Магия'),
                 AdminColumn::link('energy', 'Энергия'),
-                AdminColumn::link('health_point', 'HP'),
-                AdminColumn::link('increase_experience', '^опыт'),
-                AdminColumn::link('increase_gold', '^золото'),
-                AdminColumn::link('skill_1_id', 'Навык 1'),
-                AdminColumn::link('skill_2_id', 'Навык 2'),
-                AdminColumn::link('skill_3_id', 'Навык 3'),
+                AdminColumn::link('critical_damage', 'Критический Урон'),
+                AdminColumn::link('critical_chance', 'Вероятность крита'),
         ]);
     }
 
@@ -67,37 +64,37 @@ class ClassPersons extends Section
      *
      * @return FormInterface
      */
+    //TODO::либо решить Observers метод creating()
+    //
     public function onEdit($id)
     {
+        if($id){
+            $class_person = \App\Models\ClassPerson::find($id);
+            $dir = ($class_person->sex == 'M') ? 'man': 'woman';
+        }else
+            $dir = '';
+
         return AdminForm::panel()->addBody([
-            AdminFormElement::image('icon_man', 'icon_man')
-                ->setUploadPath(function($file){
-                return 'images/items/classes/man';
+            AdminFormElement::image('image', 'Образ')
+                ->setUploadPath(function($file) use ($dir) {
+                return 'images/items/classes/'.$dir;
                 })
                 ->setUploadFileName(function($file){
                     return $file->getClientOriginalName();
                 }),
-            AdminColumn::image('icon_man', 'icon_man'),
-            AdminFormElement::image('icon_woman', 'icon_woman')
-                ->setUploadPath(function($file){
-                return 'images/items/classes/woman';
-                })
-                ->setUploadFileName(function($file){
-                    return $file->getClientOriginalName();
-                }),
-            AdminColumn::image('icon_woman', 'icon_woman'),
-            AdminFormElement::text('name', 'Название'),
+            AdminColumn::image('image', 'Образ'),
+            AdminFormElement::text('name', 'Название')->required(),
             AdminFormElement::wysiwyg('description', 'Описание')->setEditor('simplemde'),
-            AdminFormElement::text('attack', 'Атака'),
-            AdminFormElement::text('defense', 'Защита'),
-            AdminFormElement::text('magic', 'Магия'),
-            AdminFormElement::text('energy', 'Энергия'),
-            AdminFormElement::text('health_point', 'HP'),
-            AdminFormElement::text('increase_experience', '^опыт'),
-            AdminFormElement::text('increase_gold', '^золото'),
-            AdminFormElement::text('skill_1_id', 'Навык 1'),
-            AdminFormElement::text('skill_2_id', 'Навык 2'),
-            AdminFormElement::text('skill_3_id', 'Навык 3'),
+            AdminFormElement::text('attack', 'Атака')->required()->setDefaultValue('10'),
+            AdminFormElement::text('shield', 'Защита')->required()->setDefaultValue('10'),
+            AdminFormElement::text('damage', 'Урон')->required()->setDefaultValue('5'),
+            AdminFormElement::text('hp', 'HP')->required()->setDefaultValue('500'),
+            AdminFormElement::text('mp', 'Магия')->required()->setDefaultValue('5'),
+            AdminFormElement::text('energy', 'Энергия')->required()->setDefaultValue('40'),
+            AdminFormElement::text('critical_damage', 'Критический Урон')->required()->setDefaultValue('30'),
+            AdminFormElement::text('critical_chance', 'Вероятность крита')->required()->setDefaultValue('0.3'),
+            AdminFormElement::select('sex', 'Пол')->setEnum(['M', 'W'])->required()
+
         ]);
     }
 

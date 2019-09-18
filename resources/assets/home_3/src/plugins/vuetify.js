@@ -1,3 +1,21 @@
+//
+// const MY_ICONS = {
+//   'experience': 'experience',
+//   'gold': 'gold'
+// }
+//
+// const opts = {
+//   icons:{
+//     iconfont: 'fa',
+//     values: MY_ICONS,
+//   },
+//   theme: {
+//     dark: true,
+//     themes: themes
+//   }
+//
+// }
+
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import theme from './theme'
@@ -15,3 +33,4 @@ Vue.use(Vuetify, {
   theme,
   icons: MY_ICONS
 })
+

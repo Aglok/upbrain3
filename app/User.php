@@ -2,11 +2,13 @@
 
 namespace App;
 
+use function functionCallback;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use KodiComponents\Support\Upload;
 use Illuminate\Http\UploadedFile;
 use Cmgmyr\Messenger\Traits\Messagable;
-use Hash;
+use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
+use App\Models\UserProperty;
 
 /**
  * App\User
@@ -61,6 +63,7 @@ use Hash;
 class User extends Authenticatable
 {
         use HasRoles, Upload, Messagable;
+        use PivotEventTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -96,7 +99,7 @@ class User extends Authenticatable
     protected $casts = [
         'avatar' => 'image',
     ];
-    
+
     /**
      * @return array
      */
@@ -143,10 +146,10 @@ class User extends Authenticatable
      */
     public function setPasswordAttribute($password)
     {
-        if (!empty($password) && Hash::needsRehash($password)) {
+        if (!empty($password)) {
             $this->attributes['password'] = bcrypt($password);
-        }
-
+        }else
+            return;
     }
 
     /**
@@ -196,6 +199,17 @@ class User extends Authenticatable
 
         return $this->belongsToMany(Models\ClassPerson::class, 'user_class');
     }
+
+    /**
+     * Получить свойства пользователя
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function property(){
+
+        return $this->hasMany(Models\UserProperty::class);
+    }
+
     /**
      * Получить все достижения пользователя
      *
@@ -203,7 +217,7 @@ class User extends Authenticatable
      */
     public function progresses(){
 
-        return $this->belongsToMany(Models\Progress::class, 'user_progress');
+        return $this->belongsToMany(Models\Progress::class, 'user_progress')->withPivot('progress_quality');
     }
     /**
      * Получить все образы пользователя
@@ -212,7 +226,7 @@ class User extends Authenticatable
      */
     public function user_bodies(){
 
-        return $this->belongsToMany(Models\ImageOfCharacter::class, 'user_body');
+        return $this->belongsToMany(Models\ImageOfCharacter::class, 'user_body')->withPivot('on');
     }
     /**
      * Получить все миссии пользователя
@@ -255,6 +269,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Связанные Stage, через ProcessMath
+     * firsKey - ключ по которому Process ищется из модели User process.user_id = id(localKey)
+     * secondKey - ключ по которому Stage соединяется с Process process.stage_id(secondLocalKey) = stage.id(secondKey)
+     * localKey - ключ по которому ищется текущая модель id(localKey)
+     * secondLocalKey - ключ по которому соединается Process process.stage_id(secondLocalKey) = stage.id(secondKey)
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\hasManyThrough
+     */
+    public function stages_math()
+    {
+        return $this->hasManyThrough(Models\Stage::class, Models\ProcessMath::class, 'user_id', 'id', 'id', 'stage_id');
+    }
+
+    /**
+     * Связанные Stage, через ProcessPhysics
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\hasManyThrough
+     */
+    public function stages_physics()
+    {
+        return $this->hasManyThrough(Models\Stage::class, Models\ProcessPhysics::class, 'user_id', 'id', 'id', 'stage_id');
+    }
+
+    /**
      * Получить всю статистику пользователя по математике
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -272,5 +310,37 @@ class User extends Authenticatable
     public function grade_physics(){
 
         return $this->hasMany(Models\GradePhysics::class);
+    }
+
+    /**
+     * Создаём события когда связанная модель создалась
+     * После создания User и установления класса героя, создаётся UserProperty
+     * pivotDetaching, pivotDetached, pivotUpdating, pivotUpdated
+     */
+    public static function boot()
+    {
+        parent::boot();
+
+        static::pivotAttached(function ($model, $relationName, $pivotIds, $pivotIdsAttributes){
+
+                $classes_person = $model->classes_person()->first();
+
+                //Если запись есть, то игнорируем базовые характеристики UserProperty
+                if(!UserProperty::where('user_id', $model->id)->exists()){
+
+                    UserProperty::firstOrCreate([
+                        'user_id' => $model->id,
+                        'attack' => $classes_person->attack,
+                        'shield' => $classes_person->shield,
+                        'damage' => $classes_person->damage,
+                        'hp' => $classes_person->hp,
+                        'mp' => $classes_person->mp,
+                        'energy' => $classes_person->energy,
+                        'critical_damage' => $classes_person->critical_damage,
+                        'critical_chance' => $classes_person->critical_chance
+                    ]);
+                }
+
+        });
     }
 }

@@ -72,18 +72,32 @@ class Users extends Section
      */
     public function onEdit($id = null)
     {
+
+        if(is_null($id))
+            $formPassword = AdminFormElement::password('password', 'Password')->addValidationRule('min:6')->required();
+        else
+            $formPassword = AdminFormElement::password('password', 'Password');
+
         return AdminForm::panel()->addBody([
             AdminFormElement::checkbox('active', 'Активировать'),
             AdminFormElement::text('name', 'Имя')->required(),
             AdminFormElement::text('surname', 'Фамилия')->required(),
-            AdminFormElement::password('password', 'Password')->required()->addValidationRule('min:6'),
             AdminFormElement::text('email', 'E-mail')->required()->addValidationRule('email'),
+            $formPassword,
             AdminFormElement::text('description', 'О себе'),
             AdminFormElement::multiselect('roles', 'Roles', \App\Role::class)->setDisplay('name'),
             AdminFormElement::multiselect('user_subjects', 'Предметы', \App\Models\Subject::class)->setDisplay('name'),
             AdminFormElement::image('avatar', 'Avatar'),
             AdminColumn::image('avatar')->setWidth('150px'),
-            AdminFormElement::select('sex', 'Пол')->setEnum(['M', 'W'])
+            AdminFormElement::select('sex', 'Пол')->setEnum(['M', 'W']),
+            AdminFormElement::multiselectajax('classes_person', 'Классы героя')
+                ->setModelForOptions(\App\Models\ClassPerson::class)
+                ->setDataDepends(['sex'])
+                ->setLoadOptionsQueryPreparer(function ($element, $query) {
+                    return $query->where('sex', $element->getDependValue('sex'));
+                })
+                ->setDisplay('name')
+                ->setHelpText('Доступные классы: маг, воин, целитель, критовик, интегратор'),
         ]);
     }
 

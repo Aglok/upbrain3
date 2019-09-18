@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <core-filter />
+    <!--<core-filter />-->
 
     <core-toolbar />
 
@@ -13,7 +13,7 @@
   export default {
     beforeCreate(){
       this.$dataUser.getData('/profile/all', (response) => {
-        this.setUser(response.data)
+        this.setUser(response.data);
         this.setReady(true)
       }, '');
 

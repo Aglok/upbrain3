@@ -2,6 +2,7 @@
 
 namespace App\Http\Sections;
 
+use App\Models\Artifact;
 use SleepingOwl\Admin\Contracts\Display\DisplayInterface;
 use SleepingOwl\Admin\Contracts\Form\FormInterface;
 use SleepingOwl\Admin\Section;
@@ -9,7 +10,6 @@ use AdminDisplay;
 use AdminColumn;
 use AdminForm;
 use AdminFormElement;
-use DB;
 
 /**
  * Class Artifacts
@@ -36,11 +36,6 @@ class Artifacts extends Section
      * @var string
      */
     protected $alias;
-    /**
-     * Директория для динамического создания подкатегории взависимости от типа артифакта
-     * @var string
-     */
-    protected $dir;
     /**
      * @return DisplayInterface
      */
@@ -70,26 +65,36 @@ class Artifacts extends Section
     }
 
     /**
-     * @param int $id
+     * @var int $id
+     * @return string
      * Функция принимает id артифакта и генерирует подкатегорию взависимости от типа артифакта
+     * Директория для динамического создания подкатегории взависимости от типа артифакт
      */
     public function setArtifactDir($id)
     {
-        $this->dir = DB::table('artifacts_type')->where('id', $id)->value('dir');
+        $type = Artifact::find($id)->artifact_type()->first();
+        return $type->dir;
     }
     /**
-     * @param int $id
-     *
+     * @var int $id
      * @return FormInterface
      */
     public function onEdit($id)
     {
-        $this->setArtifactDir($id);
+        //Для начала создается экземпляр без возможности указать директорию артефакта
+        //Так как пока мы не знаем его тип
+        //После создания при редактировании мы уже поставили тип и директория уже установлена
+        //TODO::Vue компонент динамичкая подгрузка dir, c ajax отправкой
+        //TODO::либо решить Observers метод creating()
+        if($id)
+            $dir = $this->setArtifactDir($id);
+        else
+            $dir = '';
 
         return AdminForm::panel()->addBody([
             AdminFormElement::image('image', 'изображение')
-                ->setUploadPath(function($file){
-                    return 'images/items/artifacts/'.$this->dir;
+                ->setUploadPath(function($file) use ($dir) {
+                    return 'images/items/artifacts/'.$dir;
                 })
                 ->setUploadFileName(function($file){
                     return $file->getClientOriginalName();
@@ -104,18 +109,22 @@ class Artifacts extends Section
                 ->setModelForOptions(\App\Models\ArtifactType::class)
                 ->setDisplay('name')->required(),
             AdminFormElement::text('attack', 'Атака'),
-            AdminFormElement::text('damage', 'Урон'),
             AdminFormElement::text('shield', 'Защита'),
+            AdminFormElement::text('damage', 'Урон'),
+            AdminFormElement::text('hp', 'Здоровье'),
             AdminFormElement::text('mp', 'Магия'),
             AdminFormElement::text('energy', 'Энергия'),
-            AdminFormElement::text('increase_experience', 'Опыт'),
-            AdminFormElement::text('increase_gold', 'Золото'),
+//            AdminFormElement::text('increase_experience', 'Опыт'),
+//            AdminFormElement::text('increase_gold', 'Золото'),
             AdminFormElement::text('rarity_id', 'Редкость'),
             AdminFormElement::text('weight', 'Вес'),
-            AdminFormElement::text('price', 'Цена'),
-            AdminFormElement::select('class_person_id', 'Класс героя')
-                    ->setModelForOptions(\App\Models\ClassPerson::class)
-                    ->setDisplay('name')->required(),
+//            AdminFormElement::text('price', 'Цена'),
+//            AdminFormElement::select('class_person_id', 'Класс героя')
+//                    ->setModelForOptions(\App\Models\ClassPerson::class)
+//                    ->setDisplay('name')->required(),
+            AdminFormElement::multiselect('features', 'Расширение', \App\Models\Feature::class)
+                    ->setModelForOptions(\App\Models\Feature::class)
+                    ->setDisplay('title')->required(),
         ]);
     }
 

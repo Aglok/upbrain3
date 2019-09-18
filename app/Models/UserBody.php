@@ -25,7 +25,7 @@ class UserBody extends Model
 {
     public $timestamps = false;
     protected $table = 'user_body';
-    protected $fillable = ['image_of_character_id','user_id'];
+    protected $fillable = ['image_of_character_id','user_id', 'active'];
 
     public function image_of_character(){
         return $this->belongsTo(ImageOfCharacter::class);

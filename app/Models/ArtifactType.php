@@ -21,7 +21,7 @@ class ArtifactType extends Model
 {
     public $timestamps = false;
 
-    protected $table = 'artifacts_type';
+    protected $table = 'artifact_type';
     protected $fillable = ['name', 'description', 'dir'];
     
 }

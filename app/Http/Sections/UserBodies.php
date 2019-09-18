@@ -9,6 +9,7 @@ use AdminDisplay;
 use AdminColumn;
 use AdminForm;
 use AdminFormElement;
+use AdminColumnEditable;
 /**
  * Class UserBodies
  *
@@ -45,9 +46,10 @@ class UserBodies extends Section
             ->setColumns([
                 AdminColumn::custom('', function(\App\Models\UserBody $user_body) {
 
-                    //TODO::необходимо делать проверку на active в таблице user_body и показывать, только выбранный образ
+                    //TODO::необходимо делать проверку на on в таблице user_body и показывать, только выбранный образ
                     //TODO::для этого добавление образов делать черех модель User, чтобы можно было обратиться к связям один ко многим
-                    if($user_body->active == 1)
+                    //TODO::динамический selectAjax, не получится внедрить связные списки, так как тут отсутвутет связь BelongToMany
+                    if($user_body->on == 1)
                         $image = $user_body->image_of_character->image;
                     else
                         $image = '';
@@ -58,7 +60,8 @@ class UserBodies extends Section
                 }),
 
                 AdminColumn::link('image_of_character.name', 'Образ'),
-                AdminColumn::link('user.full_name', 'Имя')
+                AdminColumn::link('user.full_name', 'Имя'),
+                AdminColumnEditable::checkbox('on', 'Выбрать')
             ]);
     }
 
@@ -69,18 +72,24 @@ class UserBodies extends Section
      */
     public function onEdit($id)
     {
-        $body = \App\Models\UserBody::find($id);
-        $sex = $body->user->sex;
+        if($id){
+            $body = \App\Models\UserBody::find($id);
+            $sex = $body->user->sex;
+        }else{
+            $sex = '';
+        }
 
         return AdminForm::panel()->addBody([
             AdminFormElement::select('user_id', 'Ученик')
                 ->setModelForOptions(\App\User::class)
                 ->setDisplay('full_name')->required(),
             AdminFormElement::select('image_of_character_id', 'Образ')
-                ->setModelForOptions(\App\Models\ImageOfCharacter::class)
-                ->setDisplay('name')->setLoadOptionsQueryPreparer(function($element, $query) use ($sex) {
-                    return $query
-                        ->where('sex', $sex);
+                ->setModelForOptions(\App\Models\ImageOfCharacter::class, 'name')
+                ->setLoadOptionsQueryPreparer(function($element, $query) use ($sex) {
+                          if($sex){
+                            $query = $query->where('sex', $sex);
+                          }
+                          return $query;
                     })->required()
         ]);
     }

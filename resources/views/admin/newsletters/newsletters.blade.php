@@ -93,10 +93,11 @@
                     <div class="progressbar"></div>
                 </div>
             </div>
-                    {!! Form::button('<i class="fa fa-plus"></i> Отправить', ['class' => 'btn btn-primary navbar-btn']) !!}
+                    {!! Form::button('<i class="fa fa-plus"></i> Отправить', ['id'=> 'button-send-newsletters', 'class' => 'btn btn-primary navbar-btn']) !!}
                     {!! Form::close() !!}
         </div>
     </div>
     {{--{!! Html::script('js/aglok/newsletters.js') !!}--}}
-    {!! Html::script('packages/sleepingowl/ckeditor/ckeditor.js') !!}
+    {{--{!! Html::script('packages/sleepingowl/ckeditor/ckeditor.js') !!}--}}
 @stop
+

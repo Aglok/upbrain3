@@ -1,6 +1,5 @@
 import Multiselect from 'vue-multiselect'
 window.Multiselect = Multiselect;
-//import "vue-multiselect/dist/vue-multiselect.min.css"
 
 Vue.component('deselect', Vue.extend({
     props: {
@@ -20,7 +19,8 @@ Vue.component('deselect', Vue.extend({
     },
     mounted() {
         this.val = _.first(this.options.filter(a => a.id === this.value));
-        if (this.multiple) {
+        //this.value значение поля multiselect, когда модель созадаётся this.value будет null, поэтому делаем проверку
+        if (this.multiple && this.value) {
             this.val = this.options.filter(a => this.value.indexOf(a.id) !== -1)
         }
     },

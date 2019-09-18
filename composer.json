@@ -8,7 +8,7 @@
         {
             "url": "https://github.com/Aglok/SleepingOwlAdmin.git",
             "type": "vcs",
-            "version": "4.x-dev"
+            "version": "5.6.x-dev"
         }
     ],
     "require": {
@@ -18,15 +18,16 @@
         "caouecs/laravel-lang": "~3.0",
         "cboden/ratchet": "0.4.*",
         "cmgmyr/messenger": "2.11",
+        "fico7489/laravel-pivot": "^3.0",
         "fideloper/proxy": "~4.0",
         "guzzlehttp/guzzle": "^6.0",
         "intervention/image": "^2.3",
-        "laravel/framework": "5.6.*",
+        "laravel/framework": "5.8.*",
         "laravel/tinker": "1.0.*",
-        "laravelcollective/html": "5.5.*",
-        "laravelrus/sleepingowl": "5.6.x-dev",
+        "laravelcollective/html": "5.5.* || 5.6.* || 5.7.* || 5.8.*",
+        "laravelrus/sleepingowl": "dev-development",
         "lavary/laravel-menu": "^1.7",
-        "maatwebsite/excel": "2.1.25",
+        "maatwebsite/excel": "^3.1",
         "pusher/pusher-php-server": "^3.0",
         "symfony/dom-crawler": "^4.1",
         "thiagoalessio/tesseract_ocr": "^2.2"
@@ -61,7 +62,10 @@
             "Illuminate\\Foundation\\ComposerScripts::postInstall"
         ],
         "post-update-cmd": [
-            "Illuminate\\Foundation\\ComposerScripts::postUpdate"
+            "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+            "php artisan clear-compiled",
+            "php artisan ide-helper:generate",
+            "php artisan optimize"
         ]
     },
     "config": {

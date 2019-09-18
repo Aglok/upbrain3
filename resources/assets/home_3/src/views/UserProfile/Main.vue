@@ -314,29 +314,43 @@
                     series: series
                 }
             },
+            setSubjectsGeneralValue(prop, number_lesson){
+                this.dataSetSubjects.general[prop].value += this.$dataUser.sumArrayObj(number_lesson, prop);
+            },
             generalSumStats(){
                 let user = this.user;
-                for (let prop in user){
-                    let number_lesson = user[prop].stats.number_lesson;
-                    let grade_char = user[prop].stats.grade_char;
+                for (let subject in user){
+                    let number_lesson = user[subject].stats.number_lesson;
+                    let grade_char = user[subject].stats.grade_char;
 
-                    this.dataSetSubjects.general.sum_exp.value += this.$dataUser.sumArrayObj(number_lesson, 'sum_exp');
-                    this.dataSetSubjects.general.sum_gold.value += this.$dataUser.sumArrayObj(number_lesson, 'sum_gold');
-                    this.dataSetSubjects.general.sum_tasks.value += this.$dataUser.sumArrayObj(number_lesson, 'sum_tasks');
+                    //Суммируем характеристики по всем предметам
+                    this.setSubjectsGeneralValue('sum_exp', number_lesson);
+                    this.setSubjectsGeneralValue('sum_gold', number_lesson);
+                    this.setSubjectsGeneralValue('sum_tasks', number_lesson);
 
-                    this.dataSetSubjects[prop].sum_exp.value = user[prop].sum_res.sum_exp;
-                    this.dataSetSubjects[prop].sum_gold.value = user[prop].sum_res.sum_gold;
-                    this.dataSetSubjects[prop].sum_tasks.value = this.$dataUser.sumArrayObj(number_lesson, 'sum_tasks');
+                    this.dataSetSubjects[subject].sum_exp.value = user[subject].sum_res.sum_exp;
+                    this.dataSetSubjects[subject].sum_gold.value = user[subject].sum_res.sum_gold;
+                    this.dataSetSubjects[subject].sum_tasks.value = this.$dataUser.sumArrayObj(number_lesson, 'sum_tasks');;
 
                     for (let grade in grade_char){
-                        this.dataSetSubjects[prop][grade].value = grade_char[grade];
+                        this.dataSetSubjects[subject][grade].value = grade_char[grade];
                     }
                 }
             },
+
+            resetPropsGenerals(){
+                //Обнуляем данные в случае обновления компонента, чтобы не суммировались старые данные
+                this.dataSetSubjects.general['sum_exp'].value = 0;
+                this.dataSetSubjects.general['sum_gold'].value = 0;
+                this.dataSetSubjects.general['sum_tasks'].value = 0;
+            },
+
         },
+
         mounted() {
             this.user = this.$store.state.app.user.subjects;
             this.dataSetSubjects = this.$dataUser.dataSetSubjects;
+            this.resetPropsGenerals();
             this.generalSumStats();
 
             //Динамически генерируется list для subject.tabs предметов
@@ -349,7 +363,7 @@
         updated: function () {
             this.$nextTick(function () {
                 window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub]);
-            })
+            });
         },
     }
 </script>

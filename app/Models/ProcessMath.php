@@ -39,4 +39,9 @@ class ProcessMath extends Model
     {
         return $this->belongsTo(\App\User::class);
     }
+
+    public function stage()
+    {
+        return $this->belongsTo(\App\Models\Stage::class);
+    }
 }

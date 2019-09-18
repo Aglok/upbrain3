@@ -82,4 +82,8 @@ class Artifact extends Model
     public function users(){
         return $this->belongsToMany(User::class, 'user_artifact');
     }
+
+    public function features(){
+        return $this->morphToMany(Feature::class, 'entity', 'feature_entity');
+    }
 }

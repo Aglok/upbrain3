@@ -1,0 +1,13 @@
+{
+    "increase_experience": "ув. опыта",
+    "attack": "атака",
+    "shield": "защита",
+    "damage": "урон",
+    "energy": "энергия",
+    "critical_damage": "кр. урон",
+    "critical_chance": "кр. шанс",
+    "hp": "здоровье",
+    "mp": "магия",
+    "weight": "вес"
+
+}

@@ -17,8 +17,9 @@ const dataUserStore = {
         let arrayTableTranslation = {1:5,2:9,3:14,4:18,5:23,6:27,7:33,8:39,9:45,10:50,11:56,12:62,13:68,14:70,15:72,16:74,17:76,18:78,19:80,20:82,21:84,22:86,23:88,24:90,25:92,26:94,27:96,28:98,29:99,30:100,31:100,32:100};
         return arrayTableTranslation[primary];
     },
+    //Считаем общую сумму массива объектов
     sumArrayObj(arrayObjs ,prop){
-        return Object.keys(arrayObjs).reduce(function(previous, key){return previous + arrayObjs[key][prop]}, 0);//Считаем общую сумму массива объектов
+        return Object.keys(arrayObjs).reduce(function(previous, key){return previous + arrayObjs[key][prop]}, 0);
     },
     unique(arr) {
         var obj = {};
@@ -38,6 +39,7 @@ const dataUserStore = {
         }
         return list;
     },
+
     dataSetSubjects: {
         math: {
             name: 'Математика',

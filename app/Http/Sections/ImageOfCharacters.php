@@ -54,21 +54,27 @@ class ImageOfCharacters extends Section
     }
 
     /**
-     * @param int $id
-     *
+     * @var int $id
      * @return FormInterface
      */
     public function onEdit($id)
     {
-        $image_character = \App\Models\ImageOfCharacter::find($id);
-        $dir = ($image_character->sex == 'M') ? 'man': 'woman';
+        //Для начала создается экземпляр без возможности указать директорию 'man' или 'woman'
+        //Так как пока мы не знаем пол образа
+        //После создания при редактировании мы сможем поставить пол, так как директория уже установилась
+        //TODO::либо решить Observers метод creating()
+        if($id){
+            $image_character = \App\Models\ImageOfCharacter::find($id);
+            $dir = ($image_character->sex == 'M') ? 'man': 'woman';
+        }else
+            $dir = '';
 
         return AdminForm::panel()->addBody([
             AdminFormElement::text('name', 'Name')->required(),
             AdminFormElement::text('description', 'Description')->required(),
             AdminFormElement::image('image', 'Изображение')
                 ->setUploadPath(function($file) use ($dir){
-                    return 'images/characters/'.$dir.'/';
+                    return 'images/items/characters/'.$dir.'/';
                 })
                 ->setUploadFileName(function($file){
                     return $file->getClientOriginalName();

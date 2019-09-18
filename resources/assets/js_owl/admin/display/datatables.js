@@ -1,4 +1,6 @@
 Admin.Modules.register('display.datatables', () => {
+   localStorage.clear();
+
     $.fn.dataTable.ext.errMode = (dt) => {
         Admin.Messages.error(
             dt.jqXHR.responseJSON.message || trans('lang.table.error')
@@ -6,7 +8,7 @@ Admin.Modules.register('display.datatables', () => {
     };
 
     $.fn.dataTable.ext.order['DateTime'] = function (settings, col) {
-        return this.column(col, {order: 'index'}).nodes().map((td, i) => {
+        return this.api().column(col, {order: 'index'}).nodes().map((td, i) => {
             return $(td).data('value');
         });
     }

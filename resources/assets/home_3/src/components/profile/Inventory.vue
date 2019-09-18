@@ -4,6 +4,12 @@
             <!-- Аватар -->
             <v-flex d-flex xs12 sm6 md4 style="position: relative;">
                 <div class="layout-items" :style="styleInventory.dollPanelBody">
+                    <v-menu v-model="menu" :close-on-content-click="false" :max-width="180" :min-width="180" :nudge-left="9" offset-y>
+                        <template slot="activator">
+                            <div class="btn-tool">Характеристики<span class="icon-tool" :class="menu ? 'show' : 'hide' "></span></div>
+                        </template>
+                        <profile-list-property :property="buildObjectProperties()"></profile-list-property>
+                    </v-menu>
                     <div class="wrapper-char-over"></div>
                     <div class="wrapper-char-flag">
                         <!-- Это один слот в котором находятся предметы slot.items они являются draggable -->
@@ -16,6 +22,7 @@
                                    v-bind="{group: slot.type}"
                                    @start="onStart($event, slot)"
                                    @end="onEnd($event, slot)"
+                                   @change="onChange($event, slot)"
                                    :style="setStyleSlot(slot)"
                                    :class="{'slot-highlighted': slot.active}">
                                     <div v-if="slot.items.length" :title="slot.name" class="stuff-item stuff-imaged" v-for="item in slot.items" :key="item.id">
@@ -23,7 +30,7 @@
                                             <template slot="activator">
                                                 <div class="grid-item stuff-img" :style="setStyleItem(item)"></div>
                                             </template>
-                                            <profile-item-details :item="item"></profile-item-details>
+                                            <profile-item-details :item="item" :equip="slot" @change="changeItem($event, slot, item)"></profile-item-details>
                                         </v-menu>
                                         <div class="stuff-tap-highlight"></div>
                                     </div>
@@ -61,14 +68,16 @@
                                    v-model="items"
                                    v-bind="{group: current_type}"
                                    @start="onStart($event)"
-                                   @end="onEnd($event)">
-                                    <li v-for="item in items" :key="item.id" class="grid-item" :data-type="item.type">
+                                   @end="onEnd($event)"
+                                   @change="onChange($event)"
+                                    >
+                                    <li v-for="item in items" :key="item.id" class="grid-item" :data-type="item.slot_id">
                                         <div class="stuff-item stuff-imaged">
                                             <v-menu v-model="item.active" :close-on-content-click="false" :nudge-width="200" offset-y>
                                                 <template slot="activator">
                                                     <div class="grid-item stuff-img" :style="setStyleItem(item)"></div>
                                                 </template>
-                                                <profile-item-details :item="item"></profile-item-details>
+                                                <profile-item-details :item="item" @change="changeItem($event, slot=null, item)"></profile-item-details>
                                             </v-menu>
                                             <div class="stuff-tap-highlight"></div>
                                         </div>
@@ -92,6 +101,7 @@
         },
         data(){
             return {
+                menu: false,
                 gridHighlighted: false, //Подсветка
                 //Стиль - расположение панелей инветаря в пространстве
                 styleInventory:{
@@ -127,311 +137,125 @@
                             gold: "",
                             arena: ""
                         }
-                    },
-                    {
-                        id:2,
-                        name: 'Доспех',
-                        items:[],
-                        type: 2,
-                        active: false,
-                        visible: 1,
-                        images: {
-                            normal: "images/items/slots/cuirass.png",
-                            gold: "",
-                            arena: ""
-                        }
-                    },
-                    {
-                        id:3,
-                        name: 'Оружие',
-                        items:[],
-                        type: 3,
-                        active: false,
-                        visible: 1,
-                        images: {
-                            normal: "images/items/slots/sword.png",
-                            gold: "",
-                            arena: ""
-                        }
-                    },
-                    {
-                        id:4,
-                        name: 'Ноги',
-                        items:[],
-                        type: 4,
-                        active: false,
-                        visible: 1,
-                        images: {
-                            normal: "images/items/slots/boots.png",
-                            gold: "",
-                            arena: ""
-                        }
-                    },
-                    {
-                        id:5,
-                        name: 'Тотем',
-                        items:[],
-                        type: 5,
-                        active: false,
-                        visible: 1,
-                        images: {
-                            normal: "images/items/slots/totem.png",
-                            gold: "",
-                            arena: ""
-                        }
-                    },
-                    {
-                        id:6,
-                        name: 'Книга',
-                        items:[],
-                        type: 6,
-                        active: false,
-                        visible: 1,
-                        images: {
-                            normal: "images/items/slots/book.png",
-                            gold: "",
-                            arena: ""
-                        }
-                    },
-                    {
-                        id:7,
-                        name: 'Амулет',
-                        items:[],
-                        type: 7,
-                        active: false,
-                        visible: 1,
-                        images: {
-                            normal: "images/items/slots/amulet.png",
-                            gold: "",
-                            arena: ""
-                        }
-                    },
-                    {
-                        id:8,
-                        name: 'Щит',
-                        items:[{
-                            active: false,
-                            id:17,
-                            name: 'Щит силы 1',
-                            type: 8,
-                            data: {
-                                stats: {
-                                    strength: null,
-                                    hard: 2800,
-                                    mp: null,
-                                    shield: 22,
-                                    hp: 22,
-                                    damage: 3,
-                                },
-                                item_grade: 1,
-                                price: 1000,
-                                quest: "",
-                                modif: {},
-                                description: ""
-                            },
-                            images: {
-                                disabled: "",
-                                item: "images/items/shields/demo_02.png",
-                                off: "images/items/shields/demo_02.png",
-                                info: "images/items/shields/demo_02.png",
-                                on: "images/items/shields/demo_02.png"
-                            },
-                        },],
-                        type: 8,
-                        active: false,
-                        visible: 1,
-                        images: {
-                            normal: "images/items/slots/shield.png",
-                            gold: "",
-                            arena: ""
-                        }
-
-                    },
-                    {
-                        id:9,
-                        name: 'Кольцо',
-                        items:[],
-                        type: 9,
-                        active: false,
-                        visible: 1,
-                        images: {
-                            normal: "images/items/slots/ring.png",
-                            gold: "",
-                            arena: ""
-                        }
-
-                    },
-                    {
-                        id:10,
-                        name: 'Облик',
-                        items:[],
-                        type: 10,
-                        active: false,
-                        visible: 1,
-                        images: {
-                            normal: "images/items/slots/shape.png",
-                            gold: "",
-                            arena: ""
-                        }
-                    },
-                    {
-                        id:11,
-                        name: 'Трофеи',
-                        items:[],
-                        type: 0,
-                        active: false,
-                        visible: 1,
-                        images: {
-                            normal: "images/items/slots/locked.png",
-                            gold: "",
-                            arena: ""
-                        }
-                    },
-                    {
-                        id:12,
-                        name: 'Экипировка',
-                        items:[],
-                        type: 0,
-                        active: false,
-                        visible: 1,
-                        images: {
-                            normal: "images/items/slots/empty.png",
-                            gold: "",
-                            arena: ""
-                        }
-                    },
-                    {
-                        id:13,
-                        name: 'Образ',
-                        items:[],
-                        type: 13,
-                        active: false,
-                        visible: 1,
-                        images: {
-                            info: "images/characters/dwarf.png",
-                            small: ""
-                        }
-
-                    },
+                    }
                 ],
                 //Генерация предметов
                 items:[
-                    {
-                        active: false, //Отвечает за открытие или закрытие меню
-                        id: 14,
-                        name: 'Меч силы',
-                        type: 3,
-                        label: "Единый - серый (оружие)",
-                        param: {},
-                        data: {
-                            stats: {
-                                strength: null,
-                                hard: 2800,
-                                mp: null,
-                                shield: 22,
-                                hp: 22,
-                                damage: 3,
-                            },
-                            item_grade: 1,
-                            price: 1000,
-                            quest: "",
-                            modif: {
-                            },
-                            description: ""
-                        },
-                        images: {
-                            disabled: "",
-                            item: "images/items/swords/sword_02.png",
-                            off: "images/items/swords/sword_02.png",
-                            info: "images/items/swords/sword_02.png",
-                            on: "images/items/swords/sword_02.png"
-                        },
-                        action: [],
-                        action_full: [{
-                            type: "repair2",
-                            label: "Ремонт",
-                            count: 100
-                        }, {
-                            type: "sale",
-                            cost: 100,
-                            label: "Продажа"
-                        }, {
-                            type: "warehouse",
-                            cost: {
-                                currency: "gold",
-                                value: 25000
-                            },
-                            label: "На склад"
-                        }],
-                    },
-                    {
-                        active: false,
-                        id:15,
-                        name: 'Щит силы',
-                        type: 8,
-                        data: {
-                            stats: {
-                                strength: null,
-                                hard: 2800,
-                                mp: null,
-                                shield: 22,
-                                hp: 22,
-                                damage: 3,
-                            },
-                            item_grade: 1,
-                            price: 1000,
-                            quest: "",
-                            modif: {
-                            },
-                            description: ""
-                        },
-                        images: {
-                            disabled: "",
-                            item: "images/items/shields/demo_02.png",
-                            off: "images/items/shields/demo_02.png",
-                            info: "images/items/shields/demo_02.png",
-                            on: "images/items/shields/demo_02.png"
-                        },
-                    },
-                    {
-                        active: false,
-                        id:16,
-                        name: 'Кираса силы',
-                        type: 2,
-                        data: {
-                            stats: {
-                                strength: null,
-                                hard: 2800,
-                                mp: null,
-                                shield: 22,
-                                hp: 22,
-                                damage: 3,
-                            },
-                            item_grade: 1,
-                            price: 1000,
-                            quest: "",
-                            modif: {},
-                            description: ""
-                        },
-                        images: {
-                            disabled: "",
-                            item: "images/items/armors/demo_04.png",
-                            off: "images/items/armors/demo_04.png",
-                            info: "images/items/armors/demo_04.png",
-                            on: "images/items/armors/demo_04.png"
-                        },
-                    }
+                    // {
+                    //     active: false, //Отвечает за открытие или закрытие меню
+                    //     id: 14,
+                    //     name: 'Меч силы',
+                    //     type: 6,
+                    //     label: "Единый - серый (оружие)",
+                    //     param: {},
+                    //     data: {
+                    //         stats: {
+                    //             strength: null,
+                    //             hard: 2800,
+                    //             mp: null,
+                    //             shield: 22,
+                    //             hp: 22,
+                    //             damage: 3,
+                    //         },
+                    //         item_grade: 1,
+                    //         price: 1000,
+                    //         quest: "",
+                    //         modif: {
+                    //         },
+                    //         description: ""
+                    //     },
+                    //     images: {
+                    //         disabled: "",
+                    //         item: "images/items/swords/sword_02.png",
+                    //         off: "images/items/swords/sword_02.png",
+                    //         info: "images/items/swords/sword_02.png",
+                    //         on: "images/items/swords/sword_02.png"
+                    //     },
+                    //     action: [],
+                    //     action_full: [{
+                    //         type: "repair2",
+                    //         label: "Ремонт",
+                    //         count: 100
+                    //     }, {
+                    //         type: "sale",
+                    //         cost: 100,
+                    //         label: "Продажа"
+                    //     }, {
+                    //         type: "warehouse",
+                    //         cost: {
+                    //             currency: "gold",
+                    //             value: 25000
+                    //         },
+                    //         label: "На склад"
+                    //     }],
+                    // },
+                    // {
+                    //     active: false,
+                    //     id:15,
+                    //     name: 'Щит силы',
+                    //     type: 8,
+                    //     data: {
+                    //         stats: {
+                    //             strength: null,
+                    //             hard: 2800,
+                    //             mp: null,
+                    //             shield: 22,
+                    //             hp: 22,
+                    //             damage: 3,
+                    //         },
+                    //         item_grade: 1,
+                    //         price: 1000,
+                    //         quest: "",
+                    //         modif: {
+                    //         },
+                    //         description: ""
+                    //     },
+                    //     images: {
+                    //         disabled: "",
+                    //         item: "images/items/shields/demo_02.png",
+                    //         off: "images/items/shields/demo_02.png",
+                    //         info: "images/items/shields/demo_02.png",
+                    //         on: "images/items/shields/demo_02.png"
+                    //     },
+                    // },
+                    // {
+                    //     active: false,
+                    //     id:16,
+                    //     name: 'Кираса силы',
+                    //     type: 6,
+                    //     data: {
+                    //         stats: {
+                    //             strength: null,
+                    //             hard: 2800,
+                    //             mp: null,
+                    //             shield: 22,
+                    //             hp: 22,
+                    //             damage: 3,
+                    //         },
+                    //         item_grade: 1,
+                    //         price: 1000,
+                    //         quest: "",
+                    //         modif: {},
+                    //         description: ""
+                    //     },
+                    //     images: {
+                    //         disabled: "",
+                    //         item: "images/items/armors/demo_04.png",
+                    //         off: "images/items/armors/demo_04.png",
+                    //         info: "images/items/armors/demo_04.png",
+                    //         on: "images/items/armors/demo_04.png"
+                    //     },
+                    // }
                 ],
-                current_type: 12,//Начальный тип общей группы
-                buffer_type: 12,//Буфер обмена, содержит type о текущем типе группы предмета(во время перетаскивания предмета)
+                //Свойства героя
+                user_property: [],
+                current_type: 14,//Начальный тип общей группы
+                buffer_type: 14,//Буфер обмена, содержит type о текущем типе группы предмета(во время перетаскивания предмета)
             }
         },
         methods:{
             ...mapState('app', ['user']),
             onStart: function (e, slot) {
-
-                //Подсвечиваем переносимый элемент
-                //e.item.classList.add('active');
 
                 //Если есть, рассматривается контейнер(рюкзак) с предметами ищём в объекте слот по data-type и подсвечиваем слот active
                 if(!slot){
@@ -447,43 +271,88 @@
             //Когда предмет уже положили
             onEnd: function (e, slot) {
 
-                //console.log(this.buildObjectSlots());
-                //Удаляем подсветку переносимого элемента
-                //e.item.classList.remove('active');
-
                 //Если есть, рассматривается контейнер со слотами аватар
                 if(!slot){
                     let type_id = parseInt(e.item.getAttribute('data-type'));
                     let slotEl = this.findSlot(type_id);
                     slotEl.active = false;
-                    //Если есть однотипные предметы, то меняем их местами
-                    if(slotEl.items.length > 1){
-                        const item = slotEl.items.shift();
-                        this.items.push(item);
-                    }
-
-                    this.$dataUser.getData('/profile/item', (response) => {
-                        console.log(response);
-                    }, {'action': 'item_on', 'artifact_id': slotEl.items[0].id});
-
                 }else{
                     this.gridHighlighted = false;
                     //Необходимо чтобы вернуть предмету соответсвующий тип слота в инвентаре, так как он меняется в процессе претакивания на 12(тип для рюкзака)
                     //По type=12 группируются предметы в рюкзаке
                     slot.type = this.buffer_type;
-                    this.$dataUser.getData('/profile/item', (response) => {
-                        console.log(response);
-                    }, {'action': 'item_off', 'artifact_id': 1});
                 }
 
-                this.current_type = 12;
+                this.current_type = 14;
+            },
+            request(action = 'item_on', item){
+                let artifact_id = item.id;
+
+                this.$dataUser.getData('/profile/item', (response) => {
+                    this.slots = response.data.slots;
+                    this.items = response.data.items;
+                    this.user_property = response.data.user_property;
+                }, {'action': action, 'artifact_id': artifact_id});
+            },
+
+            //Меняем местами
+            swap(slot){
+                const item = slot.items.shift();
+                this.items.unshift(item);
+                //Когда происходит замена предмета, со слота снимается артефакт
+                //Ниже запрос присваивает новый элемент, который остался в массиве после добавления
+                this.request('item_off', item);
+            },
+            //Событие вызывается, когда действие завершается предмет добален/удалён
+            //Удобное событие, так как она возвращает всегда перетаскиваемый предмет
+            onChange: function (e, slot){
+
+                //Если слота нет, рассматривается рюкзак
+                if(!slot){
+                    //Из рюкзака взяли и надели на героя
+                    if(e.hasOwnProperty('removed')){
+                        let type_id = e.removed.element.slot_id;
+                        let slotEl = this.findSlot(type_id);
+
+                        //Если есть однотипные предметы, то меняем их местами
+                        //Проверка массива, когда содержится в slotEl.items два элемента, так как при перетаскивании добавился ещё
+                        if(slotEl.items.length > 1){
+                            this.swap(slotEl);
+                        }
+
+                        this.request('item_on', slotEl.items[0]);
+                    }
+
+                    //Из сняли предмет и положили в рюкзак
+                    if(e.hasOwnProperty('added')){
+                        this.request('item_off', e.added.element);
+                    }
+                }
+            },
+
+            changeItem: function(e, slot, item){
+
+                let slotEl = this.findSlot(item.slot_id);
+                //В рюкзаке: нажимаем на предмет надеть
+                if(!slot){
+                    if(slotEl.items.length){
+                        this.swap(slotEl);
+                    }
+
+                    slotEl.items.push(item);//Вставляем в слот предмет
+                    this.items.splice(this.findIndexItem(item.id), 1);//Удаляем предмет из массива this.items по индексу
+                    this.request('item_on', slotEl.items[0]);
+                //Предмет экипирован: нажимаем снять
+                }else{
+                    this.swap(slot);
+                }
             },
             //Поиск слота для подсветки ячейки
             findSlot: function (type_id) {
                 return this.slots.find(s => s.type === type_id);
             },
-            findItem: function (id) {
-                return this.items.find(s => s.id === id);
+            findIndexItem: function (id) {
+                return this.items.findIndex(s => s.id === id);
             },
 
             //Генерация стиля для расположения слотов в пространстве
@@ -504,16 +373,16 @@
                 if(slot.type > 1 && slot.type < 6)
                     top = 64+62*(slot.type-1)+'px';
                 else if (slot.type === 13){
-                    left = '71px';
-                    top = '107px';
-                    width = '169px';
+                    left = '49px';
+                    top = '41px';
+                    width = '215px';
                     height = '100%';
                     backgroundSize = 'contain';
                     image = slot.images.info;
                 }else if(slot.type > 5 && slot.type < 11) {
                     top = 64+62 * (slot.type - 6) + 'px';
                     left = '247px';
-                }else if(slot.type === 12){//Условие для отображения переноса от героя в инвентарь, чтобы изображение не вылезало за пределы ячейки
+                }else if(slot.type === 14){//Условие для отображения переноса от героя в инвентарь, чтобы изображение не вылезало за пределы ячейки
                     if(this.buffer_type > 1 && this.buffer_type < 6)
                         top = 64+62 * (this.buffer_type-1) + 'px';
                     else if(this.buffer_type > 5 && this.buffer_type < 11){
@@ -539,61 +408,35 @@
                     }
             },
             //TODO:: доделать объект с body, создать отдельную функцию или сгенерировать отдельный объект на сервере
-            //TODO:: доделать генерицию объекта для items->artifacts, продумать какие характеристики оставить на первое время
             buildObjectSlots: function () {
                 let slots = this.$store.state.app.user.slots;
-                let artifacts = this.$store.state.app.user.artifacts;
-                let body = this.$store.state.app.user.body;
+                let items = this.$store.state.app.user.items;
+                let bodies = this.$store.state.app.user.bodies;
                 let user_class = this.$store.state.app.user.user_class;
 
-                slots.map(function (slot) {
-                    slot.active = false;
-                    slot.images = {};
-                    slot.images.normal = slot.image_normal;
-                    slot.images.arena = slot.image_arena;
-                    slot.images.gold = slot.image_gold;
-                    slot.items = [];
+                this.slots = slots;
+                this.items = items;
+            },
 
-                    let artifact = artifacts.find(a => (a.slot_id === slot.id && a.pivot.equip));
-                    if(artifact){
-                        artifact.data = {};
-                        artifact.data.stats = {
-                            strength: null,
-                            hard: 2800,
-                            mp: null,
-                            shield: 22,
-                            hp: 22,
-                            damage: 3
-                        };
-                        artifact.type = artifact.slot_id;
-                        artifact.images = {
-                            disabled: "",
-                            item: artifact.image,
-                            off: artifact.image,
-                            info: artifact.image,
-                            on: artifact.image
-                        };
-                        slot.items.push(artifact);
+            buildObjectProperties: function (){
+                let user_class = this.$store.state.app.user.user_class;
+                let subjects = this.$store.state.app.user.subjects;
+                let levels = [];
+
+                for (let subject in subjects){
+                    if(subjects.hasOwnProperty(subject) && 'lvl' in subjects[subject]){
+                        levels.push({subject: subject, lvl: subjects[subject].lvl})
                     }
 
-                });
-
-                slots.push({
-                    id:13,
-                    name: body[0][0].name,
-                    type: 13,
-                    images: {
-                        info: body[0][0].image,
-                        small: ""
-                    }
-                });
-                //this.slots = slots;
-                console.log(slots);
+                }
+                return Object.assign(this.user_property, {class: {name: user_class.name, description: user_class.description, image: user_class.image, levels: levels}})
             }
         },
 
         mounted() {
+            this.user_property = this.$store.state.app.user.user_property;
             this.buildObjectSlots();
+            //console.log(this.$t('Common.needHelp'));
         }
     }
 </script>
