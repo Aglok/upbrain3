@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "admin-lte": "^2.4.18",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "bootstrap": "^3.3.7",
     "bootstrap-daterangepicker": "^2.1.30",
     "datatables.net": "^1.10.19",
