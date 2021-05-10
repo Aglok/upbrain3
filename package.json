@@ -28,7 +28,7 @@
     "jquery": "^3.4.1",
     "jquery-form": "^4.2.2",
     "laravel-mix": "^4.1.4",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "magnific-popup": "^1.1.0",
     "moment": "^2.24.0",
     "nestable": "^0.2.0",
