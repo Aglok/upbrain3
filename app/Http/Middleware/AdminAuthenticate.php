@@ -3,25 +3,44 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Auth\Guard;
 
 class AdminAuthenticate
 {
     /**
+     * The Guard implementation.
+     *
+     * @var Guard
+     */
+    protected Guard $auth;
+
+    /**
+     * Create a new filter instance.
+     *
+     * @param  Guard $auth
+     * @return void
+     */
+    public function __construct(Guard $auth)
+    {
+        $this->auth = $auth;
+    }
+    /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
-     * @param  string|null $guard
+     * @param Request $request
+     * @param Closure $next
+     * @param string|null $guard
      *
      * @return mixed
      */
-    public function handle($request, Closure $next, $guard = null)
+    public function handle(Request $request, Closure $next, string $guard = null): mixed
     {
         $auth = Auth::guard($guard);
 
-        //dd(\Session::all());
-        if (Auth::guard($guard)->guest()) {
+        if ($auth->guest()) {
+
             if ($request->ajax() || $request->wantsJson()) {
                 return response('Unauthorized.', 401);
             } else {
@@ -29,9 +48,8 @@ class AdminAuthenticate
             }
         }
 
-        //dd($auth->user()->isManager());
         if (!$auth->user()->isManager() && !$auth->user()->isSuperAdmin()) {
-            return redirect()->guest('home_users');
+            return redirect()->guest('test');
         }
 
         return $next($request);

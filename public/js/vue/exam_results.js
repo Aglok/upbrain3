@@ -16,10 +16,10 @@ Vue.component('short-answers', Vue.extend({
     '               <tbody>'+
     '                   <tr v-for="input, index in result_short_answers">' +
     '                       <td>{{index+1}}</td>' +
-    '                       <td><input class="form-control" :id="\'short_answers_\'+input" v-model=short_answers[index] type=text></td>' +
+    '                       <td><input class="form-control" :id="\'short_answers_\'+index" v-model=short_answers[index] type=text></td>' +
     '                       <td>{{exam_answers[index]}}</td>' +
     '                       <td v-bind:class="[!!compare.result_short_answers[index] ? correct : wrong]">' +
-    '                           <input class="form-control" :id="\'result_short_answers_\'+input" v-model=compare.result_short_answers[index] type=text disabled>' +
+    '                           <input class="form-control" :id="\'result_short_answers_\'+index" v-model=compare.result_short_answers[index] type=text disabled>' +
     '                       </td>' +
     '                       <td>1</td>' +
     '                   </tr>' +
@@ -44,7 +44,7 @@ Vue.component('short-answers', Vue.extend({
     '               <tbody>'+
     '                   <tr v-for="input, index in result_expanded_answers">' +
     '                       <td>{{index+13}}</td>' +
-    '                       <td><input class="form-control" :id="\'answer_\'+input" v-model=result_expanded_answers[index] type=text></td>' +
+    '                       <td><input class="form-control" :id="\'answer_\'+index" v-model=result_expanded_answers[index] type=text></td>' +
     '                       <td>{{balls_expanded[index]}}</td>' +
     '                   </tr>' +
     '                    <tr>' +

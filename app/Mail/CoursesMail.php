@@ -10,6 +10,7 @@ class CoursesMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $name;
     public $email;
     public $type;
     public $subject;
@@ -18,8 +19,9 @@ class CoursesMail extends Mailable
      *
      * @return void
      */
-    public function __construct($email, $type, $subject)
+    public function __construct($name, $email, $type, $subject)
     {
+        $this->name = $name;
         $this->email = $email;
         $this->type = $type;
         $this->subject = $subject;
@@ -35,6 +37,6 @@ class CoursesMail extends Mailable
         return $this->from('email@upbrain.ru')
             ->view('admin.email.courses')
             ->subject('Курсы подготовки Upbrain')
-            ->with(['email' => $this->email, 'type' => $this->type, 'subject' => $this->subject]);
+            ->with(['name' => $this->name, 'email' => $this->email, 'type' => $this->type, 'subject' => $this->subject]);
     }
 }

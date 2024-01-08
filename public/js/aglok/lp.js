@@ -14,18 +14,67 @@ $(function () {
         }
     });
 
+    let data = {cls:"", subject:"", service:""}
+
+    let OpenModal = function (modal_selector){
+
+        $(modal_selector).on('show.bs.modal', function (event) {
+
+            let button = $(event.relatedTarget) // Кнопка, запускающая модальное окно
+            let cls = button.data('class') // Извлечь информацию из атрибутов data- *
+            let subject = button.data('subject')
+            let service = button.data('service')
+
+            if(typeof cls !== 'undefined')
+                data.cls = cls
+            if(typeof subject !== 'undefined')
+                data.subject = subject
+            if(typeof service !== 'undefined')
+                data.service = service
+        })
+
+    }
+
+
     //Функция принимает селектор id формы
     // Отправляет ajax запросом данные формы
     let SendForm = function sendForm(form_selector) {
 
-        $(form_selector +' .btn').one('click', function (e) {
+        OpenModal("#contact-modal-junior")
+
+        $(form_selector +' .btn').on('click', function (e) {
 
             e.preventDefault();
 
             let form = $(form_selector),
+                button = $(this),
                 name = $(form_selector + ' input[name=name]').val(),
                 phone = $(form_selector + ' input[name=phone]').val(),
-                email = $(form_selector + ' input[name=email]').val();
+                email = $(form_selector + ' input[name=email]').val()
+
+            //Блок код для обработки валидации формы junior: добавлены предметы и тип обучения
+            if(form_selector === '#form-bottom-junior'){
+                let subjects = [];
+                let type_of_training = [];
+
+                $(form_selector + ' input[name="subjects[]"]:checked').each(function () {
+                    subjects.push($(this).val());
+                });
+
+                $(form_selector + ' input[name="type_of_training[]"]:checked').each(function () {
+                    type_of_training.push($(this).val());
+                });
+
+                if(!subjects.length){
+                    infoChat(form,'Выберите хотя бы один предмет');
+                    return;
+                }
+
+                if(!type_of_training.length){
+                    infoChat(form,'Выберите хотя бы один тип обучения');
+                    return;
+                }
+            }
 
             if(typeof name !== 'undefined'){
                 if(!name){
@@ -33,6 +82,7 @@ $(function () {
                     return;
                 }
             }
+
             if(typeof phone !== 'undefined'){
                 if(!phone){
                     infoChat(form,'Напишите пожалуйста Ваш телефон.');
@@ -48,6 +98,7 @@ $(function () {
             }
 
             let data_form = form.serialize();
+            button.prop("disabled",true);
 
             $.ajax({
                 type: 'POST',
@@ -55,6 +106,8 @@ $(function () {
                 data: data_form,
 
                 success: function () {
+
+                    button.prop("disabled",false);
                     if(typeof phone !== 'undefined'){
                         infoChat(form,'Ваши данные успешно оправлены, ожидайте мы вам перезвоним!');
                     }else{

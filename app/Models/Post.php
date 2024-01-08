@@ -41,13 +41,18 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Post whereUserId($value)
  * @mixin \Eloquent
+ * @property-read int|null $comments_count
+ * @property-read int|null $tags_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Post newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Post newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Post query()
  */
 class Post extends Model
 {
 
     protected $table = 'posts';
     //Добавляем в выдачу вычисляемое поле
-    protected $appends = array('cut');//регистрируем метод getCutAttribute()(Cut вставляется между get и Attribute), и создает поле которого нет в таблице БД.
+    protected $appends = array('cut');//регистрируем метод getCutAt6tribute()(Cut вставляется между get и Attribute), и создает поле которого нет в таблице БД.
     //Делаем поля доступными для автозаполнения
     protected $fillable = array('title', 'keywords', 'description', 'text', 'link', 'image',' alt', 'author', 'published', 'subject_title', 'subject_image', 'subject_text');
 

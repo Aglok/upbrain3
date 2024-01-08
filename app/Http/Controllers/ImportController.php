@@ -1,10 +1,15 @@
 <?php namespace App\Http\Controllers;
 
+use App\Imports\ProcessesImport;
+use App\Imports\SheetsSectionsImport;
+use App\Imports\TasksImport;
+use App\Imports\UsersImport;
+use Exception;
+use Illuminate\Contracts\View\Factory;
+use Throwable;
 use function explode;
 use Illuminate\Support\Facades\Input;
 use Excel;
-use DB;
-use Hash;
 use AdminSection;
 use App\Helpers\ParserSh;
 use Symfony\Component\DomCrawler\Crawler;
@@ -12,9 +17,11 @@ use Symfony\Component\DomCrawler\Crawler;
 class ImportController extends Controller
 {
     /**
-     * @return view
+     * @return Factory|\Illuminate\View\View
      * Отправляем шаблон
-     * */
+     *
+     * @throws Throwable
+     */
     public function getIndex()
     {
         $view = view('admin.import.import', [1]);
@@ -45,13 +52,13 @@ class ImportController extends Controller
 
 
             if($table == 'section' && $subject){
-                Excel::import(new \App\Imports\SheetsSectionsImport($subject), $file);
+                Excel::import(new SheetsSectionsImport($subject), $file);
             }elseif ($table == 'tasks' && $subject){
-                Excel::import(new \App\Imports\TasksImport($subject), $file);
+                Excel::import(new TasksImport($subject), $file);
             }elseif ($table == 'users'){
-                Excel::import(new \App\Imports\UsersImport($subject), $file);
+                Excel::import(new UsersImport($subject), $file);
             }elseif($table == 'processes' && $subject){
-                Excel::import(new \App\Imports\ProcessesImport($subject), $file);
+                Excel::import(new ProcessesImport($subject), $file);
             }else{
                 return "Таких таблиц нет!";
             }
@@ -184,7 +191,7 @@ class ImportController extends Controller
      * @var $link string link to html page
      *
      * @return array with parsing data
-     * @throws \Exception
+     * @throws Exception
      */
 
     public function getContent(ParserSh $parser)

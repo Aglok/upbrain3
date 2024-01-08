@@ -26,6 +26,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SetOfTaskPhysics whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SetOfTaskPhysics whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read int|null $tasks_count
+ * @method static \Illuminate\Database\Eloquent\Builder|SetOfTaskPhysics newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|SetOfTaskPhysics newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|SetOfTaskPhysics query()
  */
 class SetOfTaskPhysics extends Model
 {

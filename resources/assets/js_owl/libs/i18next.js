@@ -4,7 +4,8 @@
  *
  * @see http://i18next.com/
  */
-window.i18next = require('i18next');
+
+import i18next from 'i18next';
 
 i18next.init({
     lng: Admin.locale,
@@ -17,6 +18,10 @@ i18next.init({
     }
 });
 
-window.trans = function (key) {
-    return i18next.t(key);
+window.trans = function (key, args) {
+    let value = i18next.t(key)
+    _.eachRight(args, (paramVal, paramKey) => {
+        value = _.replace(value, `:${paramKey}`, paramVal)
+    })
+    return value
 }

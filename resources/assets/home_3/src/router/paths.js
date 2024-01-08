@@ -35,4 +35,14 @@ export default [
     name: 'Table Exam Result',
     view: 'TableExamResult'
   },
+  {
+    path: '/notifications',
+    name: 'Notification',
+    view: 'Notifications'
+  },
+  {
+    path: '/battle/:subject?/:mission_id?',
+    name: 'Battle',
+    view: 'Battle'
+  }
 ]

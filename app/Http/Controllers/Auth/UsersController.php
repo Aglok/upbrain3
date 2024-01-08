@@ -46,7 +46,7 @@ class UsersController extends Controller {
 
 	    // Пытаемся его активировать с указанным кодом
 	    if ($user->activate($activationCode)) {
-	        // В случае успеха авторизовываем его
+	        // В случае успеха авторизовавшем его
 	        Auth::login($user);
 	        // И выводим сообщение об успехе
 	        return $this->getMessage("Аккаунт активирован", "/");
@@ -62,7 +62,7 @@ class UsersController extends Controller {
 
 	public function postLogin() {
 	    // Формируем базовый набор данных для авторизации
-	    // (isActive => 1 нужно для того, чтобы авторизоваться могли только
+	    // (isActive => 1 нужно для того чтобы, авторизоваться могли только
 	    // активированные пользователи)
 	    $creds = array(
 	        'password' => Input::get('password'),

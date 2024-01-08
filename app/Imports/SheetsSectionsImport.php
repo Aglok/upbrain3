@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 class SheetsSectionsImport implements WithMultipleSheets
 {
     /**
-     * @param string
+     * @var string
      * Название листа в таблице
      */
     public $subject;

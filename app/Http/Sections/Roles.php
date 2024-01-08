@@ -39,10 +39,10 @@ class Roles extends Section
     /**
      * @return DisplayInterface
      */
-    public function onDisplay()
+    public function onDisplay(): DisplayInterface
     {
         return AdminDisplay::table()
-            ->with('users')
+            ->with(['users'])
             ->setHtmlAttribute('class', 'table-primary')
             ->setColumns([
                 AdminColumn::text('id', '#')->setWidth('30px'),
@@ -56,9 +56,9 @@ class Roles extends Section
      *
      * @return FormInterface
      */
-    public function onEdit($id)
+    public function onEdit(int $id): FormInterface
     {
-        return AdminForm::panel()->addBody([
+        return AdminForm::card()->addBody([
             AdminFormElement::text('name', 'Key')->required(),
             AdminFormElement::text('label', 'Label')->required()
         ]);
@@ -67,9 +67,9 @@ class Roles extends Section
     /**
      * @return FormInterface
      */
-    public function onCreate()
+    public function onCreate(): FormInterface
     {
-        return $this->onEdit(null);
+        return $this->onEdit((int)null);
     }
 
     /**

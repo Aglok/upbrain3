@@ -16,13 +16,18 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserClass whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserClass whereUserId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|UserClass newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserClass newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserClass query()
+ * @property int|null $active
+ * @method static \Illuminate\Database\Eloquent\Builder|UserClass whereActive($value)
  */
 class UserClass extends Model
 {
     public $timestamps = false;
     
     protected $table = 'user_class';
-    protected $fillable = ['user_id', 'class_person_id'];
+    protected $fillable = ['user_id', 'class_person_id', 'on'];
 
     public function class_person(){
         return $this->belongsTo(ClassPerson::class);

@@ -16,6 +16,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryPhysics whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryPhysics whereParentCategoryId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryPhysics newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryPhysics newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryPhysics query()
  */
 class CategoryPhysics extends Model
 {

@@ -1,6 +1,6 @@
 <div class="container m-b-lg">
     <div class="m-b-0 text-center">
-        <span class="common-title" id="subjects">Наши преимущества</span>
+        <span class="common-title" id="feature">Наши преимущества</span>
     </div>
     <div class="mx-auto col-sm-8 m-y-lg upbrain-block-list-2">
  {{--       <h2 class="m-t-lg">На онлайн - встрече вы получите:</h2>--}}

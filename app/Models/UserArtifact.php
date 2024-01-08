@@ -16,6 +16,11 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserArtifact whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserArtifact whereUserId($value)
  * @mixin \Eloquent
+ * @property int|null $equip
+ * @method static \Illuminate\Database\Eloquent\Builder|UserArtifact newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserArtifact newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserArtifact query()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserArtifact whereEquip($value)
  */
 class UserArtifact extends Model
 {

@@ -21,6 +21,13 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ImageOfCharacter whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ImageOfCharacter whereUserLevel($value)
  * @mixin \Eloquent
+ * @property string|null $sex
+ * @property-read \Illuminate\Database\Eloquent\Collection|User[] $users
+ * @property-read int|null $users_count
+ * @method static \Illuminate\Database\Eloquent\Builder|ImageOfCharacter newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ImageOfCharacter newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ImageOfCharacter query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ImageOfCharacter whereSex($value)
  */
 class ImageOfCharacter extends Model
 {
@@ -30,7 +37,7 @@ class ImageOfCharacter extends Model
     protected $fillable = ['name', 'description', 'image', 'user_level', 'class_person_id', 'sex'];
 
     protected $casts = [
-        'image' => 'image',
+        //'image' => 'image',
     ];
 
     /**

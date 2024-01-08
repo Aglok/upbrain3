@@ -1,4 +1,4 @@
 /**
- * @see http://www.daterangepicker.com/
+ * @see: http://www.daterangepicker.com/
  */
-require('bootstrap-daterangepicker')
+require('daterangepicker')

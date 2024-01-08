@@ -15,6 +15,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExamAnswer whereExamId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExamAnswer whereId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamAnswer newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamAnswer newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamAnswer query()
  */
 class ExamAnswer extends Model
 {

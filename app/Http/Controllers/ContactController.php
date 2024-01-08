@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\FormRegistrationMail;
 use Illuminate\Http\Request;
 use App\Models\Contact;
-use App\Models\User_Vk;
+use App\Models\UserVk;
 use App\Mail\MeetMail;
 use App\Mail\TrialExamMail;
 use App\Mail\CoursesMail;
@@ -30,7 +30,7 @@ class ContactController extends Controller
             if($vk_user){
                 return response()->json('Вы уже получили свой номер: <span class="text-white">'.$vk_user->gen_code.'</span>');
             }else{
-                User_Vk::create(
+                UserVk::create(
                     [
                         'vk_id' => $vk_id,
                         'domain' => $domain,
@@ -61,19 +61,59 @@ class ContactController extends Controller
             $name = $request->get('name');
             $phone = $request->get('phone');
             $email = $request->get('email');
-            $special_offer = $request->get('special_offer');
             $type = $request->get('type');
             $subject = $request->get('subject');
+            $link = $request->get('link');
+
+            $special_offer = '';
+            $subjects = [];
+            $type_of_training = [];
+            $schools = [];
+            $individual = '';
+
+            if($request->has('special_offer')){
+                $special_offer = $request->get('special_offer');
+            }
+            if($request->has('subjects')){
+                $subjects = $request->get('subjects');
+            }
+            if($request->has('type_of_training')){
+                $type_of_training = $request->get('type_of_training');
+            }
+            if($request->has('schools')){
+                $schools = $request->get('schools');
+            }
+            if($request->has('individual')){
+                $individual = $request->get('individual');
+            }
+
+
+            $subjects = implode(',', $subjects);
+            $type_of_training = implode(',', $type_of_training);
+            $schools = implode(',', $schools);
 
             if(!$email) $email = 'email@upbrain.ru';
+
             if($special_offer)
                 $special_offer = 'Хочет получить специальное предложение от 2х предметов';
-            else
-                $special_offer = '';
+            if($individual)
+                $individual = 'Хочет индивидуальное занятие';
 
-            $body =  ($type ? $type.': ' :''). ($subject ? $subject.': ' :'').'Имя: ' . $name . ' Почта: ' . $email . ' Телефон: ' . $phone  . ' Дополнительно: ' . $special_offer;
+            $body =  ($type ? $type .'; ' :'') .
+                ($subject ? $subject .'; ' :'') .
+                ($link ? ' Класс ' . $link .'; ' :'') .
+                ' Имя: ' . $name . ';' .
+                ' Почта: ' . $email . ';' .
+                ' Телефон: ' . $phone  . ';' .
+                ' Дополнительно: ' . $special_offer . ';' .
+                ($subjects ? ' Предметы: ' . $subjects.'; ':'') .
+                ($type_of_training ? ' Тип обучения: ' . $type_of_training.'; ':'') .
+                ($schools ? ' Школы: ' . $schools.'; ':'') .
+                ' Занятие: ' . $individual;
 
-            $mail_to = 'email@upbrain.ru';
+            // $mail_to = 'email@upbrain.ru';
+            $mail_to = 'upbrainschool@gmail.com';
+
 
             \Mail::raw($body, function ($message) use ($mail_to, $email, $name, $body) {
                 $message->from($email, $name);
@@ -85,19 +125,24 @@ class ContactController extends Controller
             if($type == 'Webinar')
                 \Mail::to($email)->send(new MeetMail($email));
             elseif($type == 'ege' || $type == 'oge')
-                \Mail::to($email)->send(new CoursesMail($email, $type, $subject));
+                \Mail::to($email)->send(new CoursesMail($name, $email, $type, $subject));
             elseif($type == 'trial_exam' || $type == 'intensive_exam')
                 \Mail::to($email)->send(new TrialExamMail($email));
             else
-                \Mail::to($email)->send(new CoursesMail($email, $type, $subject));
+                \Mail::to($email)->send(new CoursesMail($name, $email, $type, $subject));
 
            Contact::create(
                 [
                     'firstname' => $name,
                     'phone'   => $phone,
                     'email'      => $email,
-                    'special_offer'    => $special_offer,
-                    'type' => $type
+                    // 'special_offer'    => $special_offer,
+                    'type' => $type,
+                    'subjects' => $subjects,
+                    'link' => $link,
+                    'type_of_training' => $type_of_training,
+                    'schools' => $schools,
+                    'individual' => $individual
                 ]
             );
             return response()->json($request->all());
@@ -109,6 +154,7 @@ class ContactController extends Controller
     }
 
     public function saveForm(Request $request){
+
         if($request->ajax()) {
             $name = $request->get('name');
             $surname = $request->get('surname');
@@ -141,14 +187,15 @@ class ContactController extends Controller
                 ($place ? ' Место: ' . $place.'; ':'') .
                 ($additionally ? ' Дополнительно: ' . $additionally.'; ':'');
 
-            $mail_to = 'email@upbrain.ru';
+            //$mail_to = 'email@upbrain.ru';
+            $mail_to = 'upbrainschool@gmail.com';
 
             \Mail::raw($body, function ($message) use ($mail_to, $email, $name, $body) {
                 $message->from($email, $name);
                 $message->to($mail_to)->subject('Письмо для upbrain.ru');
             });
 
-            \Mail::to($email)->send(new FormRegistrationMail($email));
+            \Mail::to($email)->send(new FormRegistrationMail($name, $email));
 
             Contact::create(
                 [

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VueCookies from 'vue-cookies'
 import * as types from './mutation_types'
+
 Vue.use(Vuex);
 window.$cookies = VueCookies;
 
@@ -83,7 +84,7 @@ const mutations = {
                 }
 
             });
-            swal('Задача удалена!');
+            Swal.fire('Задача удалена!');
         }
     },
     [types.REMOVE_FROM_CART] (state, index) {
@@ -93,12 +94,10 @@ const mutations = {
     },
     [types.GET_TASKS_FROM_COOKIES] (state) {
         let tasksCookie = JSON.parse($cookies.get('tasks'));
-        if(!state.added.length && tasksCookie.length)
+        if(!state.added.length && Array.isArray(tasksCookie) && tasksCookie.length)
             state.added = tasksCookie
     }
-
 };
-
 // one store for entire application
 export default new Vuex.Store({
     state,

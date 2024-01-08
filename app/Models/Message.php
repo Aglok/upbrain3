@@ -27,6 +27,12 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Message whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Message whereUserId($value)
  * @mixin \Eloquent
+ * @property-read int|null $participants_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|Participant[] $recipients
+ * @property-read int|null $recipients_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Message newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Message newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Message query()
  */
 class Message extends Eloquent
 {

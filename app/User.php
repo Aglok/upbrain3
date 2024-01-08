@@ -2,7 +2,15 @@
 
 namespace App;
 
-use function functionCallback;
+use App\Models\Message;
+use Carbon\Carbon;
+use Cmgmyr\Messenger\Models\Participant;
+use Cmgmyr\Messenger\Models\Thread;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\hasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use KodiComponents\Support\Upload;
 use Illuminate\Http\UploadedFile;
@@ -27,17 +35,17 @@ use App\Models\UserProperty;
  * @property mixed $avatar
  * @property string|null $class_person_id
  * @property string|null $remember_token
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  * @property string|null $sex
  * @property string|null $notify
  * @property int|null $active
  * @property-read string $avatar_url_or_blank
  * @property-read string $full_name
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Message[] $messages
- * @property-read \Illuminate\Database\Eloquent\Collection|\Cmgmyr\Messenger\Models\Participant[] $participants
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Role[] $roles
- * @property-read \Illuminate\Database\Eloquent\Collection|\Cmgmyr\Messenger\Models\Thread[] $threads
+ * @property-read Collection|Message[] $messages
+ * @property-read Collection|Participant[] $participants
+ * @property-read Collection|Role[] $roles
+ * @property-read Collection|Thread[] $threads
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User active($active)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereAvatar($value)
@@ -59,6 +67,46 @@ use App\Models\UserProperty;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereSurname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\User whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property int|null $gold
+ * @property int|null $experience
+ * @property int|null $tasks
+ * @property-read Collection|\App\Models\Artifact[] $artifacts
+ * @property-read int|null $artifacts_count
+ * @property-read Collection|\App\Models\ClassPerson[] $classes_person
+ * @property-read int|null $classes_person_count
+ * @property-read Collection|\App\Models\GradeMath[] $grade_math
+ * @property-read int|null $grade_math_count
+ * @property-read Collection|\App\Models\GradePhysics[] $grade_physics
+ * @property-read int|null $grade_physics_count
+ * @property-read int|null $messages_count
+ * @property-read int|null $participants_count
+ * @property-read Collection|\App\Models\ProcessMath[] $processes_math
+ * @property-read int|null $processes_math_count
+ * @property-read Collection|\App\Models\ProcessPhysics[] $processes_physics
+ * @property-read int|null $processes_physics_count
+ * @property-read Collection|\App\Models\Progress[] $progresses
+ * @property-read int|null $progresses_count
+ * @property-read UserProperty|null $property
+ * @property-read int|null $roles_count
+ * @property-read Collection|\App\Models\Stage[] $stages_math
+ * @property-read int|null $stages_math_count
+ * @property-read Collection|\App\Models\Stage[] $stages_physics
+ * @property-read int|null $stages_physics_count
+ * @property-read int|null $threads_count
+ * @property-read Collection|\App\Models\UserTransaction[] $transactions
+ * @property-read int|null $transactions_count
+ * @property-read Collection|\App\Models\ImageOfCharacter[] $user_bodies
+ * @property-read int|null $user_bodies_count
+ * @property-read Collection|\App\Models\Mission[] $user_missions
+ * @property-read int|null $user_missions_count
+ * @property-read Collection|\App\Models\Subject[] $user_subjects
+ * @property-read int|null $user_subjects_count
+ * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|User query()
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereExperience($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereGold($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereTasks($value)
  */
 class User extends Authenticatable
 {
@@ -78,7 +126,10 @@ class User extends Authenticatable
         'description',
         'avatar',
         'sex',
-        'active'
+        'active',
+        'gold',
+        'experience',
+        'tasks'
     ];
 
     /**
@@ -97,13 +148,13 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'avatar' => 'image',
+        'avatar' => 'string',
     ];
 
     /**
      * @return array
      */
-    public function getUploadSettings()
+    public function getUploadSettings(): array
     {
         return [
             'avatar' => [
@@ -120,7 +171,7 @@ class User extends Authenticatable
      *
      * @return string
      */
-    protected function getUploadFilename(UploadedFile $file)
+    protected function getUploadFilename(UploadedFile $file): string
     {
         return md5($this->id).'.'.$file->getClientOriginalExtension();
     }
@@ -128,7 +179,7 @@ class User extends Authenticatable
     /**
      * @return bool
      */
-    public function isSuperAdmin()
+    public function isSuperAdmin(): bool
     {
         return $this->hasRole('admin');
     }
@@ -136,7 +187,7 @@ class User extends Authenticatable
     /**
      * @return bool
      */
-    public function isManager()
+    public function isManager(): bool
     {
         return $this->hasRole('manager');
     }
@@ -144,18 +195,17 @@ class User extends Authenticatable
     /**
      * @param string $password
      */
-    public function setPasswordAttribute($password)
+    public function setPasswordAttribute(string $password): void
     {
         if (!empty($password)) {
             $this->attributes['password'] = bcrypt($password);
-        }else
-            return;
+        }
     }
 
     /**
      * @return string $full_name
      */
-    public function getFullNameAttribute()
+    public function getFullNameAttribute(): string
     {
         return $this->attributes['name'].' '.$this->attributes['surname'];
     }
@@ -163,7 +213,7 @@ class User extends Authenticatable
     /**
      * @return string
      */
-    public function getAvatarUrlOrBlankAttribute()
+    public function getAvatarUrlOrBlankAttribute(): string
     {
         if (empty($url = $this->avatar_url)) {
             return asset('images/avatar/default/no-photo-male.png');
@@ -174,66 +224,74 @@ class User extends Authenticatable
 
 
     /**
+     * @param string $query
+     * @param int $active
      * @return string
      * Принимает get запрос ?active=1, ?active=0
      */
-    public function scopeActive($query, $active)
+    public function scopeActive(string $query, int $active): string
     {
         return $query->where('active', $active);
     }
     /**
-     * Получить с все артифакты пользователя
+     * Получить с все артефакты пользователя
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function artifacts(){
+    public function artifacts(): BelongsToMany
+    {
 
         return $this->belongsToMany(Models\Artifact::class, 'user_artifact')->withPivot('equip');
     }
     /**
      * Получить все классы пользователя
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function classes_person(){
+    public function classes_person(): BelongsToMany
+    {
 
-        return $this->belongsToMany(Models\ClassPerson::class, 'user_class');
+        return $this->belongsToMany(Models\ClassPerson::class, 'user_class')->withPivot(['active']);
     }
 
     /**
      * Получить свойства пользователя
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasOne
      */
-    public function property(){
+    public function property(): HasOne
+    {
 
-        return $this->hasMany(Models\UserProperty::class);
+        return $this->hasOne(Models\UserProperty::class);
     }
 
     /**
      * Получить все достижения пользователя
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function progresses(){
+    public function progresses(): BelongsToMany
+    {
 
         return $this->belongsToMany(Models\Progress::class, 'user_progress')->withPivot('progress_quality');
     }
     /**
      * Получить все образы пользователя
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function user_bodies(){
+    public function user_bodies(): BelongsToMany
+    {
 
         return $this->belongsToMany(Models\ImageOfCharacter::class, 'user_body')->withPivot('on');
     }
     /**
      * Получить все миссии пользователя
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function user_missions(){
+    public function user_missions(): BelongsToMany
+    {
 
         //Передаём дополнительные параметры 'done', 'updated_at', 'created_at'
         return $this->belongsToMany(Models\Mission::class, 'user_mission')->withPivot('done', 'updated_at', 'created_at');
@@ -241,9 +299,10 @@ class User extends Authenticatable
     /**
      * Получить все выбранные предметы пользователя
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function user_subjects(){
+    public function user_subjects(): BelongsToMany
+    {
 
         return $this->belongsToMany(Models\Subject::class, 'user_subject');
     }
@@ -251,9 +310,10 @@ class User extends Authenticatable
     /**
      * Получить весь процесс пользователя по математике
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function processes_math(){
+    public function processes_math(): HasMany
+    {
 
         return $this->hasMany(Models\ProcessMath::class);
     }
@@ -261,23 +321,24 @@ class User extends Authenticatable
     /**
      * Получить весь процесс пользователя по физике
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function processes_physics(){
+    public function processes_physics(): HasMany
+    {
 
         return $this->hasMany(Models\ProcessPhysics::class);
     }
 
     /**
      * Связанные Stage, через ProcessMath
-     * firsKey - ключ по которому Process ищется из модели User process.user_id = id(localKey)
+     * firstKey - ключ по которому Process ищется из модели User process.user_id = id(localKey)
      * secondKey - ключ по которому Stage соединяется с Process process.stage_id(secondLocalKey) = stage.id(secondKey)
      * localKey - ключ по которому ищется текущая модель id(localKey)
      * secondLocalKey - ключ по которому соединается Process process.stage_id(secondLocalKey) = stage.id(secondKey)
      *
-     * @return \Illuminate\Database\Eloquent\Relations\hasManyThrough
+     * @return hasManyThrough
      */
-    public function stages_math()
+    public function stages_math(): hasManyThrough
     {
         return $this->hasManyThrough(Models\Stage::class, Models\ProcessMath::class, 'user_id', 'id', 'id', 'stage_id');
     }
@@ -285,9 +346,9 @@ class User extends Authenticatable
     /**
      * Связанные Stage, через ProcessPhysics
      *
-     * @return \Illuminate\Database\Eloquent\Relations\hasManyThrough
+     * @return hasManyThrough
      */
-    public function stages_physics()
+    public function stages_physics(): hasManyThrough
     {
         return $this->hasManyThrough(Models\Stage::class, Models\ProcessPhysics::class, 'user_id', 'id', 'id', 'stage_id');
     }
@@ -295,9 +356,10 @@ class User extends Authenticatable
     /**
      * Получить всю статистику пользователя по математике
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function grade_math(){
+    public function grade_math(): HasMany
+    {
 
         return $this->hasMany(Models\GradeMath::class);
     }
@@ -305,11 +367,23 @@ class User extends Authenticatable
     /**
      * Получить всю статистику пользователя по физике
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function grade_physics(){
+    public function grade_physics(): HasMany
+    {
 
         return $this->hasMany(Models\GradePhysics::class);
+    }
+
+    /**
+     * Получить всю статистику пользователя по математике
+     *
+     * @return HasMany
+     */
+    public function transactions(): HasMany
+    {
+
+        return $this->hasMany(Models\UserTransaction::class);
     }
 
     /**
@@ -326,18 +400,20 @@ class User extends Authenticatable
                 $classes_person = $model->classes_person()->first();
 
                 //Если запись есть, то игнорируем базовые характеристики UserProperty
-                if(!UserProperty::where('user_id', $model->id)->exists()){
+                if(!UserProperty::where('user_id', $model->id)->exists() && $classes_person){
 
                     UserProperty::firstOrCreate([
                         'user_id' => $model->id,
                         'attack' => $classes_person->attack,
                         'shield' => $classes_person->shield,
-                        'damage' => $classes_person->damage,
+                        'damage_min' => $classes_person->damage_min,
+                        'damage_max' => $classes_person->damage_max,
                         'hp' => $classes_person->hp,
                         'mp' => $classes_person->mp,
                         'energy' => $classes_person->energy,
                         'critical_damage' => $classes_person->critical_damage,
-                        'critical_chance' => $classes_person->critical_chance
+                        'critical_chance' => $classes_person->critical_chance,
+                        'type_id' => $classes_person->type_id,
                     ]);
                 }
 

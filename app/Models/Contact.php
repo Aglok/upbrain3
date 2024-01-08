@@ -32,6 +32,23 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Contact whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Contact whereUserId($value)
  * @mixin \Eloquent
+ * @property string|null $patronymic
+ * @property string|null $subjects
+ * @property string|null $type_of_training
+ * @property string|null $hei
+ * @property string|null $place
+ * @property string|null $points
+ * @property string|null $additionally
+ * @method static \Illuminate\Database\Eloquent\Builder|Contact newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Contact newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Contact query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Contact whereAdditionally($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Contact whereHei($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Contact wherePatronymic($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Contact wherePlace($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Contact wherePoints($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Contact whereSubjects($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Contact whereTypeOfTraining($value)
  */
 class Contact extends Model
 {
@@ -43,6 +60,7 @@ class Contact extends Model
         'patronymic' ,
         'phone',
         'subjects',
+        'link',
         'type_of_training',
         'hei',
         'points',

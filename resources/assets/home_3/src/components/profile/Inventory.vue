@@ -1,12 +1,18 @@
 <template>
-    <v-container fluid grid-list-md style="height: 427px; padding: 0">
-        <v-layout row wrap>
+    <!--
+        Тут жёстко привязваем стили подобранные под все экраны:
+        Поменял поведение отображения блоков cols="4" sm="6" md="4", для мобильных 6 колонок, для остальных 4 колонок на каждый блок
+        v-container: height: 427px; padding: 0
+        v-col: position: relative
+    -->
+    <v-container fluid style="height: 427px; padding: 0">
+        <v-row>
             <!-- Аватар -->
-            <v-flex d-flex xs12 sm6 md4 style="position: relative;">
+            <v-col cols="4" sm="6" md="4" style="position: relative;">
                 <div class="layout-items" :style="styleInventory.dollPanelBody">
                     <v-menu v-model="menu" :close-on-content-click="false" :max-width="180" :min-width="180" :nudge-left="9" offset-y>
-                        <template slot="activator">
-                            <div class="btn-tool">Характеристики<span class="icon-tool" :class="menu ? 'show' : 'hide' "></span></div>
+                        <template v-slot:activator="{ on }">
+                            <div v-on="on" class="btn-tool-menu">Характеристики<span class="icon-tool" :class="menu ? 'show' : 'hide' "></span></div>
                         </template>
                         <profile-list-property :property="buildObjectProperties()"></profile-list-property>
                     </v-menu>
@@ -25,68 +31,84 @@
                                    @change="onChange($event, slot)"
                                    :style="setStyleSlot(slot)"
                                    :class="{'slot-highlighted': slot.active}">
-                                    <div v-if="slot.items.length" :title="slot.name" class="stuff-item stuff-imaged" v-for="item in slot.items" :key="item.id">
-                                        <v-menu v-model="item.active" class="game-content" :close-on-content-click="false" :nudge-width="200" offset-y>
-                                            <template slot="activator">
-                                                <div class="grid-item stuff-img" :style="setStyleItem(item)"></div>
-                                            </template>
-                                            <profile-item-details :item="item" :equip="slot" @change="changeItem($event, slot, item)"></profile-item-details>
-                                        </v-menu>
-                                        <div class="stuff-tap-highlight"></div>
-                                    </div>
+                            <div v-if="slot.items.length" :title="slot.name" class="stuff-item stuff-imaged" v-for="item in slot.items" :key="item.id">
+                                <!--Выплывающее меню с описанием предмета item.active генерируется v-menu автоматом-->
+                                <v-menu v-model="item.active" class="game-content" :close-on-content-click="false" :nudge-width="200" offset-y>
+                                    <template v-slot:activator="{ on }">
+                                        <div v-on="on" class="grid-item stuff-img" :style="setStyleItem(item)"></div>
+                                    </template>
+                                    <profile-item-details :item="item" :items_bag="items_bag" :equip="slot" @change="changeItem($event, slot, item)"></profile-item-details>
+                                </v-menu>
+                                <div class="stuff-tap-highlight"></div>
+                            </div>
                         </draggable>
+
                         <!-- Это один слот -->
                         <div class="characteristics">
-                            <v-flex d-flex xs12>
-                                <v-layout row wrap>
-                                    <v-flex d-flex>
-                                        <v-layout row wrap>
-                                            <v-flex d-flex xs12>D:30</v-flex>
-                                            <v-flex d-flex xs12>C:25</v-flex>
-                                        </v-layout>
-                                    </v-flex>
-                                    <v-flex d-flex>
-                                        <v-layout row wrap>
-                                            <v-flex d-flex xs12>B:10</v-flex>
-                                            <v-flex d-flex xs12>A:2</v-flex>
-                                        </v-layout>
-                                    </v-flex>
-                                </v-layout>
-                            </v-flex>
-                        </div>
+                            <v-row no-gutters>
+                                <v-col cols="12">
+                                    <v-row align="center" justify="center">
+                                        <v-col cols="6" class="pa-0">D:30</v-col>
+                                        <v-col cols="6" class="pa-0">C:25</v-col>
+                                    </v-row>
+                                    <v-row align="center" justify="center">
+                                        <v-col cols="6" class="pa-0">B:10</v-col>
+                                        <v-col cols="6" class="pa-0">A:2</v-col>
+                                    </v-row>
+                                </v-col>
+                            </v-row>
+                    </div>
                     </div>
                 </div>
-            </v-flex>
+            </v-col>
             <!-- Рюкзак -->
-            <v-flex d-flex xs12 sm6 md4 style="position: relative;">
-                <div class="grid-slots layout-item hidden-sm-and-down" :style="styleInventory.gridPanelBody">
+            <v-col cols="4" sm="6" md="4" style="position: relative;">
+                <div class="grid-slots layout-item d-none d-md-flex d-lg-flex" :style="styleInventory.gridPanelBody">
                     <div class="grid-text">Рюкзак</div>
                     <div class="grid-inner" :style="styleInventory.gridInnerBody" :class="{'slot-highlighted': gridHighlighted}">
                         <draggable class="grid-items"
                                    tag="ul"
-                                   :class="{filler:!items.length}"
-                                   v-model="items"
+                                   :class="{filler:!items_bag.length}"
+                                   v-model="items_bag"
                                    v-bind="{group: current_type}"
                                    @start="onStart($event)"
                                    @end="onEnd($event)"
                                    @change="onChange($event)"
+                                   :move="onMove"
                                     >
-                                    <li v-for="item in items" :key="item.id" class="grid-item" :data-type="item.slot_id">
+                                    <li v-for="item in items_bag" :key="item.id" class="grid-item" :data-type="item.artifact_type.slot_id">
                                         <div class="stuff-item stuff-imaged">
+
+                                            <!--Выплывающее меню с описанием предмета item.active генерируется v-menu автоматом-->
+
                                             <v-menu v-model="item.active" :close-on-content-click="false" :nudge-width="200" offset-y>
-                                                <template slot="activator">
-                                                    <div class="grid-item stuff-img" :style="setStyleItem(item)"></div>
+                                                <template v-slot:activator="{ on }">
+                                                    <div v-on="on" class="grid-item stuff-img" :style="setStyleItem(item)"></div>
                                                 </template>
-                                                <profile-item-details :item="item" @change="changeItem($event, slot=null, item)"></profile-item-details>
+                                                <profile-item-details :item="item" @change="changeItem($event, slot=null, item)" v-on:sale="sellItem(item)"></profile-item-details>
                                             </v-menu>
+
+                                            <!-- Диалоговое окно с подтвержением продажи, item.sellDialog=false, генерериуется в компоненте profile-item-sale динимически-->
+
+                                            <v-dialog v-model="sellDialog" :max-width="300">
+                                                <profile-item-sale :item="itemSale" v-on:sale="sellItem"></profile-item-sale>
+                                            </v-dialog>
+
+                                            <v-badge v-if="notCanBuyOrEquip(item)" avatar overlap offset-x="20" offset-y="7" color="">
+                                                <template v-slot:badge>
+                                                    <v-avatar>
+                                                        <v-img src="images/bg/profile/interface/lock.png"></v-img>
+                                                    </v-avatar>
+                                                </template>
+                                            </v-badge>
                                             <div class="stuff-tap-highlight"></div>
                                         </div>
                                     </li>
                         </draggable>
                     </div>
                 </div>
-            </v-flex>
-        </v-layout>
+            </v-col>
+        </v-row>
     </v-container>
 </template>
 
@@ -101,13 +123,18 @@
         },
         data(){
             return {
+                //Открыть диалоговое окно для продажи предмета
+                sellDialog: false,
+                //Переменная небходима для буфера, чтобы передать предмет в компонент sale,
+                //предмет через emit попадает из компонента detail
+                itemSale: {},
                 menu: false,
                 gridHighlighted: false, //Подсветка
                 //Стиль - расположение панелей инветаря в пространстве
                 styleInventory:{
                     dollPanelBody: {
                         width: '318px',
-                        left: '8px',
+                        left: '17px',
                         top: 0,
                         height: '422px'
                     },
@@ -140,121 +167,25 @@
                     }
                 ],
                 //Генерация предметов
-                items:[
-                    // {
-                    //     active: false, //Отвечает за открытие или закрытие меню
-                    //     id: 14,
-                    //     name: 'Меч силы',
-                    //     type: 6,
-                    //     label: "Единый - серый (оружие)",
-                    //     param: {},
-                    //     data: {
-                    //         stats: {
-                    //             strength: null,
-                    //             hard: 2800,
-                    //             mp: null,
-                    //             shield: 22,
-                    //             hp: 22,
-                    //             damage: 3,
-                    //         },
-                    //         item_grade: 1,
-                    //         price: 1000,
-                    //         quest: "",
-                    //         modif: {
-                    //         },
-                    //         description: ""
-                    //     },
-                    //     images: {
-                    //         disabled: "",
-                    //         item: "images/items/swords/sword_02.png",
-                    //         off: "images/items/swords/sword_02.png",
-                    //         info: "images/items/swords/sword_02.png",
-                    //         on: "images/items/swords/sword_02.png"
-                    //     },
-                    //     action: [],
-                    //     action_full: [{
-                    //         type: "repair2",
-                    //         label: "Ремонт",
-                    //         count: 100
-                    //     }, {
-                    //         type: "sale",
-                    //         cost: 100,
-                    //         label: "Продажа"
-                    //     }, {
-                    //         type: "warehouse",
-                    //         cost: {
-                    //             currency: "gold",
-                    //             value: 25000
-                    //         },
-                    //         label: "На склад"
-                    //     }],
-                    // },
-                    // {
-                    //     active: false,
-                    //     id:15,
-                    //     name: 'Щит силы',
-                    //     type: 8,
-                    //     data: {
-                    //         stats: {
-                    //             strength: null,
-                    //             hard: 2800,
-                    //             mp: null,
-                    //             shield: 22,
-                    //             hp: 22,
-                    //             damage: 3,
-                    //         },
-                    //         item_grade: 1,
-                    //         price: 1000,
-                    //         quest: "",
-                    //         modif: {
-                    //         },
-                    //         description: ""
-                    //     },
-                    //     images: {
-                    //         disabled: "",
-                    //         item: "images/items/shields/demo_02.png",
-                    //         off: "images/items/shields/demo_02.png",
-                    //         info: "images/items/shields/demo_02.png",
-                    //         on: "images/items/shields/demo_02.png"
-                    //     },
-                    // },
-                    // {
-                    //     active: false,
-                    //     id:16,
-                    //     name: 'Кираса силы',
-                    //     type: 6,
-                    //     data: {
-                    //         stats: {
-                    //             strength: null,
-                    //             hard: 2800,
-                    //             mp: null,
-                    //             shield: 22,
-                    //             hp: 22,
-                    //             damage: 3,
-                    //         },
-                    //         item_grade: 1,
-                    //         price: 1000,
-                    //         quest: "",
-                    //         modif: {},
-                    //         description: ""
-                    //     },
-                    //     images: {
-                    //         disabled: "",
-                    //         item: "images/items/armors/demo_04.png",
-                    //         off: "images/items/armors/demo_04.png",
-                    //         info: "images/items/armors/demo_04.png",
-                    //         on: "images/items/armors/demo_04.png"
-                    //     },
-                    // }
-                ],
+              items_bag:[],
                 //Свойства героя
                 user_property: [],
                 current_type: 14,//Начальный тип общей группы
                 buffer_type: 14,//Буфер обмена, содержит type о текущем типе группы предмета(во время перетаскивания предмета)
             }
         },
+        provide: function () {
+            return {
+                changeItem: this.changeItem,
+                notCanBuyOrEquip: this.notCanBuyOrEquip
+            }
+        },
         methods:{
             ...mapState('app', ['user']),
+            ...mapMutations('app', ['setSlots', 'setItems']),
+            onMove: function(e){
+                return !this.notCanBuyOrEquip(e.draggedContext.element)
+            },
             onStart: function (e, slot) {
 
                 //Если есть, рассматривается контейнер(рюкзак) с предметами ищём в объекте слот по data-type и подсвечиваем слот active
@@ -288,9 +219,13 @@
             request(action = 'item_on', item){
                 let artifact_id = item.id;
 
-                this.$dataUser.getData('/profile/item', (response) => {
+                this.$dataUser.getPostData('/profile/item', (response) => {
                     this.slots = response.data.slots;
-                    this.items = response.data.items;
+                    this.items_bag = response.data.items_bag;
+
+                    this.setSlots(response.data.slots);
+                    this.setItems(response.data.items);
+
                     this.user_property = response.data.user_property;
                 }, {'action': action, 'artifact_id': artifact_id});
             },
@@ -298,7 +233,7 @@
             //Меняем местами
             swap(slot){
                 const item = slot.items.shift();
-                this.items.unshift(item);
+                this.items_bag.unshift(item);
                 //Когда происходит замена предмета, со слота снимается артефакт
                 //Ниже запрос присваивает новый элемент, который остался в массиве после добавления
                 this.request('item_off', item);
@@ -311,7 +246,8 @@
                 if(!slot){
                     //Из рюкзака взяли и надели на героя
                     if(e.hasOwnProperty('removed')){
-                        let type_id = e.removed.element.slot_id;
+                        let type_id = e.removed.element.artifact_type.slot_id;
+                        console.log(type_id)
                         let slotEl = this.findSlot(type_id);
 
                         //Если есть однотипные предметы, то меняем их местами
@@ -323,7 +259,7 @@
                         this.request('item_on', slotEl.items[0]);
                     }
 
-                    //Из сняли предмет и положили в рюкзак
+                    //Сняли предмет и положили в рюкзак
                     if(e.hasOwnProperty('added')){
                         this.request('item_off', e.added.element);
                     }
@@ -332,27 +268,50 @@
 
             changeItem: function(e, slot, item){
 
-                let slotEl = this.findSlot(item.slot_id);
+                let slotEl = this.findSlot(item.artifact_type.slot_id);
                 //В рюкзаке: нажимаем на предмет надеть
                 if(!slot){
+
+                    //Если условия не выполнены, чтобы одеть предмет
+                    if(this.notCanBuyOrEquip(item)){
+                        return false;
+                    }
+
                     if(slotEl.items.length){
                         this.swap(slotEl);
                     }
 
                     slotEl.items.push(item);//Вставляем в слот предмет
-                    this.items.splice(this.findIndexItem(item.id), 1);//Удаляем предмет из массива this.items по индексу
+                    this.removeItem(item);//Удаляем предмет из массива this.items_bag по индексу
                     this.request('item_on', slotEl.items[0]);
                 //Предмет экипирован: нажимаем снять
                 }else{
                     this.swap(slot);
                 }
             },
-            //Поиск слота для подсветки ячейки
+
+            removeItem: function(item){
+                this.items_bag.splice(this.findIndexItem(item.id), 1);
+            },
+
+            sellItem: function(item){
+                this.itemSale = item;
+
+                this.sellDialog = item.sellDialog;
+                if(item.confirmSale){
+                    this.removeItem(item);
+                    this.request('sale', item);
+                    console.log('Товар продан')
+                }
+            },
+            //Поиск слота для подсветки ячейки по type_id артефакта
             findSlot: function (type_id) {
                 return this.slots.find(s => s.type === type_id);
             },
+
+            //Поиск предмета из массива this.items_bag по индексу
             findIndexItem: function (id) {
-                return this.items.findIndex(s => s.id === id);
+                return this.items_bag.findIndex(s => s.id === id);
             },
 
             //Генерация стиля для расположения слотов в пространстве
@@ -369,6 +328,10 @@
                 let height = '60px';
                 let image = slot.images.normal;
                 let backgroundSize = '60px';
+
+                if(slot.type !== 13 && slot.items.length){
+                    image = "images/items/slots/slot_regular.png"
+                }
 
                 if(slot.type > 1 && slot.type < 6)
                     top = 64+62*(slot.type-1)+'px';
@@ -394,6 +357,7 @@
                 return {
                     'background-image': 'url('+image+')',
                     'background-size': backgroundSize,
+                    //'background-position': backgroundPosition,
                     left: left,
                     top: top,
                     width: width,
@@ -409,13 +373,14 @@
             },
             //TODO:: доделать объект с body, создать отдельную функцию или сгенерировать отдельный объект на сервере
             buildObjectSlots: function () {
-                let slots = this.$store.state.app.user.slots;
-                let items = this.$store.state.app.user.items;
+                let slots = this.$store.state.app.slots;
+                let items_bag = this.$store.state.app.items_bag;
                 let bodies = this.$store.state.app.user.bodies;
                 let user_class = this.$store.state.app.user.user_class;
 
                 this.slots = slots;
-                this.items = items;
+                this.items_bag = items_bag;
+                console.log(items_bag)
             },
 
             buildObjectProperties: function (){
@@ -430,6 +395,17 @@
 
                 }
                 return Object.assign(this.user_property, {class: {name: user_class.name, description: user_class.description, image: user_class.image, levels: levels}})
+            },
+
+            //Провека на возможность покупки
+            notCanBuyOrEquip: function(artifact){
+                let canArray = ['canBuy', 'canEquip'];
+                for(let can in canArray){
+                    let prop = canArray[can];
+                    if(artifact.hasOwnProperty(prop)){
+                        return !!Object.keys(artifact[prop]).length;
+                    }
+                }
             }
         },
 

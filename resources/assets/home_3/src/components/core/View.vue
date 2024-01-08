@@ -2,14 +2,14 @@
   <div v-if="!ready" class="progress-bar">
     <v-progress-circular :size="70" :width="7" color="yellow" indeterminate></v-progress-circular>
   </div>
-  <v-content v-else>
+  <v-main v-else>
     <div id="core-view" >
       <v-fade-transition mode="out-in">
         <router-view />
       </v-fade-transition>
     </div>
     <core-footer v-if="$route.name !== 'Maps'" />
-  </v-content>
+  </v-main>
 </template>
 
 <script>

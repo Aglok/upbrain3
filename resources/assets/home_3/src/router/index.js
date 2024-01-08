@@ -31,8 +31,9 @@ Vue.use(Router)
 // Create a new router
 const router = new Router({
   //mode: 'history', //Мод убирает хэш пути, чтобы этот мод использовать необходимо настроить .htaccess и редирект на адрес dashboard
-  routes: paths.map(path => route(path.path, path.view, path.name))
-      .concat([{path: '*', view: 'TableExam'}]),// * означает что если путь не нашёлся будет перенаправлять в dashboard
+  routes: paths
+    .map(path => route(path.path, path.view, path.name))
+    .concat([{path: '*', view: 'TableExam'}]),// * означает что если путь не нашёлся будет перенаправлять в dashboard
   scrollBehavior (to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition

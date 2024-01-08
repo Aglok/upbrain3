@@ -34,6 +34,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Newsletter whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Newsletter whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|Newsletter newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Newsletter newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Newsletter query()
  */
 class Newsletter extends Model
 {

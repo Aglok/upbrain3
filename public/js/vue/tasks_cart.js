@@ -19,16 +19,16 @@ Vue.component('tasks_cart', Vue.extend({
                     '<i class="fa fa-btn fa-shopping-cart"></i>' +
                     '<span class="label label-warning">{{tasks.length}}</span>' +
                 '</a>' +
-                '<ul class="dropdown-menu" v-show="!tasks.length" >' +
+                '<ul class="dropdown-menu" v-if="!tasks.length">' +
                     '<li class="header">' +
                         '<i>Нет выбранных задач</i>' +
                     '</li>' +
                 '</ul>' +
-                '<ul class="dropdown-menu" v-show="tasks.length">' +
-                    '<li class="header">У вас {{tasks.length}}: опыта:{{total_experience}} монет:{{total_gold}}</li>' +
+                '<ul class="dropdown-menu" v-if="tasks.length">' +
+                    '<li class="header dropdown-item">У вас {{tasks.length}}: опыта:{{total_experience}} монет:{{total_gold}}</li>' +
                     '<li>' +
-                        '<ul class="menu">' +
-                        '<li>' +
+                        '<ul class="list-group">' +
+                        '<li class="list-group-item border-0 p-2">' +
                             '<div class="task-table">' +
                                 '<div class="task-header">' +
                                     '<div class="task-row">' +
@@ -50,8 +50,8 @@ Vue.component('tasks_cart', Vue.extend({
                             '</li>'+
                         '</ul>' +
                     '</li>' +
-                    '<li class="footer" @click="this.getSetOfTasks">' +
-                        '<a class="btn" id="show-modal" @click="showModal = true">К редактору</a>' +
+                    '<li class="footer dropdown-item" @click="this.getSetOfTasks">' +
+                        '<a href="#" class="btn btn-primary" id="show-modal" @click="showModal = true, toggleMenu()">К редактору</a>' +
                     '</li>' +
                 '</ul>' +
                 '<script type="text/x-template" id="modal-template">' +
@@ -150,7 +150,7 @@ Vue.component('tasks_cart', Vue.extend({
                             '<div class="task-header">' +
                                 '<div class="task-row">' +
                                     '<div class="task-cell width-50 text-center">' +
-                                        '<button href="#" @click.prevent="allSelectedTasks()" class="btn btn-primary btn-xs fa fa-list-ul"></button>' +
+                                        '<button href="#" @click.prevent="allSelectedTasks()" class="btn btn-primary btn-xs"><i class="fa fa-list-ul" aria-hidden="true"></i></button>' +
                                     '</div>' +
                                     '<div class="task-cell row">' +
                                         '<div class="task-row">' +
@@ -188,8 +188,8 @@ Vue.component('tasks_cart', Vue.extend({
                         '</div>' +
                     '</div>' +
                     '<div slot="footer" :showModal = showModal>' +
-                        '<button class="modal-default-button btn btn-primary" @click="this.saveCart">Сохранить</button>' +
-                        '<button class="modal-default-button btn btn-primary" @click="showModal = false">Закрыть</button>' +
+                        '<button class="modal-default-button btn btn-primary" @click="saveCart(), toggleMenu()">Сохранить</button>' +
+                        '<button class="modal-default-button btn btn-primary" @click="showModal = false, toggleMenu()">Закрыть</button>' +
                     '</div>' +
                 '</modal>' +
                 '</li>',
@@ -221,8 +221,15 @@ Vue.component('tasks_cart', Vue.extend({
         ...mapActions([
             'removeFromCart'
         ]),
+        toggleMenu: function(){
+          let menu = $('aside.main-sidebar');
+            if(this.showModal)
+                menu.hide();
+            else
+                menu.show();
+        },
         remove: function(index){
-            swal({
+            Swal.fire({
                 title: 'Хотите удалить?',
                 type: 'warning',
                 showCancelButton: true,
@@ -232,14 +239,14 @@ Vue.component('tasks_cart', Vue.extend({
                 if (result.value) {
                     this.removeFromCart(index);
                     this.tasks_cart.splice(index, 1);
-                } else if (result.dismiss === swal.DismissReason.cancel) {
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
                     return false;
                 }
             })
 
         },
         removeSetOfTask: function(task_set, set_id, index, task_id){
-            swal({
+            Swal.fire({
                 title: 'Хотите удалить?',
                 type: 'warning',
                 showCancelButton: true,
@@ -258,9 +265,9 @@ Vue.component('tasks_cart', Vue.extend({
                             type: 'success',
                         }).show();
                     }).catch(function () {
-                        swal('Нельзя удалить!');
+                        Swal.fire('Нельзя удалить!');
                     });
-                } else if (result.dismiss === swal.DismissReason.cancel) {
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
                     return false;
                 }
             })
@@ -283,7 +290,7 @@ Vue.component('tasks_cart', Vue.extend({
                         app.progresses = responsive.data[5];//Все предметы
                         console.log(app.progresses);
                     }).catch(function (e) {
-                        swal('Заполните ваши данные! Ошибка: ' + e);
+                        Swal.fire('Заполните ваши данные! Ошибка: ' + e);
                     });
                 }else{
                     new Noty({text: 'Выберите задачи для сборки или набор задач или квест'});
@@ -291,6 +298,7 @@ Vue.component('tasks_cart', Vue.extend({
             }
         },
         saveCart: function () {
+            console.log(1);
             if(this.tasks.length && (this.set_of_tasks.length || Object.keys(this.mission).length)){
                 let app = this;
                 axios.post('tasks_cart/save/'+this.subject,{
@@ -310,7 +318,7 @@ Vue.component('tasks_cart', Vue.extend({
                         text: (!text) ? 'Совпадений нет' :'Результат совпадений: <br>'+text//Список задач которые уже есть
                         }).show();
                 }).catch(function (responsive) {
-                    swal('Заполните ваши данные!');
+                    Swal.fire('Заполните ваши данные!');
                 }).then(function () {
                     //Обновление данных после сохранения корзины
                     //app.getSetOfTasks();

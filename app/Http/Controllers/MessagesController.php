@@ -5,8 +5,14 @@ use Carbon\Carbon;
 use App\Models\Message;
 use Cmgmyr\Messenger\Models\Participant;
 use Cmgmyr\Messenger\Models\Thread;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Auth;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
 use Input;
 use Session;
 use App\Services\PusherWrapper as Pusher;
@@ -21,13 +27,13 @@ class MessagesController extends Controller
     /**
      * @var Pusher
      */
-    protected $pusher;
+    protected Pusher $pusher;
 
     /**
      * @var string
      * Директория для upload изображения
      */
-    public $dir = 'messages';
+    public string $dir = 'messages';
 
     public function __construct(Pusher $pusher)
     {
@@ -35,9 +41,9 @@ class MessagesController extends Controller
         $this->pusher = $pusher;
     }
     /**
-     * Show all of the message threads to the user.
+     * Show all the message threads to the user.
      *
-     * @return mixed
+     * @return Application|Factory|View
      */
     public function index()
     {
@@ -53,7 +59,7 @@ class MessagesController extends Controller
      * Shows a message thread.
      *
      * @param $id
-     * @return mixed
+     * @return Application|array|RedirectResponse|Redirector
      */
     public function show($id)
     {
@@ -77,7 +83,7 @@ class MessagesController extends Controller
     /**
      * Creates a new message thread.
      *
-     * @return mixed
+     * @return Application|Factory|View
      */
     public function create()
     {
@@ -87,7 +93,7 @@ class MessagesController extends Controller
     /**
      * Stores a new message thread.
      *
-     * @return mixed
+     * @return JsonResponse
      */
     public function store()
     {
@@ -191,7 +197,7 @@ class MessagesController extends Controller
 
         $strImageName = '';
 
-        //Транслителируем в латиницу
+        //Транслитерируем в латиницу
         $full_name = Common::translit(Auth::user()->full_name);
         $dir = $this->dir.'/'.$full_name;
 

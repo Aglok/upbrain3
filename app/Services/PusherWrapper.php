@@ -4,11 +4,15 @@ namespace App\Services;
 
 use Config;
 use Pusher\Pusher;
+use Pusher\PusherException;
 
 class PusherWrapper
 {
-    protected $pusher;
+    protected Pusher $pusher;
 
+    /**
+     * @throws PusherException
+     */
     public function __construct()
     {
         $app_id = Config::get('pusher.appId');

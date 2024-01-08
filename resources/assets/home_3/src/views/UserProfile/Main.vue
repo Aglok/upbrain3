@@ -1,33 +1,31 @@
 <template>
-    <v-container fill-height fluid grid-list-xl game>
-        <v-layout wrap>
-            <v-flex md12 sm12 lg12>
-                <material-card title="Общие данные" text="" offset="0" @click="focus">
-                    <v-layout wrap>
-                        <v-flex md12 sm12 lg4>
+    <v-container fluid game>
+        <v-row>
+            <material-card title="Общие данные" text="" offset="0" v-on:click="focus" :ripple="false">
+                    <v-row class="d-flex align-content-end flex-wrap">
+                        <v-col cols="12" sm="12" md="4" lg="4">
                             <v-list>
-                                <v-list-tile v-for="(item, index) in dataSetSubjects.general" :key="index">
-                                    <v-list-tile-action>
+                                <v-list-item v-for="(item, index) in dataSetSubjects.general" :key="index">
+                                    <v-list-item-icon>
                                         <v-btn icon ripple>
                                             <v-tooltip v-model="item.show" top>
                                                 <template v-slot:activator="{ on }">
-                                                    <v-btn icon @click="item.show = !item.show">
-                                                        <v-icon class="icon" :class="item.icon_class"></v-icon>
-                                                    </v-btn>
+                                                    <v-icon @click="item.show = !item.show" class="icon" :class="item.icon_class"></v-icon>
                                                 </template>
                                                 <span>{{item.text}}</span>
                                             </v-tooltip>
                                         </v-btn>
-                                    </v-list-tile-action>
-                                    <v-list-tile-content>
-                                        <v-list-tile-title>{{item.value}}</v-list-tile-title>
-                                    </v-list-tile-content>
-                                </v-list-tile>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                        <v-list-item-title>{{item.value}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
                             </v-list>
-                        </v-flex>
-                        <v-flex md12 sm12 lg4>
-                            <v-tabs v-model="chart.tabs" color="transparent" slider-color="white">
-                                <span class="subheading font-weight-light mr-3" style="align-self: center">Графики роста:</span>
+                        </v-col>
+                        <v-col cols="12" sm="12" md="4" lg="4" >
+                            <v-tabs v-model="chart.tabs" background-color="transparent" align-with-title color="black">
+                                <v-tabs-slider color="yellow"></v-tabs-slider>
+                                <span class="title font-weight-light mr-3" style="align-self: center">Графики роста:</span>
                                 <v-tab class="mr-3" :key="0">
                                     По сложностям
                                 </v-tab>
@@ -39,94 +37,94 @@
                                 </v-tab>
                             </v-tabs>
                             <v-list>
-                                <v-list-tile v-for="item in aliasSubjects()" :key="item" class="list-badge">
-                                    <v-list-tile-action>
-                                        <span :data-color="dataSetSubjects[item].color" class="badge filter" :class="`badge-${dataSetSubjects[item].color}`"></span>
-                                    </v-list-tile-action>
+                            <v-list-item v-for="item in aliasSubjects()" :key="item" class="list-badge">
+                                <v-list-item-action>
+                                    <span :data-color="dataSetSubjects[item].color" class="badge filter" :class="`badge-${dataSetSubjects[item].color}`"></span>
+                                </v-list-item-action>
 
-                                    <v-list-tile-content>
-                                        <v-list-tile-title v-text="dataSetSubjects[item].name"></v-list-tile-title>
-                                    </v-list-tile-content>
-                                </v-list-tile>
-                            </v-list>
+                                <v-list-item-content>
+                                    <v-list-item-title v-text="dataSetSubjects[item].name"></v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list>
                             <v-tabs-items v-model="chart.tabs">
-                                <v-tab-item :key="0">
-                                    <!-- Диаграмма распределения задач по уровням сложности -->
-                                    <material-chart-card
-                                            @change="focus"
-                                            ref="chart_card_0"
-                                            class="main"
-                                            :data="dataStats('grade_char', 'sum_tasks')"
-                                            :options="dataStats('grade_char', 'sum_tasks').options"
-                                            :responsive-options="dataStats('grade_char', 'sum_tasks').responsiveOptions"
-                                            :elevation="0"
-                                            type="Bar"
-                                    >
-                                        <h4 class="title font-weight-light">График распределения задач по уровням сложности</h4>
-                                        <p class="category d-inline-flex font-weight-light"></p>
-                                    </material-chart-card>
-                                </v-tab-item>
-                                <v-tab-item :key="1">
-                                    <!-- График роста задач по количеству решённых задач -->
-                                    <material-chart-card
-                                            ref="chart_card_1"
-                                            class="main"
-                                            :data="dataStats('number_lesson', 'sum_tasks')"
-                                            :options="{
-                                                lineSmooth: this.$chartist.Interpolation.simple({divisor: 2}),
-                                                axisY: {
-                                                    //Округляем до целого значения
-                                                    labelInterpolationFnc: function(value) {
-                                                      return parseInt(value);
-                                                    }
-                                                },
-                                            }"
-                                            :responsive-options="dataStats('number_lesson', 'sum_tasks').responsiveOptions"
-                                            :elevation="0"
-                                            type="Line"
-                                    >
-                                        <h4 class="title font-weight-light">График распределения решённых задач по занятиям</h4>
-                                        <p class="category d-inline-flex font-weight-light"></p>
-                                    </material-chart-card>
-                                </v-tab-item>
-                                <v-tab-item :key="2">
-                                    <!-- График роста задач по количеству опыту -->
-                                    <material-chart-card
-                                            ref="chart_card_2"
-                                            class="main"
-                                            :data="dataStats('number_lesson', 'sum_exp')"
-                                            :options="{
-                                                lineSmooth: this.$chartist.Interpolation.simple({divisor: 2}),
-                                                axisY: {
-                                                    //Округляем до целого значения
-                                                    labelInterpolationFnc: function(value) {
-                                                      return parseInt(value);
-                                                    }
-                                                },
+                            <v-tab-item :key="0">
+                                <!-- Диаграмма распределения задач по уровням сложности -->
+                                <material-chart-card
+                                        @change="focus"
+                                        ref="chart_card_0"
+                                        class="main"
+                                        :data="dataStats('grade_char', 'sum_tasks')"
+                                        :options="dataStats('grade_char', 'sum_tasks').options"
+                                        :responsive-options="dataStats('grade_char', 'sum_tasks').responsiveOptions"
+                                        :elevation="0"
+                                        type="Bar"
+                                >
+                                    <h4 class="title font-weight-light">График распределения задач по уровням сложности</h4>
+                                    <p class="category d-inline-flex font-weight-light"></p>
+                                </material-chart-card>
+                            </v-tab-item>
+                            <v-tab-item :key="1">
+                                <!-- График роста задач по количеству решённых задач -->
+                                <material-chart-card
+                                        ref="chart_card_1"
+                                        class="main"
+                                        :data="dataStats('number_lesson', 'sum_tasks')"
+                                        :options="{
+                                            lineSmooth: this.$chartist.Interpolation.simple({divisor: 2}),
+                                            axisY: {
+                                                //Округляем до целого значения
+                                                labelInterpolationFnc: function(value) {
+                                                  return parseInt(value);
+                                                }
+                                            },
+                                        }"
+                                        :responsive-options="dataStats('number_lesson', 'sum_tasks').responsiveOptions"
+                                        :elevation="0"
+                                        type="Line"
+                                >
+                                    <h4 class="title font-weight-light">График распределения решённых задач по занятиям</h4>
+                                    <p class="category d-inline-flex font-weight-light"></p>
+                                </material-chart-card>
+                            </v-tab-item>
+                            <v-tab-item :key="2">
+                                <!-- График роста задач по количеству опыту -->
+                                <material-chart-card
+                                        ref="chart_card_2"
+                                        class="main"
+                                        :data="dataStats('number_lesson', 'sum_exp')"
+                                        :options="{
+                                            lineSmooth: this.$chartist.Interpolation.simple({divisor: 2}),
+                                            axisY: {
+                                                //Округляем до целого значения
+                                                labelInterpolationFnc: function(value) {
+                                                  return parseInt(value);
+                                                }
+                                            },
 
-                                            }"
-                                            :responsive-options="dataStats('number_lesson', 'sum_exp').responsiveOptions"
-                                            :elevation="0"
-                                            type="Line"
-                                    >
-                                        <h4 class="title font-weight-light">График распределения опыта по занятиям</h4>
-                                        <p class="category d-inline-flex font-weight-light"></p>
-                                    </material-chart-card>
-                                </v-tab-item>
-                            </v-tabs-items>
-                        </v-flex>
+                                        }"
+                                        :responsive-options="dataStats('number_lesson', 'sum_exp').responsiveOptions"
+                                        :elevation="0"
+                                        type="Line"
+                                >
+                                    <h4 class="title font-weight-light">График распределения опыта по занятиям</h4>
+                                    <p class="category d-inline-flex font-weight-light"></p>
+                                </material-chart-card>
+                            </v-tab-item>
+                        </v-tabs-items>
+                        </v-col>
 
                         <!-- Выводит 20 последних задач по всем предметам -->
-                        <v-flex md12 sm12 lg4>
+                        <v-col cols="12" sm="12" md="4" lg="4" >
                             Последние 20 выполненных задач
-                            <v-list-tile v-for="item in listLastTasks(20)" :key="item.id" avatar>
-                                <v-list-tile-content>
-                                    <v-list-tile-title>{{ item.number_task}}. {{ item.task }}</v-list-tile-title>
-                                    <span class="mx-2 caption grey--text">{{ moment(item.created_at).format('MM.DD.YYYY')}} {{ item.subject}}</span>
-                                </v-list-tile-content>
+                            <v-list-item v-for="item in listLastTasks(20)" :key="item.id" two-line>
+                                <v-list-item-content>
+                                    <v-list-item-title>{{ item.number_task}}. {{ item.task }}</v-list-item-title>
+                                    <v-list-item-subtitle>{{ moment(item.created_at).format('MM.DD.YYYY')}} {{ item.subject}}</v-list-item-subtitle>
+                                </v-list-item-content>
 
-                                <v-list-tile-action>
-                                    <v-btn icon ripple>
+                                <v-list-item-action>
+                                    <v-btn icon>
                                         <v-tooltip v-model="item.show" top>
                                             <template v-slot:activator="{ on }">
                                                 <v-btn icon @click="item.show = !item.show" @handle="focus()">
@@ -136,103 +134,99 @@
                                             <span>опыт: {{item.experience}} монет: {{item.gold}} трудность: {{item.grade}}</span>
                                         </v-tooltip>
                                     </v-btn>
-                                </v-list-tile-action>
-                            </v-list-tile>
-                        </v-flex>
-                    </v-layout>
-                </material-card>
-            </v-flex>
+                                </v-list-item-action>
+                            </v-list-item>
+                        </v-col>
+                    </v-row>
+            </material-card>
+        </v-row>
+        <!-- Статистика по каждому предмету tab -->
+        <v-row>
+            <material-card class="card-tabs" width="100%">
+                <v-row slot="header">
+                    <v-tabs v-model="subject.tabs" color="white" background-color="transparent">
+                        <span class="font-weight-light mx-3" style="align-self: center">Предметы:</span>
+                        <v-tab class="mr-3" v-for="(subject, key, index) in this.user" :key="index">
+                            <!--<v-icon class="mr-2">mdi-bug</v-icon>-->
+                            {{dataSetSubjects[key].name}}
+                        </v-tab>
+                    </v-tabs>
+                </v-row>
 
-            <!-- Статистика по каждому предмету tab -->
-            <v-flex md12 lg12>
-                <material-card class="card-tabs">
-                    <v-flex slot="header">
-                        <v-tabs v-model="subject.tabs" color="transparent" slider-color="white">
-                            <span class="subheading font-weight-light mr-3" style="align-self: center">Предметы:</span>
-                            <v-tab class="mr-3" v-for="(subject, key, index) in this.user" :key="index">
-                                <!--<v-icon class="mr-2">mdi-bug</v-icon>-->
-                                {{dataSetSubjects[key].name}}
-                            </v-tab>
-                        </v-tabs>
-                    </v-flex>
+                <!-- Большой цикл tab value значение свойства по каждому предмету-->
+                <v-tabs-items v-model="subject.tabs">
+                    <v-tab-item v-for="(value, subject, index) in this.user" :key="index">
+                        <v-row class="d-flex align-content-end flex-wrap">
+                            <!-- Статистика по предмету -->
+                            <v-col @click="complete('subject' ,0)" cols="12" sm="12" md="4" lg="4">
+                                Предмет {{dataSetSubjects[subject].name}}
+                                <v-list>
+                                    <v-list-item v-for="(item, key, i) in dataSetSubjects[subject]" :key="i" v-if="key !== 'color' && key !== 'name'">
+                                        <v-list-item-icon>
+                                            <v-btn icon ripple>
+                                                <v-tooltip v-model="item.show" top>
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-icon class="icon" :class="item.icon_class" @click="item.show = !item.show"></v-icon>
+                                                    </template>
+                                                    <span>{{item.text}}</span>
+                                                </v-tooltip>
+                                            </v-btn>
+                                        </v-list-item-icon>
 
-                    <!-- Большой цикл tab value значение свойства по каждому предмету-->
-                    <v-tabs-items v-model="subject.tabs">
-                        <v-tab-item v-for="(value, subject, index) in this.user" :key="index">
-                            <v-layout wrap mx-3>
-                                <!-- Статистика по предмету -->
-                                <v-flex @click="complete('subject' ,0)" md12 sm12 lg4>
-                                    Предмет {{dataSetSubjects[subject].name}}
-                                    <v-list>
-                                        <v-list-tile v-for="(item, key, i) in dataSetSubjects[subject]" :key="i" v-if="key !== 'color' && key !== 'name'">
-                                            <v-list-tile-action>
-                                                <v-btn icon ripple>
-                                                    <v-tooltip v-model="item.show" top>
-                                                        <template v-slot:activator="{ on }">
-                                                            <v-btn icon @click="item.show = !item.show">
-                                                                <v-icon class="icon" :class="item.icon_class"></v-icon>
-                                                            </v-btn>
-                                                        </template>
-                                                        <span>{{item.text}}</span>
-                                                    </v-tooltip>
-                                                </v-btn>
-                                            </v-list-tile-action>
+                                        <v-list-item-content v-if="typeof item.value !== 'object'">
+                                            <v-list-item-title>{{item.value}}</v-list-item-title>
+                                        </v-list-item-content>
 
-                                            <v-list-tile-content v-if="typeof item.value !== 'object'">
-                                                <v-list-tile-title>{{item.value}}</v-list-tile-title>
-                                            </v-list-tile-content>
+                                        <!-- Вывод количества задач по трудностям -->
+                                        <v-list-item-content v-else>
+                                            <v-list-item-title>
+                                                {{item.value.sum_tasks}}
+                                                <v-tooltip bottom>
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-btn icon v-on="on">
+                                                            <v-icon color="grey">fa-info-circle</v-icon>
+                                                        </v-btn>
+                                                    </template>
+                                                    <span>
+                                                        Опыт: {{item.value.sum_exp}}
+                                                        Монет: {{item.value.sum_gold}}
+                                                    </span>
+                                                </v-tooltip>
+                                            </v-list-item-title>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-list>
+                            </v-col>
 
-                                            <!-- Вывод количества задач по трудностям -->
-                                            <v-list-tile-content v-else>
-                                                <v-list-tile-title>
-                                                    {{item.value.sum_tasks}}
-                                                    <v-tooltip bottom>
-                                                        <template v-slot:activator="{ on }">
-                                                            <v-btn icon v-on="on">
-                                                                <v-icon color="grey">fa-info-circle</v-icon>
-                                                            </v-btn>
-                                                        </template>
-                                                        <span>
-                                                            Опыт: {{item.value.sum_exp}}
-                                                            Монет: {{item.value.sum_gold}}
-                                                        </span>
-                                                    </v-tooltip>
-                                                </v-list-tile-title>
-                                            </v-list-tile-content>
-                                        </v-list-tile>
-                                    </v-list>
-                                </v-flex>
+                            <!-- Список достижений по предмету -->
+                            <v-col @click="complete('subject', 1)" cols="12" sm="12" md="4" lg="4">
+                                Достижения
+                                <v-list two-line v-if="value.user_progresses.length">
+                                    <div v-for="(progress, index) in value.user_progresses">
+                                        <v-list-item :key="progress.name">
+                                            <v-list-item-avatar>
+                                                <img :src="progress.image">
+                                            </v-list-item-avatar>
 
-                                <!-- Список достижений по предмету -->
-                                <v-flex @click="complete('subject', 1)" md12 sm12 lg4>
-                                    Достижения
-                                    <v-list two-line v-if="value.user_progresses.length">
-                                        <div v-for="(progress, index) in value.user_progresses">
-                                            <v-list-tile :key="progress.name" avatar>
-                                                <v-list-tile-avatar>
-                                                    <img :src="progress.image">
-                                                </v-list-tile-avatar>
-
-                                                <v-list-tile-content>
-                                                    <v-list-tile-title v-html="progress.name"></v-list-tile-title>
-                                                    <v-list-tile-sub-title v-html="progress.description"></v-list-tile-sub-title>
-                                                </v-list-tile-content>
-                                            </v-list-tile>
-                                        </div>
-                                    </v-list>
-                                    <div v-else>
-                                        У вас пока нет достижений по этому предмету. Нужно решить больше задач разного уровня.
+                                            <v-list-item-content>
+                                                <v-list-item-title v-html="progress.name"></v-list-item-title>
+                                                <v-list-item-subtitle v-html="progress.description"></v-list-item-subtitle>
+                                            </v-list-item-content>
+                                        </v-list-item>
                                     </div>
-                                </v-flex>
-                                <v-flex @click="complete('subject', 2)" md12 sm12 lg4>
-                                        Доступные функции. Открываются новые возможности по изучению предмета. Вы можете пользоваться по достижению определённого уровня.
-                                </v-flex>
-                            </v-layout>
-                        </v-tab-item>
-                    </v-tabs-items> 
-                </material-card>
-            </v-flex>
-        </v-layout>
+                                </v-list>
+                                <div v-else>
+                                    У вас пока нет достижений по этому предмету. Нужно решить больше задач разного уровня.
+                                </div>
+                            </v-col>
+                            <v-col @click="complete('subject', 2)" cols="12" sm="12" md="4" lg="4">
+                                    Доступные функции. Открываются новые возможности по изучению предмета. Вы можете пользоваться по достижению определённого уровня.
+                            </v-col>
+                        </v-row>
+                    </v-tab-item>
+                </v-tabs-items>
+            </material-card>
+        </v-row>
     </v-container>
 </template>
 
@@ -266,7 +260,7 @@
             //Важно событие click обрабытывает после события change
             focus(){
                 for (let ref in this.$refs){
-                    if(ref.indexOf('chart_cart'))
+                    if(this.$refs.hasOwnProperty(ref) && ref.indexOf('chart_cart'))
                         this.$refs[ref].$refs.chart.redraw();
                 }
             },
@@ -274,7 +268,7 @@
                 let user = this.user;
                 let tasks = [];
                 for (let prop in user){
-                    if(user[prop].last_tasks.length)
+                    if(user.hasOwnProperty(prop) && user[prop].last_tasks.length)
                         tasks = tasks.concat(user[prop].last_tasks);
                 }
 
@@ -299,15 +293,19 @@
 
                 for (let subject in user){
                     let set = [];
-                    let props = user[subject].stats[group];//Получаем массив свойств по группировки grade_char, number_lesson, section_id
-                    labels = labels.concat(Object.keys(props));//Объединение ключей объекта для получения label
 
-                    if(Object.keys(props).length !== 0){
-                        for (let prop in props){
-                            set.push(props[prop][total])
+                    if(user.hasOwnProperty(subject)){
+                        let props = user[subject].stats[group];//Получаем массив свойств по группировки grade_char, number_lesson, section_id
+                        labels = labels.concat(Object.keys(props));//Объединение ключей объекта для получения label
+
+                        if(Object.keys(props).length !== 0){
+                            for (let prop in props){
+                                if(props.hasOwnProperty(prop))
+                                    set.push(props[prop][total])
+                            }
                         }
+                        series.push(set);
                     }
-                    series.push(set);
                 }
                 return {
                     labels: this.$dataUser.unique(labels),
@@ -320,20 +318,22 @@
             generalSumStats(){
                 let user = this.user;
                 for (let subject in user){
-                    let number_lesson = user[subject].stats.number_lesson;
-                    let grade_char = user[subject].stats.grade_char;
+                    if(user.hasOwnProperty(subject)){
+                        let number_lesson = user[subject].stats.number_lesson;
+                        let grade_char = user[subject].stats.grade_char;
 
-                    //Суммируем характеристики по всем предметам
-                    this.setSubjectsGeneralValue('sum_exp', number_lesson);
-                    this.setSubjectsGeneralValue('sum_gold', number_lesson);
-                    this.setSubjectsGeneralValue('sum_tasks', number_lesson);
+                        //Суммируем характеристики по всем предметам
+                        this.setSubjectsGeneralValue('sum_exp', number_lesson);
+                        this.setSubjectsGeneralValue('sum_gold', number_lesson);
+                        this.setSubjectsGeneralValue('sum_tasks', number_lesson);
 
-                    this.dataSetSubjects[subject].sum_exp.value = user[subject].sum_res.sum_exp;
-                    this.dataSetSubjects[subject].sum_gold.value = user[subject].sum_res.sum_gold;
-                    this.dataSetSubjects[subject].sum_tasks.value = this.$dataUser.sumArrayObj(number_lesson, 'sum_tasks');;
+                        this.dataSetSubjects[subject].sum_exp.value = user[subject].sum_res.sum_exp;
+                        this.dataSetSubjects[subject].sum_gold.value = user[subject].sum_res.sum_gold;
+                        this.dataSetSubjects[subject].sum_tasks.value = this.$dataUser.sumArrayObj(number_lesson, 'sum_tasks');;
 
-                    for (let grade in grade_char){
-                        this.dataSetSubjects[subject][grade].value = grade_char[grade];
+                        for (let grade in grade_char){
+                            this.dataSetSubjects[subject][grade].value = grade_char[grade];
+                        }
                     }
                 }
             },
@@ -370,5 +370,9 @@
 <style>
     g.ct-labels {
         color: black;
+    }
+    /*Временное решение чтобы скрыть блоки формул заключённые в [], чтобы исправить нужно формулы держать внутри ()*/
+    .MathJax_PHTML_Display {
+        display: inline-block;
     }
 </style>

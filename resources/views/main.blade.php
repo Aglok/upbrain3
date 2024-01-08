@@ -30,13 +30,15 @@
                     <div class="navbar-right">
                         <ul class="navbar-nav">
                             <li>
+                                <a href="lp_junior_classes">Для 5-8 класса</a>
+                            </li>
+                            <li>
                                 <a href="lp_ege">Курсы ЕГЭ</a>
                             </li>
 
                             <li>
                                 <a href="lp_oge">Курсы ОГЭ</a>
                             </li>
-
                             <li>
                                 <a href="reviews">Отзывы</a>
                             </li>
@@ -62,7 +64,7 @@
                                 <a href="#contacts">Контакты</a>
                             </li> --}}
                             <li>
-                                <button data-toggle="modal" data-target="#contact-modal" class="btn">Бесплатный урок</button>
+                                <button data-toggle="modal" data-target="#contact-modal" class="btn">Записаться на урок</button>
                             </li>
                         </ul>
                     </div>
@@ -76,6 +78,9 @@
             <nav class="navmenu navmenu-default navmenu-fixed-right offcanvas">
                 <a class="navbar-brand-fixed" href="/"><img src="{!! asset('images/bg/header/header_logo.png') !!}" alt="Upbrain"></a>
                 <ul class="list-group">
+                    <li class="list-group-item">
+                        <a href="lp_junior_classes">Для 5-8 класса</a>
+                    </li>
                     <li class="list-group-item">
                         <a href="lp_ege">Курсы ЕГЭ</a>
                     </li>
@@ -132,6 +137,9 @@
                     <div class="navbar-right">
                         <ul class="navbar-nav mr-auto">
                             <li>
+                                <a href="lp_junior_classes">Для 5-8 класса</a>
+                            </li>
+                            <li>
                                 <a href="lp_ege">Курсы ЕГЭ</a>
                             </li>
 
@@ -167,7 +175,13 @@
                 </div>
                 {{-- Контакт --}}
                 <div class="contact">
-                    <p class="tel"><a href="tel:+7916804-76-25">+7(916)804-76-25</a><br><a href="tel:+79295173303">+7(929)517-33-03</a></p>
+                    <p class="tel">
+                    {{-- <a href="tel:+7916804-76-25">+7(916)804-76-25</a><br>
+                    <a href="tel:+79295173303">+7(929)517-33-03</a>
+                    </br>
+                    </br>
+                    --}}
+                    </p>
                     <button data-toggle="modal" data-target="#contact-modal" class="btn">Заказать звонок</button>
                 </div>
             </nav>

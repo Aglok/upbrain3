@@ -26,6 +26,12 @@
     font-family: TT-Rounds-Condensed;
     font-size: 20px;
 }
+.font-form{
+    font-size: 1rem;
+}
+.font-size-drop{
+    font-size: 14px;
+}
 .font-regular{font-family: TT-Rounds-Condensed Regular;}
 .font-bold{font-family: TT-Rounds-Condensed Bold;}
 b.font-bold{font-size: 30px}
@@ -42,6 +48,55 @@ b.font-bold{font-size: 30px}
     margin-right: 0;
     margin-left: 0;
 }
+/*checkbox новый дизайн */
+.form-check {
+    margin-bottom: 0;
+}
+@media (min-width: 576px){
+    .form-inline .form-check {
+        -webkit-justify-content: right;
+        -ms-flex-pack: center;
+        justify-content: right;
+    }
+}
+/* Скрываем реальный чекбокс */
+.checkbox {
+    display: none;
+}
+/* Задаем внешний вид для нашего кастомного чекбокса. Все обязательные свойства прокомментированы, остальные же свойства меняйте по вашему усмотрению */
+.checkbox-custom {
+    position: relative;      /* Обязательно задаем, чтобы мы могли абсолютным образом позиционировать псевдоэлемент внютри нашего кастомного чекбокса */
+    width: 20px;             /* Обязательно задаем ширину */
+    height: 20px;            /* Обязательно задаем высоту */
+    border: 2px solid #ccc;
+    border-radius: 3px;
+}
+/* Кастомный чекбокс и лейбл центрируем по вертикали. Если вам это не требуется, то вы можете убрать свойство vertical-align: middle из данного правила, но свойство display: inline-block обязательно должно быть */
+.checkbox-custom,
+.label {
+    display: inline-block;
+    vertical-align: middle;
+}
+/* Если реальный чекбокс у нас отмечен, то тогда добавляем данный признак и к нашему кастомному чекбоксу  */
+.checkbox:checked + .checkbox-custom::before {
+    content: "";             /* Добавляем наш псевдоэлемент */
+    display: block;			 /* Делаем его блочным элементом */
+    position: absolute;      /* Позиционируем его абсолютным образом */
+    /* Задаем расстояние от верхней, правой, нижней и левой границы */
+    top: 2px;
+    right: 2px;
+    bottom: 2px;
+    left: 2px;
+    background: #413548;     /* Добавляем фон. Если требуется, можете поставить сюда картинку в виде "галочки", которая будет символизировать, что чекбокс отмечен */
+    border-radius: 2px;
+}
+.width-100{
+    width: 100% !important;
+}
+.form-inline .form-group {
+    margin-left: 0;
+}
+
 
 .radio input[type=radio], .radio-inline input[type=radio], .checkbox input[type=checkbox], .checkbox-inline input[type=checkbox]{
     margin-top: -17px;
@@ -514,7 +569,7 @@ p:empty,#shopify-theme-controls,.jumbo-list-products .themeByline,.jumbo-list-pr
     padding: 0
 }
 
-.btn {
+.btn, .btn-collapse {
     display: inline-block;
     font-size: 16px;
     padding: 7px 24px;
@@ -527,7 +582,7 @@ p:empty,#shopify-theme-controls,.jumbo-list-products .themeByline,.jumbo-list-pr
     cursor: pointer;
 }
 
-.btn.focus,.btn:focus,.btn:hover {
+.btn.focus,.btn:focus,.btn:hover, .btn-collapse:hover, .btn-collapse:focus {
     color: #fff;
     border: 1px solid #ffad0c;
     background: #fc9115;
@@ -1917,6 +1972,12 @@ a:hover, a:focus{
     font-family: TT-Rounds-Condensed Bold;
 }
 
+.panel-floating-horizontal {
+    /*margin-left: -20px;*/
+    /*margin-right: -20px;*/
+    padding: 20px 40px;
+}
+
 .panel-floating-inline {
     margin-left: -20px;
     margin-right: -20px
@@ -2611,7 +2672,10 @@ a:hover, a:focus{
     border-top: 1px solid #f2f2f2;
 }
 .panel-price .row > div:nth-child(2n){
-    border-left: 0;
+    /*border-left: 0;*/
+}
+.panel-price .row > div:last-child{
+    border-bottom: 1px solid #f2f2f2;
 }
 .container-wrap-price{
     background: #f6f6f6;
@@ -2805,13 +2869,13 @@ button.close{
         text-align: center;
     }
 }
-.upbrain-block-list > .row > .row{
+.upbrain-block-list > .row > .row, .upbrain-block-list > .row > .block-table{
     background-color: #fff;
     border: 1px solid rgba(0, 0, 0, 0.125);
     padding: 16px;
 }
 
-.upbrain-block-list > .row > .row:nth-child(2n){
+.upbrain-block-list > .row > .row:nth-child(2n), .upbrain-block-list > .row > .block-table:nth-child(2n){
     border-left: 0;
 }
 .upbrain-block-list > .row p, .upbrain-block-list > .row > div{

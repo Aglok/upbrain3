@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 
 abstract class Present
 {
-    protected $model;
+    protected Model $model;
 
     public function __construct(Model $model)
     {

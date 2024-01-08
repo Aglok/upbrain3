@@ -20,6 +20,11 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserBody whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserBody whereUserId($value)
  * @mixin \Eloquent
+ * @property int|null $on
+ * @method static \Illuminate\Database\Eloquent\Builder|UserBody newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserBody newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserBody query()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserBody whereOn($value)
  */
 class UserBody extends Model
 {

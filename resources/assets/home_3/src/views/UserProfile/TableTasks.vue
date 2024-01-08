@@ -1,45 +1,43 @@
 <template>
-    <v-container fill-height fluid grid-list-xl game>
-        <v-layout justify-center wrap>
-            <v-flex md12>
+    <v-container fluid game table>
+        <v-row>
+            <v-col cols="12">
                 <material-card
-                        :title="this.$store.state.app.user.subjects[this.$store.state.app.subject].user_missions[this.$route.params.mission_id].name"
-                        :text="this.$store.state.app.user.subjects[this.$store.state.app.subject].user_missions[this.$route.params.mission_id].description"
+                        :title=this.getUserMission().name
+                        :text=this.getUserMission().description
                 >
-                    <v-data-table :headers="headers" :items="tasks" hide-actions :expand="expand" item-key="id">
+                    <!-- Чтобы включить expanded panel нужно добавить свойство show-expand-->
+                    <v-data-table :headers="headers" :items="tasks" hide-default-footer :expanded.sync="expanded" item-key="number_task">
 
-                        <template v-slot:headers="props">
-                            <tr>
-                                <th v-for="header in props.headers" :class="(header.value == 'images') ? 'hidden-sm-and-down': 'hidden-xs-only'">
-                                    <span class="subheading font-weight-light black--text" v-text="header.text"/>
-                                </th>
-                            </tr>
+                        <!--<template v-slot:item.data-table-expand="{ item }">-->
+                            <!--<v-icon color="black">mdi-chevron-down</v-icon>-->
+                        <!--</template>-->
+
+                        <template v-slot:item.percent="{ item }">
+                            <v-chip :color="getColor(item.percent)">{{ item.percent }}</v-chip>
                         </template>
-                        <template v-slot:items="props">
-                            <tr @click="props.expanded = !props.expanded">
-                                <td>{{props.item.id}}</td>
-                                <td v-html="props.item.task" ref="task_{{props.item.id}}">
-                                    <img v-if="props.item.image" :src="props.item.image">
-                                </td>
-                                <td class="hidden-xs-only">{{props.item.grade}}</td>
-                                <td class="hidden-xs-only">{{props.item.experience}}</td>
-                                <td class="hidden-xs-only">{{props.item.gold}}</td>
-                                <td class="hidden-xs-only">{{props.item.answer}}</td>
-                                <td class="hidden-xs-only">
-                                    <span :class="[props.item.done ? 'green--text' : 'red--text']">{{props.item.percent}}</span>
-                                    <!--<span class="green&#45;&#45;text">Ok</span>-->
-                                </td>
-                            </tr>
+
+                        <template v-slot:item.done="{ item }">
+                            <span :class="[item.done ? 'green--text' : 'red--text']">{{ (item.done)? 'Да' : 'Нет'}}</span>
                         </template>
-                        <template v-slot:expand="props">
-                            <v-card flat class="hidden-md-and-up">
-                                <v-card-text>Трудность: {{props.item.grade}}</v-card-text>
-                                <v-card-text>Опыт: {{props.item.experience}}</v-card-text>
-                                <v-card-text>Монет: {{props.item.gold}}</v-card-text>
-                                <v-card-text>Ответ: {{props.item.answer}}</v-card-text>
-                                <v-card-text>Выполнено: <span :class="[props.item.done ? 'green--text' : 'red--text']">{{props.item.percent}}</span></v-card-text>
-                            </v-card>
+
+                        <template v-slot:item.task="{ item }">
+                            <span ref="task_{{item.id}}">{{item.task}}</span>
+                            <img v-if="item.image" :src="item.image">
                         </template>
+
+                        <!--<template v-slot:expanded-item="{ item }">-->
+                            <!--<v-card flat>-->
+                                <!--<v-card-text>Подсказка</v-card-text>-->
+                            <!--</v-card>-->
+                            <!--<v-card flat class="d-sm-none">-->
+                                <!--<v-card-text>Трудность: {{item.grade}}</v-card-text>-->
+                                <!--<v-card-text>Опыт: {{item.experience}}</v-card-text>-->
+                                <!--<v-card-text>Монет: {{item.gold}}</v-card-text>-->
+                                <!--<v-card-text>Ответ: {{item.answer}}</v-card-text>-->
+                                <!--<v-card-text>Выполнено: <span :class="[item.done ? 'green&#45;&#45;text' : 'red&#45;&#45;text']">{{item.percent}}</span></v-card-text>-->
+                            <!--</v-card>-->
+                        <!--</template>-->
                     </v-data-table>
                 </material-card>
                 <div class="footer">
@@ -48,8 +46,8 @@
                         <!--<i class="fa fa-history"></i> Последнее обновление {{moment(date.updated_at).fromNow()}}-->
                     </div>
                 </div>
-            </v-flex>
-        </v-layout>
+            </v-col>
+        </v-row>
     </v-container>
 </template>
 
@@ -58,7 +56,7 @@
     export default {
         name: "TableTasks",
         data: () => ({
-            expand: true,
+            expanded: [],
             headers:[
                 {
                     sortable: false,
@@ -92,6 +90,11 @@
                 },
                 {
                     sortable: false,
+                    text: 'Процент',
+                    value: 'percent',
+                },
+                {
+                    sortable: false,
                     text: 'Выполнено',
                     value: 'done',
                 },
@@ -100,13 +103,20 @@
             date: {
                 updated_at: ''//Чтобы свойство было реактивным необходимо создавать объекты со свойствами
             },
-            mission_id: 0
+            mission_id: 0,
+            title: '',
+            text: ''
         }),
         methods:{
+            getColor (percent) {
+                if (percent < 30) return 'red'
+                else if (percent < 60 && percent < 60) return 'orange'
+                else return 'green'
+            },
             setData(data){
-                //console.log(data);
                 let app = this;
                 let id = data.id;
+                let number_task = data.number_task;
                 let task = data.task;
                 let image = data.image;
                 let grade = data.grade;
@@ -123,6 +133,7 @@
 
                 app.tasks.push({
                     id: id,
+                    number_task: number_task,
                     task: task,
                     image: image,
                     grade: grade,
@@ -139,15 +150,21 @@
                 let app = this;
                 //math переменную берём из vuex subjects
                 this.$dataUser.getData('/profile/table_tasks/'+this.$store.state.app.subject+'/'+this.$route.params.mission_id, (response) => {
-                    response.data.forEach(function (item) {
+                    console.log(response)
+                    response.data.tasks.forEach(function (item) {
                         app.setData(item);
                     });
                 });
             },
             ...mapState('app', ['subject']),
+            getUserMission(){
+                return this.$store.state.app.user.subjects[this.$store.state.app.subject].user_missions.find(m => m.id === parseInt(this.$route.params.mission_id));
+            }
         },
         created(){
-            this.getData()
+            this.getData();
+            // this.title = this.getUserMission().name;
+            // this.text = this.getUserMission().description;
         },
         updated: function () {
             //app.tasks = [];

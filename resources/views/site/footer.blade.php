@@ -3,15 +3,15 @@
     <div class="row">
         <div class="col-xl-3">
             <div class="footer-address">
-                Москва <br>м. Новослободская, <br>Новослободская улица, 55С1
+                Москва <br>м. Новослободская
             </div>
             <br>
             <div class="footer-address">
-                м. Краснопресненская, <br>Волков переулок дом 7/9
+                м. Краснопресненская
             </div>
             <br>
             <div class="footer-address">
-                м. Чистые пруды, <br>Архангельский переулок дом 9
+                м. Чистые пруды
             </div>
         </div>
         <div id="map-1" class="col-xl-8"></div>
@@ -28,7 +28,7 @@
             <a href="#" title="Отличный преподаватель ЕГЭ, ОГЭ, ДВИ">Отличные преподаватели и репетиторы Upbrain.</a>
         </div>
 
-        <div class="footer-contact col-xl-3">
+{{--         <div class="footer-contact col-xl-3">
             <button data-toggle="modal" data-target="#contact-modal" class="btn">Заказать звонок</button>
             <ul class="list-inline mt-2 mb-0">
                 <li class="list-inline-item">
@@ -45,7 +45,7 @@
                 </li>
             </ul>
             +7(916)804-76-25 <br>+7(929)517-33-03<br>email@upbrain.ru
-        </div>
+        </div> --}}
         <div class="col-xl-12">
             <a href="#" data-toggle="modal" data-target="#policy-modal">Политика кондефициальности</a>
         </div>
@@ -59,7 +59,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
             <div class="modal-body">
-            <small>Последнее обновление: 03 апреля 2018 г.</small>
+            <small>Последнее обновление: 2022 г.</small>
                     <h2>Право на сохранение конфиденциальности</h2>
                     <p>Данная Политика конфиденциальности содержит описание ваших прав на сохранение конфиденциальности в
                         отношении сбора, использования, обработки ваших личных данных. Политика применима к веб-сайту upbrain.ru и
@@ -98,7 +98,7 @@
 
                     <p>Обращение по вопросам, касающимся конфиденциальности данных пользователей.
                         При появлении вопросов относительно данной политики свяжитесь с нами.</p>
-                    Тел: +79168047625<br>
+{{--                    Тел: +79168047625<br>--}}s
                     E-mail: email@upbrain.ru<br>
             </div>
             </div>
@@ -119,6 +119,7 @@
     <script>
 
         $(function(){
+
             let array_selectors = [
                 '#form-bottom',
                 '#form-top',
@@ -130,6 +131,8 @@
                 '#who-is-form-5',
                 '#who-is-form-6',
                 '#form-modal',
+                '#form-modal-junior',
+                '#form-bottom-junior'
             ];
             let array_img_selectors = $('.gain-icon');
 

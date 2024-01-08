@@ -1,26 +1,22 @@
 <template>
-        <v-layout row list-progresses scroll>
-            <v-flex xs12>
+    <v-container fluid>
+        <v-row class="list-progresses scroll">
+            <v-col cols="12">
                 <v-card>
-                    <v-list three-line>
-                        <template>
-                            <v-subheader :key="header">{{ header }}</v-subheader>
-                            <v-list-tile v-for="(item, index) in progresses()" :key="item.name" avatar>
-                                <div class="v-list__tile v-list__tile--link v-list__tile--avatar">
-                                    <div class="v-avatar">
-                                        <img :src="item.image">
-                                    </div>
-                                </div>
-                                <v-list-tile-content>
-                                    <v-list-tile-title v-html="item.name"></v-list-tile-title>
-                                    <v-list-tile-sub-title v-html="item.description"></v-list-tile-sub-title>
-                                </v-list-tile-content>
-                            </v-list-tile>
-                        </template>
+                    <v-list>
+                        <v-subheader :key="header">{{ header }}</v-subheader>
+                        <v-list-item two-line v-for="(item, index) in progresses()" :key="item.name">
+                                <v-img aspect-ratio="1" :src="item.image" class="v-avatar"></v-img>
+                            <v-list-item-content>
+                                <v-list-item-title v-html="item.name"></v-list-item-title>
+                                <v-list-item-subtitle v-html="item.description"></v-list-item-subtitle>
+                            </v-list-item-content>
+                        </v-list-item>
                     </v-list>
                 </v-card>
-            </v-flex>
-        </v-layout>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>
@@ -34,7 +30,7 @@
         },
         methods:{
             progresses: function () {
-                return this.$store.state.app.user.subjects[this.$store.state.app.subject].progresses;
+                return this.$store.state.app.user.progresses;
             }
         }
     }

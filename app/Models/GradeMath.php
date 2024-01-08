@@ -30,6 +30,11 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GradeMath whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GradeMath whereUserId($value)
  * @mixin \Eloquent
+ * @property int|null $sum_crystal
+ * @method static \Illuminate\Database\Eloquent\Builder|GradeMath newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|GradeMath newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|GradeMath query()
+ * @method static \Illuminate\Database\Eloquent\Builder|GradeMath whereSumCrystal($value)
  */
 class GradeMath extends Model
 {

@@ -1,36 +1,24 @@
-//
-// const MY_ICONS = {
-//   'experience': 'experience',
-//   'gold': 'gold'
-// }
-//
-// const opts = {
-//   icons:{
-//     iconfont: 'fa',
-//     values: MY_ICONS,
-//   },
-//   theme: {
-//     dark: true,
-//     themes: themes
-//   }
-//
-// }
-
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-import theme from './theme'
 import '@fortawesome/fontawesome-free/css/all.css'
 import '@mdi/font/css/materialdesignicons.css'
-
+import themes from './themes'
 
 const MY_ICONS = {
-  'experience': 'experience',
-  'gold': 'gold'
+    'experience': 'experience',
+    'gold': 'gold'
 }
 
-Vue.use(Vuetify, {
-  iconfont: 'fa',
-  theme,
-  icons: MY_ICONS
-})
+const options = {
+    icons:{
+        iconfont: 'fa',
+        values: MY_ICONS,
+    },
+    theme: {
+        themes: {light: themes.light}
+    }
+}
 
+Vue.use(Vuetify)
+
+export default new Vuetify(options)

@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryMath whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CategoryMath whereParentCategoryId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryMath newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryMath newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CategoryMath query()
  */
 class CategoryMath extends Model
 {

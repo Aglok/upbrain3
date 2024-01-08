@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * App\Models\SetOfTaskMath
@@ -26,6 +28,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SetOfTaskMath whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SetOfTaskMath whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read int|null $tasks_count
+ * @method static \Illuminate\Database\Eloquent\Builder|SetOfTaskMath newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|SetOfTaskMath newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|SetOfTaskMath query()
  */
 class SetOfTaskMath extends Model
 {
@@ -33,11 +39,13 @@ class SetOfTaskMath extends Model
     protected $table = 'set_of_tasks_math';
     protected $fillable = ['id','name','alias','image','type','description','created_at','updated_at'];
 
-    public function set_of_task_type(){
+    public function set_of_task_type(): BelongsTo
+    {
         return $this->belongsTo(SetOfTaskType::class, 'type');
     }
 
-    public function tasks(){
+    public function tasks(): BelongsToMany
+    {
         return $this->belongsToMany(TaskMath::class, 'set_of_task_math','set_of_task_id', 'task_id');
     }
 }

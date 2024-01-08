@@ -73,22 +73,22 @@
             </div>
         </div>
         <div class="mx-auto col-lg-6">
-        <h2>Предметы</h2>
-        <div class="form-group">
-        <ul class="list-unstyled width-100">
-            @foreach(\App\Models\Subject::all() as $subject)
-                <li>
-                    <div class="form-check">
-                        <label>
-                            {!! Form::checkbox('subjects[]', $subject->name, false, ['class'=>'form-check-input checkbox'])!!}
-                            <span class="checkbox-custom"></span>
-                            <span class="label font-light ml-1">{{$subject->name}}</span>
-                        </label>
-                    </div>
-                </li>
-            @endforeach
-        </ul>
-        </div>
+            <h2>Предметы</h2>
+            <div class="form-group">
+            <ul class="list-unstyled width-100">
+                @foreach(\App\Models\Subject::all() as $subject)
+                    <li>
+                        <div class="form-check">
+                            <label>
+                                {!! Form::checkbox('subjects[]', $subject->name, false, ['class'=>'form-check-input checkbox'])!!}
+                                <span class="checkbox-custom"></span>
+                                <span class="label font-light ml-1">{{$subject->name}}</span>
+                            </label>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+            </div>
         </div>
     </div>
     <div class="row">

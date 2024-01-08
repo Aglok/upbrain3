@@ -65,17 +65,25 @@ class UserClasses extends Section
      */
     public function onEdit($id)
     {
-        return AdminForm::panel()->addBody([
+        return AdminForm::card()->addBody([
             AdminFormElement::select('user_id', 'Ученик')
                 ->setModelForOptions(\App\User::class)
-                ->setDisplay('full_name')->required(),
+                ->setDisplay('full_name')
+//                ->setLoadOptionsQueryPreparer(function ($element, $query) {
+//                        return $query->where('active', 1);
+//                })
+                ->required(),
             AdminFormElement::dependentselect('class_person_id', 'Класс героя')
                 ->setModelForOptions(\App\Models\ClassPerson::class)
                 ->setDisplay('name')
                 ->setDataDepends(['user_id'])
                 ->setLoadOptionsQueryPreparer(function ($element, $query) {
-                    $user = \App\User::find($element->getDependValue('user_id'))->first();
-                    return $query->where('sex', $user->sex);
+                    //Если модель создаётся впервые
+                    if($element->getDependValue('user_id')){
+                        $user = \App\User::find($element->getDependValue('user_id'));
+                        return $query->where('sex', $user->sex);
+                    }
+                    return $query;
                 })
                 ->required()
         ]);

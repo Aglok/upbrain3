@@ -29,11 +29,19 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ProcessPhysics whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ProcessPhysics whereUserId($value)
  * @mixin \Eloquent
+ * @property int|null $crystal
+ * @property int|null $done
+ * @property-read \App\Models\Stage|null $stage
+ * @method static \Illuminate\Database\Eloquent\Builder|ProcessPhysics newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProcessPhysics newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProcessPhysics query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProcessPhysics whereCrystal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProcessPhysics whereDone($value)
  */
 class ProcessPhysics extends Model
 {
     protected $table = 'processes_physics';
-    protected $fillable = ['user_id', 'number_task', 'stage_id', 'experience', 'gold', 'rating', 'comment', 'number_lesson'];
+    protected $fillable = ['user_id', 'number_task', 'stage_id', 'experience', 'gold', 'rating', 'comment', 'number_lesson', 'done'];
 
     public function user()
     {
@@ -43,5 +51,10 @@ class ProcessPhysics extends Model
     public function stage()
     {
         return $this->belongsTo(\App\Models\Stage::class);
+    }
+
+    public function task()
+    {
+        return $this->belongsTo(\App\Models\TaskMath::class,  'number_task');
     }
 }

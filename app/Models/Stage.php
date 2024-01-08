@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Stage whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Stage whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|Stage newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Stage newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Stage query()
  */
 class Stage extends Model
 {

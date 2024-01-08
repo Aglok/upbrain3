@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserProgress whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserProgress whereUserId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|UserProgress newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserProgress newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserProgress query()
  */
 class UserProgress extends Model
 {

@@ -8,4 +8,7 @@ export default {
   toggleDrawer: toggle('drawer'),
   setUser: set('user'),
   setSubject: set('math'),
+  setSlots: set('slots'),
+  setItems: set('items_bag'),
+  setBattles: set('battles'),
 }

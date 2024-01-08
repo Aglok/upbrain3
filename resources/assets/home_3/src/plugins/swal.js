@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
 // Lib imports
-import sweetalert from 'sweetalert2';
+import swal from 'sweetalert2';
 
-Vue.prototype.swal = sweetalert
+window.swal = swal

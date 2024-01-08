@@ -183,7 +183,7 @@ return [
         SleepingOwl\Admin\Providers\SleepingOwlServiceProvider::class,
 //      App\Providers\HomeSectionsServiceProvider::class,
 
-        Intervention\Image\ImageServiceProviderLaravel5::class,
+        Intervention\Image\ImageServiceProvider::class,
         /*
          * Barryvhd Ide Service Provider
          */
@@ -256,7 +256,6 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Form' => Collective\Html\FormFacade::class,
         'Html' => Collective\Html\HtmlFacade::class,
-        'Input' => Illuminate\Support\Facades\Input::class,
         /*
          * Import and Export
         */
@@ -270,6 +269,10 @@ return [
          * Lavary/laravel-menu
         */
         'Menu' => Lavary\Menu\Facade::class,
+        /*
+         * Intervention Image
+        */
+        'Image' => Intervention\Image\Facades\Image::class
     ],
 
 ];

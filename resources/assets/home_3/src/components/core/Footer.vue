@@ -3,8 +3,8 @@
     <div class="footer-items">
       <span class="game-tool" v-for="link in links" :key="link.title">
         <v-tooltip top dark open-delay="150" transition="ease">
-          <template slot="activator">
-            <v-btn :class="link.class" @click.stop="link.dialog = true" class="btn v-btn--icon tertiary--text footer-links"></v-btn>
+          <template v-slot:activator="{ on }">
+            <v-btn :class="link.class" @click.stop="link.dialog = true" class="btn v-btn--icon tertiary--text footer-links" v-on="on"></v-btn>
           </template>
           <span>{{link.title}}</span>
         </v-tooltip>
@@ -93,7 +93,7 @@ export default {
 #core-footer{
   position: absolute;
   right: 1%;
-  bottom: 1%;
+  bottom: 0;
   z-index: 2;
 }
 #core-footer .btn{
@@ -105,10 +105,14 @@ export default {
   position: relative;
   -webkit-transition: 0.5s ease;
   transition: 0.5s ease;
-  -webkit-box-shadow: 2px 2px 4px #eeeeee5e;
+  -webkit-box-shadow: 2px 2px 4px #eeeeee00;
   border: 0;
   border-radius: 12px;
 }
+#core-footer .v-btn:before {
+  transition: none;
+}
+
 #core-footer .btn.profile{
   background: url(/images/bg/profile/toolbar/rabbit_t.png) 50% 50% no-repeat;
   background-size: 127%;

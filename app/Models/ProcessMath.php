@@ -29,11 +29,19 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ProcessMath whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ProcessMath whereUserId($value)
  * @mixin \Eloquent
+ * @property int|null $crystal
+ * @property int|null $done
+ * @property-read \App\Models\Stage|null $stage
+ * @method static \Illuminate\Database\Eloquent\Builder|ProcessMath newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProcessMath newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProcessMath query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProcessMath whereCrystal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ProcessMath whereDone($value)
  */
 class ProcessMath extends Model
 {
     protected $table = 'processes_math';
-    protected $fillable = ['user_id', 'number_task', 'stage_id', 'experience', 'gold', 'rating', 'comment', 'number_lesson'];
+    protected $fillable = ['user_id', 'number_task', 'stage_id', 'experience', 'gold', 'rating', 'comment', 'number_lesson', 'done'];
 
     public function user()
     {
@@ -43,5 +51,10 @@ class ProcessMath extends Model
     public function stage()
     {
         return $this->belongsTo(\App\Models\Stage::class);
+    }
+
+    public function task()
+    {
+        return $this->belongsTo(\App\Models\TaskMath::class,  'number_task');
     }
 }

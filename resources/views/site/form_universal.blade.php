@@ -8,7 +8,7 @@
     </div>
     {!! Form::close() !!}
 @else
-    <p class="text-center text-white">Количество мест ограничено.<br>Регистрируйтесь прямо сейчас</p>
+    {{-- <p class="text-center text-white">Количество мест ограничено.<br>Регистрируйтесь прямо сейчас</p> --}}
     {!! Form::open(['id' => $id, 'url'=>'contact', 'method' => 'post', 'class'=>'form-inline mx-auto col-sm-8'])!!}
     <div class="form-group">
         <div class="row mx-auto col-lg-6">

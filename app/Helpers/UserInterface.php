@@ -2,26 +2,48 @@
 
 namespace App\Helpers;
 
+use App\Helpers\Items\ItemsForCommon;
 use App\Helpers\JoinSubjects as Subjects;
-use App\Models\Artifact;
+use App\Helpers\BattleFunction as BF;
+use App\Models\ArtifactType;
+use App\Models\ClassPerson;
 use App\Models\ImageOfCharacter;
+use App\Models\UserAction;
+use App\Presenters\UserPresent;
+use App\Helpers\Items\ItemsForProfile;
 use App\User;
 use App\Models\Mission;
+use App\Models\Skill;
 use App\Models\Slot;
-use function dd;
 use Illuminate\Database\Eloquent\Collection;
-use stdClass;
+use function array_key_exists;
 
 class UserInterface
 {
     /**
      * Определяем свойство $lvl;
-     * @var $sum
+     * @var int $sum
      * @return integer
      * Функция конвертирует опыт ученика в уровень по заданной таблице
+     * TODO: создать таблицу опыта и избавиться от if else
+     * TODO: match в phpstorm не распознает
      * */
-    public static function convertExpInLvl($sum): int
+    public static function convertExpInLvl(int $sum): int
     {
+        /**
+        $lvl = match(true) {
+            $sum >= 1000 && $sum < 2000 => 1,
+            $sum >= 2000 && $sum < 3200 => 2,
+            $sum >= 3200 && $sum < 4800 => 3,
+            $sum >= 4800 && $sum < 7300 => 4,
+            $sum >= 7300 && $sum < 12600 => 5,
+            $sum >= 12600 && $sum < 20600 => 6,
+            $sum >= 20600 && $sum < 25600 => 7,
+            $sum >= 25600 && $sum < 34600 => 7,
+            $sum >= 34600 && $sum < 48200 => 7,
+            default => 0,
+        };
+          **/
 
         $lvl = 0;
 
@@ -50,291 +72,176 @@ class UserInterface
         return $lvl;
     }
 
-    public static function getSexUser($user_id): string
+    /**
+     * @var $user_id int
+     * @return string
+     * */
+    public static function getSexUser(int $user_id): string
     {
-        
         $sex = User::find($user_id)->sex;
-
-        if ($sex == 'M') {
-            $dir = 'man';
-        } else {
-            $dir = 'woman';
-        }
-
-        return $dir;
+        return ($sex == 'M') ? 'man' : 'woman';
     }
 
     /**
-     * @var $user_id
-     * @return array
+     * @return Collection|\Illuminate\Support\Collection
      * Функция собирает данные из таблицы images_of_characters и users_body
      * Выводит образы персонажей
      * Получаем список образов одного пользователя(связь BelongToMany)
      * TODO: Возможно, сделать смену образов и с выбором в интерфейсе.
-     * */
-    public static function getImageCharacter($user_id): array
+     * *@var int $user_id
+     */
+    public static function getImageCharacter(int $user_id): Collection|\Illuminate\Support\Collection
     {
 
         $dir = static::getSexUser($user_id);
-        $image_char =  User::find($user_id)->user_bodies()->get();
+        $user = User::find($user_id);
+        $image_char = $user->user_bodies()->get();
 
-        if(!count($image_char))
-            $image_char[] = (object)['name' => 'Без образа', 'image' => '/images/items/characters/default/portal.png', 'pivot' => (object)['on' => 1]];
+        //Если ещё нет образов, то привязываем к начальному образу
+        if(!count($image_char)){
+            $user->user_bodies()->attach(21, ['on' => 1]);
+        }
 
-        return [$image_char, $dir];
+        //Если образов больше чем 1, то удаляем начальный образ
+        if(count($image_char) > 1 && $image_char->contains('id', '21')){
+            $user->user_bodies()->detach(21);
+        }
+
+        return $image_char->map(function($item){
+            //dd(collect($item)->on);
+            //$item = $item->toArray();
+            $item['on'] = $item->pivot->on;
+            $item['canEquip'] = ['class_person_id' => $item['class_person_id'], 'sex' => $item['sex'], 'user_level' => $item['user_level']];
+            return collect($item)->except(['pivot', 'id', 'class_person_id', 'user_level', 'sex']);
+        });
     }
 
     /**
-     * @var $user_id
+     * @var int $user_id
      * @return ImageOfCharacter
      * Выводит образ персонажа
      * Получаем выбранный образ образ
      * */
-    public static function getActiveImageCharacter($user_id){
+    public static function getActiveImageCharacter(int $user_id) : ImageOfCharacter {
 
         //Найти какой образ активен и отправить его
-        $body = static::getImageCharacter($user_id)[0];
+        $body = static::getImageCharacter($user_id);
 
         $idBodyActive = $body->search(function ($item) {
-            return $item->pivot->on == 1;
+            return $item['on'] == 1;
         });
 
         return $body[$idBodyActive];
     }
 
-    /**
-     * @var $user_id
-     * @return \Illuminate\Support\Collection
-     * Функция собирает данные из таблицы trophy и user_trophy, rarity
-     * Фильтрует массив от пустых значений и создает список характеристик трофеев
-     * */
-    public static function getArtifactsPerson($user_id): \Illuminate\Support\Collection
-    {
-        $artifacts = User::find($user_id)->artifacts()->with('rarity', 'artifact_type')->get();
-
-
-        //Генерируем html данные-свойства артефактов
-        $filteredArtifactsSpecification = static::getArtifactsHtml($artifacts);
-
-        return collect($filteredArtifactsSpecification);
-    }
-
-    /**
-     * @var $user_id
-     * @return array
-     * Функция генерирует html данные-свойства артефактов ввиде ствойства info
-     * Фильтрует массив от пустых значений и создает список характеристик трофеев
-     * Создаём свойство stats ввиде набора характеристик артефакта
-     * TODO::убрать class_person_id, increase_experience, increase_gold эти свойства определить в модели Feature
-     * */
-    public static function getArtifactsHtml($artifacts){
-
-        $arr = [];//Вспомогательный массив содержит html обёртку по свойствам артефактов
-        $stats = [];//Статистика по характеристикам
-
-        //Преобразовывает коллекцию в массив для удобной итерации
-        foreach ($artifacts->toArray() as $artifact) {
-
-            $info = '<ul style="list-style: none">';
-            $filteredArtifactSpecification = [];//Массива содержит отфильтрованные характеристики отличные от 0
-
-                //Коллекцию переводим в массив для перебора значения
-                foreach ($artifact as $specification => $value) {
-
-                    if (!$value) continue;
-
-                    $info .= '<li>';
-                    if ($specification == 'name' || $specification == 'description') {
-                        $info .= $value;
-                    }elseif ($specification == 'attack') {
-                        $stats[$specification] = $value;
-                        $info .= 'атака: ' . $value;
-                        unset($specification);
-                    }elseif ($specification == 'damage') {
-                        $stats[$specification] = $value;
-                        $info .= 'урон: ' . $value;
-                        unset($specification);
-                    }elseif ($specification == 'shield') {
-                        $stats[$specification] = $value;
-                        $info .= 'защита: ' . $value;
-                        unset($specification);
-                    }elseif ($specification == 'hp') {
-                        $stats[$specification] = $value;
-                        $info .= 'здоровье: ' . $value;
-                        unset($specification);
-                    }elseif ($specification == 'mp') {
-                        $stats[$specification] = $value;
-                        $info .= 'магия: ' . $value;
-                        unset($specification);
-                    }elseif ($specification == 'energy') {
-                        $stats[$specification] = $value;
-                        $info .= 'энергия: ' . $value;
-                        unset($specification);
-                    }elseif ($specification == 'critical_damage') {
-                        $stats[$specification] = $value;
-                        $info .= 'Критический урон: ' . $value;
-                        unset($specification);
-                    }elseif ($specification == 'energy') {
-                        $stats[$specification] = $value;
-                        $info .= 'Вероятность кр. урон: ' . $value;
-                        unset($specification);
-                    }elseif ($specification == 'increase_experience') {
-                        $stats[$specification] = $value;
-                        $info .= 'увл. опыта: ' . ($value * 100) . '%';
-                        unset($specification);
-                    }elseif ($specification == 'increase_gold') {
-                        $stats[$specification] = $value;
-                        $info .= 'увл. золота: ' . ($value * 100) . '%';
-                        unset($specification);
-                    }elseif ($specification == 'rarity') {
-                        $info .= 'редкость: ' . $value['name'];
-                    }elseif ($specification == 'weight') {
-                        $stats[$specification] = $value;
-                        $info .= 'вес: ' . $value;
-                        unset($specification);
-                    }elseif ($specification == 'artifact_type_id') {
-                        unset($specification);
-                    }elseif ($specification == 'rarity_id') {
-                        unset($specification);
-                    }
-
-                    $info .= '</li>';
-
-                    if(isset($specification))
-                        $filteredArtifactSpecification[$specification] = $value;
-
-                    $filteredArtifactSpecification['images'] = (object)[
-                            'off' => '',
-                            'info' => $artifact['image'],
-                            'on' => ''
-                    ];
-
-                    //Удаляем так как мы сделали новые переменные images
-                    unset($filteredArtifactSpecification['image']);
-
-                }
-            $info .= '</ul>';
-
-            //Удаляем пустые списки <li></li>
-            $info = str_replace("<li></li>", "", $info);
-
-            $filteredArtifactSpecification['info'] = $info;
-            $filteredArtifactSpecification['stats'] = (object)$stats;
-
-            array_push($arr, (object)$filteredArtifactSpecification);
-        }
-
-        return $arr;
-    }
 
     /**
      * @var int $user_id
-     * @var int $equip неэкипирован/экипирован 0/1
-     * @return \Illuminate\Support\Collection
-     * Получаем список всех артефактов неэкипированых или экипированых 0/1
-     * */
-    public static function getItemsPerson($user_id, $equip = 0){
-
-        $equip = (int)$equip;
-        $artifacts = static::getArtifactsPerson($user_id);
-
-        $filteredArtifacts =  $artifacts->filter(function ($value) use ($equip) {
-            if(array_key_exists('pivot', (array)$value))
-                return $value->pivot['equip'] === $equip;
-        })->values();
-
-        return $filteredArtifacts;
-    }
-
-    /**
-     * @var $user_id
+     * @var UserPresent $user_present
      * @return array
      * Получаем список всех слотов с артефактами пользователя для составления инвентаря
      * */
-    public static function getSlotsPerson($user_id){
+    public static function getSlotsPerson(int $user_id, UserPresent $user_present): array{
 
         $slots = Slot::all();
         $preparedSlots = [];//Массив данных содержащий информацию о слотах и интерфейсе
 
-        $bodies = static::getImageCharacter($user_id)[0];
+        $bodies = static::getImageCharacter($user_id);
 
         //Получаем key образа установленный как активный
-        $body = $bodies->search(function ($item, $key){
-            return $item->pivot->on === 1;
+        $body = $bodies->search(function ($item){
+            return $item['on'] === 1;
         });
 
 
         //Предметы экипированные на user
-        $items_on = static::getItemsPerson($user_id, 1);
+        $items = new ItemsForProfile($user_id, 1, $user_present, 'canEquip');
+        $items_on = $items->getArtifacts();
 
         foreach($slots as $slot){
 
             $items = [];
-
-            //Получаем key предмета находящийся в slot->id
-            $item_on = $items_on->search(function ($item) use ($slot){
+            //Получаем предмет находящийся в slot->id
+            $item_on = collect($items_on)->first(function ($item) use ($slot){
                 return $item->slot_id === $slot->id;
             });
 
-            if($item_on === 0 || $item_on)
-                $items[] = $items_on[$item_on];//Чтобы убрать ссылку на родительский объект
+            if($item_on)
+                $items[] = collect($item_on)->except(['rarity_id', 'artifact_type_id', 'artifact_trade_id', 'pivot', 'slot_id', 'subjects', 'price', 'image', 'user_level', 'class_type_id']);;//Чтобы убрать ссылку на родительский объект
 
-            $s = (object)array_merge($slot->toArray(),
-                [
-                    'active' => false,
-                    'images' => ['normal' => $slot->image_normal, 'arena' => $slot->image_arena, 'gold' => $slot->image_gold],
-                    'items' => $items
-                ]);
+            $s = [
+                'active' => false,
+                'images' => ['normal' => $slot->image_normal ?? "", 'arena' => $slot->image_arena ?? "", 'gold' => $slot->image_gold ?? ""],
+                'items' => $items
+            ];
 
-            array_push($preparedSlots, $s);
+            $slot_extended = (object)[...collect($slot)->except(['image_arena', 'image_arena', 'image_gold'])->toArray(), ...$s];
+
+            array_push($preparedSlots, $slot_extended);
         }
 
         array_push($preparedSlots,
-            (object)
-                [
+            (object)[
                     'id' => 13,
-                    'name' => $bodies[$body]->name ,
+                    'name' => $bodies[$body]['name'] ,
                     'type'=> 13,
                     'images'=> (object)[
-                        'info' => $bodies[$body]->image,
-                        'small'=> $bodies[$body]->image
+                        'info' => $bodies[$body]['image'],
+                        'small'=> $bodies[$body]['image']
                 ]
             ]);
 
         return $preparedSlots;
     }
     /**
-     * @var $user_id
-     * @var $subject_id
-     * @return Collection
+     * @var int $user_id
+     * @var string $subject
+     * @return \Illuminate\Support\Collection
      * Получаем список всех квестов пользователя по id пользователя и alias предмета
      * */
-    public static function getUserMissions($user_id, $subject)
+    public static function getUserMissions(int $user_id, string $subject): \Illuminate\Support\Collection
     {
-        return User::find($user_id)->user_missions()->where('subject_id', Subjects::getSubjectId($subject))->get();
+        return User::find($user_id)->user_missions()
+            ->where('subject_id', Subjects::getSubjectId($subject))
+            ->get()
+            ->map(function ($item){
+                $item->done = $item->pivot['done'];
+                return $item->only(['id', 'name', 'description', 'progress_id', 'monster_id', 'user_level', 'done']);
+            });
     }
 
     /**
-     * @var $user_missions
+     *
+     * @param \Illuminate\Support\Collection $user_missions
      * @return array
-     * Получаем список всех артефактов из массива квестов, к каждому квесту привязан свой предмет
-     * */
-    public static function getUserMissionsHtmlArtifacts($user_missions)
+     * Получаем список всех артефактов пользователя по миссиям пользователя
+     */
+    public static function getUserMissionsHtmlArtifacts(\Illuminate\Support\Collection $user_missions) : array
     {
         $missions_artifacts = [];
 
         foreach ($user_missions as $user_mission){
-            $mission_artifacts = Mission::find($user_mission->id)->artifacts()->get();
+            $mission_artifacts = Mission::find($user_mission['id'])
+                ->artifacts()
+                ->get();
 
             if(!$mission_artifacts->isEmpty()){
-                $missions_artifacts[] = static::getArtifactsHtml($mission_artifacts);
+                $items = new ItemsForCommon(null, $mission_artifacts);
+                $missions_artifacts[] = collect($items->getArtifacts())->map(function ($item){
+                    $item->mission_id = $item->pivot['mission_id'];
+                    return collect($item)->only(['id','description', 'image', 'name', 'info', 'price', 'stats', 'mission_id']);
+                });
             }
         }
-
         return $missions_artifacts;
     }
 
-    public static function getArtifactPersonFilteredForExpGold($user_id)
+    /**
+     * @var int $user_id
+     * @return array
+     * Получаем список всех артефактов, отфильрованных по наличию свойства increase_experience, increase_gold
+     * */
+    public static function getArtifactPersonFilteredForExpGold(int $user_id) : array
     {
 
         $artifacts = static::getArtifactsPerson($user_id);
@@ -349,121 +256,243 @@ class UserInterface
                 if ($specification == 'increase_experience' || $specification == 'increase_gold') {
                     if ($value) $filteredExpGoldArtifactSpec[$specification] = $value;
                 }
-
             }
 
-            array_push($arr, $filteredExpGoldArtifactSpec);
+            $arr[] = $filteredExpGoldArtifactSpec;
         }
 
         return $arr;
     }
 
     /**
-     * @var $user_id
-     * @return Collection | String
-     * Получаем список классов одного пользователя(связь BelongToMany)
-     * TODO: в таблицу classes_person сделать поле active, чтобы указать текущий класс из множества принадлежащих user_id
-     * TODO: предполагается upgrade класса в несколько ступеней
-     * TODO: $user_class[0] заменить на $user_class[0]->where('active', 1)
-     * */
-    public static function getUserClass($user_id)
+     *
+     * @return \Illuminate\Support\Collection
+     * Получаем выбранный класс одного пользователя(связь BelongToMany)
+     * Done: в таблицу classes_person сделать поле active, чтобы указать текущий класс из множества принадлежащих user_id
+     * Done: предполагается upgrade класса в несколько ступеней
+     * Done: $user_class[0] заменить на $user_class[0]->where('active', 1): Done
+     * @var int $user_id
+     */
+    public static function getUserClass(int $user_id) : \Illuminate\Support\Collection
     {
-        $user_class = User::find($user_id)->classes_person()->get();
+        $user_class = User::find($user_id)->classes_person()->where('active', '=', 1)->get();
 
-        return (count($user_class) ? $user_class[0]: "Класс героя не выбран");
+        if(!$user_class){
+            $user_class = ClassPerson::where('type_id', '=', '0')->first();
+        }
+        return $user_class;
 
     }
     /**
-     * @var $user_id
-     * @var $subject
+     * @var int $user_id
+     * @var string $subject
+     * @return \Illuminate\Support\Collection
+     * Получаем список всех достижений пользователя по id пользователя и alias предмета
+     * */
+    public static function getUserProgress(int $user_id, string $subject): \Illuminate\Support\Collection
+    {
+        return User::find($user_id)->progresses()
+            ->where('subject_id', Subjects::getSubjectId($subject))
+            ->get()
+            ->map(function ($item) {
+                return $item->only(['name', 'type', 'rank' ,'description', 'image']);
+            });
+    }
+
+    /**
+     * @var int $user_id
      * @return Collection
-     * Получаем список всех достижений пользователя по id пользователя и alias предмета
+     * Получаем список всех скиллов пользователя по id пользователя
      * */
-    public static function getUserProgress($user_id, $subject)
+    public static function getUserSkills(int $user_id): Collection
     {
-        return User::find($user_id)->progresses()->where('subject_id', Subjects::getSubjectId($subject))->get();
+        return static::getUserClass($user_id)->skills()->with(['features'])->get();
+    }
+
+
+    /**
+     * @return \Illuminate\Support\Collection
+     * Получаем список всех характеристик пользователя по id пользователя и alias предмета
+     * *@var int $user_id
+     */
+    public static function getUserProperty(int $user_id): \Illuminate\Support\Collection
+    {
+        return static::updateUserProperty($user_id);
     }
 
     /**
-     * @var $user_id
-     * @return object
-     * Получаем список всех достижений пользователя по id пользователя и alias предмета
-     * */
-    public static function getUserProperty($user_id)
-    {
-        static::updateUserProperty($user_id);
-        return User::find($user_id)->property()->first();
-    }
-
-    /**
-     * @var $user_id
-     * @return void
+     * @var int $user_id
+     * @return \Illuminate\Support\Collection возвращает
      * Обновляет характеристики героя, при изменении экипировки
-     * TODO::написать дополнительную функцию увеличения характеристик в зависомости от lvl и класса
-     * */
-    public static function updateUserProperty($user_id){
+     * type_id свойсво тип выбираемого класса, меняется в property и user_class, у пользователя может быть несколько классов
+     * Создаём чистые характиристики героя:
+     * invariant_stats - начальные неизменяемые характеристики {}
+     * artifact_stats - добвление характеристик от предметов {}
+     * skill_stats - добвление характеристик от умений {}
+     * up_level - добвление характеристик от уровня {}
+     * total - итоговые характеристики {}
+     * TODO::написать дополнительную функцию увеличения характеристик в зависомости от lvl->up_level и класс
+     * TODO user_skills и user_actions как использовать при выборе
+     */
+    public static function updateUserProperty(int $user_id): \Illuminate\Support\Collection
+    {
+
+        $skills_actions = [];
+        $artifact_stats = [];
 
         //Получаем инвариантные характеристики героя
-        $user_class = static::getUserClass($user_id)->toArray();
+        $user_class = collect(static::getUserClass($user_id)
+            ->map(function ($item){
+                //Убираем пересекающиеся свойства
+                return collect($item)->except(['name', 'description', 'sex', 'id', 'pivot', 'type_id', 'image']);
+            })
+            ->first());
 
-        //Убираем пересекающиеся свойства
-        unset($user_class['id']);
-        unset($user_class['name']);
-        unset($user_class['description']);
-        unset($user_class['image']);
-        unset($user_class['pivot']);
-        unset($user_class['sex']);
+        //Создаём клон для сохранения начальных параметров
+        $invariant_stats = clone $user_class;
+        $user_class = $user_class->toArray();
 
         //Получаем все экипированные предметы
-        $artifacts = static::getItemsPerson($user_id, 1);
+        $items = new ItemsForProfile($user_id, 1);
+        $artifacts = $items->getArtifacts();
 
-        foreach($artifacts as $artifact){
-            foreach ($artifact->stats as $stat => $value){
-                if (array_key_exists($stat, $user_class) && $value){
-                    $user_class[$stat] += $value;
+        //Добавление характеристик героя при использовании skills
+        $actions = UserAction::whereUserId($user_id)->value('actions');
+        $skills = json_decode($actions)->skills;
+
+        foreach($skills as $skill){
+            $skill_features = [];//Список расширений для одного skill
+            $skill_model = Skill::find($skill->skill_id);
+            $features = $skill_model->features()->get();
+            $active = $skill->active;
+            $number_of_moves = $skill->number_of_moves;
+
+            //$features_list:
+            // [
+            //'1' => ['damage_min' => 1.1, 'damage_max' => 1.1, 'operator' => 'increase',  'method' => 'percent],
+            //'2' => ['hp' => 50, 'operator' => 'decrease', 'method => 'absolute']
+            //]
+            $features_list = BF::FeatureStatsUser($features, $active, $number_of_moves);
+            foreach ($features_list as $key=>$f_stats){
+                $feature_stats = [];//Характиристики одного расширения
+                foreach ($f_stats as $stat => $value) {
+                    if ($stat == 'method' or $stat == 'operator')
+                        continue;
+                    if (collect($user_class)->has($stat) && $value) {
+
+                        if ($f_stats['method'] != 'equally') {
+                            //Уменьшение и увеличение в процентах отностельного или абсолютного текущего параметра
+                            $stats_values = BF::FeatureRatioValue($value, $f_stats['operator'], $f_stats['method'], $user_class[$stat]);
+                            $feature_stats[$stat] = round($stats_values['f_s']);
+                            $user_class[$stat] = $stats_values['u_s'];
+                        }
+
+                        if (str_contains($stat, 'damage') && $f_stats['operator'] == 'max') {
+                            $feature_stats['damage_max'] = $user_class['damage_max'];
+                            $user_class['damage_min'] = $user_class['damage_max'];
+                        }
+                        if (str_contains($stat, 'damage') && $f_stats['operator'] == 'min') {
+                            $feature_stats['damage_max'] = $user_class['damage_min'];
+                            $user_class['damage_max'] = $user_class['damage_min'];
+                        }
+                    }
                 }
 
+                //Формируем объект skill
+                foreach($skill_model->toArray() as $k => $value) {
+                    if(($value && $k !== 'id') || $k == 'active')
+                        $skill_features[$k] = $value;
+                }
+
+                $skill_features['stats'][$key] = $feature_stats;
+            }
+
+            $skills_actions[$skill->skill_id] = $skill_features;//Записываем все расширения для одного skill
+        }
+
+        //Добавление характеристик героя при надевании артифакта
+        foreach($artifacts as $artifact){
+            foreach ($artifact->stats as $stat => $value){
+                if (collect($user_class)->has($stat) && $value){
+                    if(array_key_exists($stat, $artifact_stats)){
+                        $artifact_stats[$stat] += $value;
+                    }else
+                        $artifact_stats[$stat] = $value;
+
+                    $user_class[$stat] += $value;
+                }
             }
         }
-
+        //$user_class['type_id'] так же обновляется при обновлении характеристик
+        //type_id - это класса Маг или Воин или не выбран
         User::find($user_id)->property()->update($user_class);
+
+        return collect([
+            'invariant_stats' => $invariant_stats,
+            'artifact_stats' => $artifact_stats,
+            'skills_stats' => $skills_actions,
+            'up_level' => [],
+            'total' => User::find($user_id)->property()
+                ->get()
+                ->map(function ($item){
+                    return collect($item)->except(['created_at', 'updated_at', 'user_id', 'id', 'type_id']);
+                })
+                ->first()
+            ]);
     }
 
     /**
-     * @var $subject
-     * @var $user_id
+     * @param int $mission_id
+     * @param string $subject
+     * @return Collection
+     * Получаем задачи из модели Task[Subject] по $mission_id, $subject
+     */
+    public static function getMissionTasks(int $mission_id, string $subject) : \Illuminate\Support\Collection {
+
+        $_subject = Subjects::_Subject($subject);
+        $tasks_function = 'task'.$_subject;
+        $mission = Mission::find($mission_id);
+        return $mission->$tasks_function()->orderBy('experience')->get()->values();
+    }
+
+
+    /**
+     * @param int $user_id
+     * @param string $subject
      * @return Collection
      * Получаем список процессов для разных моделей(связь hasMany)
-     * Получаем задачи из модели Task[Subject] и объединяем в одну коллекции
-     * */
-    public static function getLastTasks($subject, $user_id){
+     * Получаем задачи из модели Process_Subject c pivot task, выделяем только нужные поля
+     * Поля: 'experience', 'gold', 'crystal' ,'rating', 'number_task', 'task', 'grade', 'subject', 'created_at'
+     */
+    public static function getLastTasks(int $user_id, string $subject) : \Illuminate\Support\Collection {
 
-        $process_func = 'processes_'.$subject;//Метод hasMany для вызова моделей динамически для существующего предмета
-        $modelTask = 'App\Models\Task'.ucfirst($subject);
-        $processes = User::find($user_id)->$process_func()->latest()->limit(10)->get()->reverse();
-        $arrayNumbers = $processes->pluck('number_task');
-
-        $tasks = $modelTask::whereIn('number_task', $arrayNumbers)->get()->toArray();
-
-        $tasksObject = collect([]);
-
-        foreach($processes->toArray() as $key => $process){
-            //Объединение массивов происходит заменой одинаковых полей первого, на второй массив
-            //Добавляем свойство show для раскрытия/закрытия tooltip на странице
-            $tasksObject->push((object)array_merge($tasks[$key], $process, ['show' => false, 'subject' => Subjects::getSubjectName($subject)]));
-        }
-
-        return $tasksObject;
+        //Метод hasMany для вызова моделей динамически для существующего предмета
+        $process_func = 'processes_'.$subject;
+        return User::find($user_id)->$process_func()
+            ->with(['task'])
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(function ($item) use ($subject) {
+                $task = $item->task->only(['task', 'grade']);
+                $item->task = $task['task'];
+                $item->grade = $task['grade'];
+                $item->subject = Subjects::getSubjectName($subject);
+                return $item->only(['experience', 'gold', 'crystal' ,'rating', 'number_task', 'task', 'grade', 'subject', 'created_at']);
+            })
+            ->sortBy('number_task')
+            ->reverse()
+            ->values();
     }
 
     /**
-     * @var $subject
-     * @var $user_id
+     * @param int $user_id
+     * @param string $subject
      * @return Collection
      * Получаем список процессов для разных моделей(связь hasMany)
      * Получаем статистику из модели Grade[Subject] и объединяем в одну коллекции
-     * */
-    public static function getUserProcesses($subject, $user_id){
+     */
+    public static function getUserProcesses(int $user_id, string $subject) : \Illuminate\Support\Collection{
         $grade_func = 'grade_'.$subject;
         $grades = User::find($user_id)->$grade_func()->get();
         $stats = [];
@@ -476,19 +505,20 @@ class UserInterface
     /**
      * @var $stats array
      * @var $subject string
-     * @var $grades array
+     * @var $grades Collection
      * @var $regroup bool
      * @var $group string
+     * @return void
      * Вспомогательная функция для получения статистики ученика
      * Используется рекурсия для более детальной обрабоки статистики
      * */
-    public static function getStatsGrade(array &$stats ,$subject, $grades, $regroup, $group){
+    public static function getStatsGrade(array &$stats ,string $subject, Collection $grades, bool $regroup, string $group) : void {
 
 
         $modelSections = 'App\Models\Sections'.ucfirst($subject);
         //Используемые свойства для получения по ним суммы всех элементов
         $props = ['sum_tasks', 'sum_exp', 'sum_gold'];
-        //Используемые свойства для группирровки по ним
+        //Используемые свойства для группировки по ним
         $propsGroup = ['number_lesson', 'grade_char', 'section_id'];
         //Счётчик для условия остановки рекурсии
         $count = 0;
@@ -513,13 +543,13 @@ class UserInterface
                     //Вместо section_id вставляем название
                     if($propGroup == 'section_id'){
                         $section_name = $modelSections::find($num)->name;
-                        $stats[$propGroup][$section_name][$prop] = $sum;
+                        $stats[$propGroup][$section_name][$prop] = round($sum, 2);
                     }else{
-                        $stats[$propGroup][$num][$prop] = $sum;
+                        $stats[$propGroup][$num][$prop] = round($sum, 2);
                     }
                 }
 
-                // Условие для рекурсии $regroup булев тип, если false рекурсия вглубь уходить не будет
+                //Условие для рекурсии $regroup булев тип, если false рекурсия вглубь уходить не будет
                 if($regroup){
                     if($propGroup == 'section_id'){
                         $section_name = $modelSections::find($num)->name;
@@ -534,4 +564,75 @@ class UserInterface
             $count++;
         }
     }
+
+    /**
+     * @param int $user_id
+     * @param int $gold
+     * @return int
+     * Функция рассчитывает общее количество монет, учитывая покупки и продажи
+     * */
+    public static function updateGoldsUser(int $user_id, int $gold) : int {
+
+        $userTransaction = User::find($user_id)->transactions()->get();
+
+        if($userTransaction->count()){
+            //Прибавляем к общей сумме
+            $plusGold = $userTransaction->where('action','sale')->sum('gold');
+
+            //Вычитаем из общей суммы
+            $minusGold = $userTransaction->whereIn('action', ['buy', 'take'])->sum('gold');
+
+            $gold = $gold + $plusGold - $minusGold;
+        }
+
+        return $gold;
+    }
+
+    /**
+     * @param int $user_id
+     * @param array $crystals
+     * @return array
+     * Функция рассчитывает общее количество кристаллов, учитывая покупки и продажи
+     * */
+    public static function updateArrayCrystalsUser(int $user_id, array $crystals) : array {
+
+        $userTransaction = User::find($user_id)->transactions()->get();
+
+        foreach ($crystals as $color_crystal => &$value){
+
+            if($userTransaction->count() && $value > 0){
+                //Прибавляем к общей сумме
+                $plusCrystal = $userTransaction->where('action','sale')->sum($color_crystal);
+
+                //Вычитаем из общей суммы
+                $minusCrystal = $userTransaction->whereIn('action', ['buy', 'take'])->sum($color_crystal);
+
+                $value = $value + $plusCrystal - $minusCrystal;
+            }
+        }
+
+        unset($value);
+        return $crystals;
+    }
+
+    /**
+     * @var int $user_id
+     * @return \Illuminate\Support\Collection
+     * Функция собирает данные из таблицы trophy и user_trophy, rarity
+     * Фильтрует массив от пустых значений и создает список характеристик трофеев
+     * */
+    public static function getArtifactsPerson(int $user_id): \Illuminate\Support\Collection
+    {
+        $items = new ItemsForCommon($user_id);
+        return $items->getArtifacts();
+    }
+
+    /**
+     * Функция получает объект типов артефактов ввиде artifact_type: {'weapon':'1', 'armor':'2', ...}
+     * @return \Illuminate\Support\Collection
+     **/
+    public static function getArtifactTypes(): \Illuminate\Support\Collection {
+        return ArtifactType::all()->where('active', 1)->pluck('dir', 'id')->flip();
+    }
+
 }

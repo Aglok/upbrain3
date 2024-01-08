@@ -24,6 +24,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Comment whereText($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Comment whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|Comment newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Comment newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Comment query()
  */
 class Comment extends Model
 {

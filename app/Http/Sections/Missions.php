@@ -2,19 +2,25 @@
 
 namespace App\Http\Sections;
 
+use AdminSection;
+use App\Models\Artifact;
+use App\Models\Mission;
+use App\Models\Monster;
+use App\Models\TaskMath;
 use SleepingOwl\Admin\Contracts\Display\DisplayInterface;
 use SleepingOwl\Admin\Contracts\Form\FormInterface;
+use SleepingOwl\Admin\Exceptions\Form\Element\SelectException;
 use SleepingOwl\Admin\Section;
 use AdminDisplay;
 use AdminColumn;
 use AdminForm;
 use AdminFormElement;
-use DB;
+use AdminColumnEditable;
 
 /**
  * Class Missions
  *
- * @property \App\Models\Mission $model
+ * @property Mission $model
  *
  * @see http://sleepingowladmin.ru/docs/model_configuration_section
  */
@@ -39,17 +45,32 @@ class Missions extends Section
 
     /**
      * @return DisplayInterface
+     * @throws SelectException
      */
-    public function onDisplay()
+    public function onDisplay(): DisplayInterface
     {
         return AdminDisplay::table()
             ->setHtmlAttribute('class', 'table-primary')
             ->setColumns([
-                AdminColumn::link('name', 'Название'),
-                AdminColumn::text('description', 'Описание'),
-                AdminColumn::text('subject_id', 'Предмет'),
-                AdminColumn::text('progress_id', 'Достижения'),
-                AdminColumn::text('level', 'Уровень')
+                AdminColumnEditable::text('name', 'Название'),
+                AdminColumnEditable::text('description', 'Описание'),
+                AdminColumnEditable::select('subject_id', 'Предмет')
+                    ->setWidth('250px')
+                    ->setModelForOptions(\App\Models\Subject::class)
+                    ->setDisplay('name')
+                    ->setTitle('Выберите предмет'),
+                AdminColumnEditable::select('progress_id', 'Достижения')
+                    ->setWidth('250px')
+                    ->setModelForOptions(\App\Models\Progress::class)
+                    ->setDisplay('name')
+                    ->setTitle('Выберите достижение'),
+                AdminColumnEditable::text('user_level', 'Уровень'),
+                AdminColumnEditable::select('monster_id', 'Монстр')
+                    ->setWidth('250px')
+                    ->setModelForOptions(Monster::class)
+                    ->setDisplay('name')
+                    ->setTitle('Выберите монстра'),
+                AdminColumn::lists('artifacts.name', 'Артифакты')->setWidth('200px'),
             ]);
     }
 
@@ -57,10 +78,11 @@ class Missions extends Section
      * @param int $id
      *
      * @return FormInterface
+     * @throws SelectException
      */
-    public function onEdit($id)
+    public function onEdit(int $id): FormInterface
     {
-        return AdminForm::panel()->addBody([
+        return AdminForm::card()->addBody([
             AdminFormElement::text('name', 'Название'),
             AdminFormElement::text('description', 'Описание'),
             AdminFormElement::select('subject_id', 'Предмет')
@@ -69,18 +91,25 @@ class Missions extends Section
             AdminFormElement::select('progress_id', 'Достижения')
                 ->setModelForOptions(\App\Models\Progress::class)
                 ->setDisplay('name')->required(),
-            AdminFormElement::text('level', 'Уровень'),
-            AdminFormElement::multiselect('artifacts', 'Артефакты', \App\Models\Artifact::class)->setDisplay('name'),
+            AdminFormElement::text('user_level', 'Уровень'),
+            AdminFormElement::multiselect('artifacts', 'Артефакты', Artifact::class)->setDisplay('name'),
+            AdminFormElement::select('monster_id', 'Монстр', Monster::class)->setDisplay('name'),
 
+            //Посылаем запрос в таблицу TaskMath для отображения задач, данной модели Mission
+            AdminSection::getModel(TaskMath::class)
+                ->fireDisplay(
+                    ['scopes' => ['withMission', $id]]
+                )
         ]);
     }
 
     /**
      * @return FormInterface
+     * @throws SelectException
      */
-    public function onCreate()
+    public function onCreate(): FormInterface
     {
-        return $this->onEdit(null);
+        return $this->onEdit((int)null);
     }
 
     /**

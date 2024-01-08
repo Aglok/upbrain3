@@ -20,6 +20,11 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Role whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Role whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read int|null $permissions_count
+ * @property-read int|null $users_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Role newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role query()
  */
 class Role extends Model
 {
@@ -33,7 +38,7 @@ class Role extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function permissions()
+    public function permissions(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Permission::class);
     }
@@ -44,7 +49,7 @@ class Role extends Model
      * @param  Permission $permission
      * @return mixed
      */
-    public function givePermissionTo(Permission $permission)
+    public function givePermissionTo(Permission $permission): mixed
     {
         return $this->permissions()->save($permission);
     }
@@ -54,7 +59,7 @@ class Role extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function users()
+    public function users(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(User::class);
     }

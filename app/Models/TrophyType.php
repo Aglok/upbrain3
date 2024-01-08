@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TrophyType whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TrophyType whereName($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|TrophyType newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|TrophyType newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|TrophyType query()
  */
 class TrophyType extends Model
 {

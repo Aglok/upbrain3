@@ -2,9 +2,12 @@
 
 namespace App\Http\Sections;
 
-use function foo\func;
+use App\Models\SetOfTaskMath;
+use App\Models\TaskMath;
 use SleepingOwl\Admin\Contracts\Display\DisplayInterface;
 use SleepingOwl\Admin\Contracts\Form\FormInterface;
+use SleepingOwl\Admin\Exceptions\FilterOperatorException;
+use SleepingOwl\Admin\Exceptions\Form\Element\SelectException;
 use SleepingOwl\Admin\Section;
 use AdminDisplay;
 use AdminColumn;
@@ -15,7 +18,7 @@ use AdminColumnFilter;
 /**
  * Class TaskMaths
  *
- * @property \App\Models\TaskMath $model
+ * @property TaskMath $model
  *
  * @see http://sleepingowladmin.ru/docs/model_configuration_section
  */
@@ -40,8 +43,9 @@ class TaskMaths extends Section
 
     /**
      * @return DisplayInterface
+     * @throws FilterOperatorException
      */
-    public function onDisplay($scopes = null)
+    public function onDisplay(): DisplayInterface
     {
         \Meta::addJs('tasks', asset('js/aglok/tasks.js'),'admin-default', true)
             ->addJs('mathjax', 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=default','admin-default');
@@ -55,9 +59,9 @@ class TaskMaths extends Section
                         return \App\Models\SectionsMath::find($id)->name;
                 }),
                 AdminDisplayFilter::related('set_of_task_id')
-                    ->setModel(\App\Models\SetOfTaskMath::class)
+                    ->setModel(SetOfTaskMath::class)
                     ->setTitle(function($id){
-                        return \App\Models\SetOfTaskMath::find($id)->name;
+                        return SetOfTaskMath::find($id)->name;
                 })
             ])
             ->setColumns([
@@ -118,11 +122,10 @@ class TaskMaths extends Section
                 ->setHtmlAttribute('class', 'width-150'),
         ])->setPlacement('table.header');
 
-
-        //Принимает запрос через scopes, который отфильтровывает данные
-        if($scopes){
-            $display->setScopes($scopes);
-        }
+        //Принимает запрос через scopes, который отфильтровывает данные, scopes задаётся в модели Tasks
+        $payload = $this->getPayload();
+        if(count($payload) > 0)
+            $display->setScopes($payload['scopes']);
 
         return $display;
     }
@@ -131,10 +134,11 @@ class TaskMaths extends Section
      * @param int $id
      *
      * @return FormInterface
+     * @throws SelectException
      */
-    public function onEdit($id)
+    public function onEdit(int $id): FormInterface
     {
-        return AdminForm::panel()->addBody([
+        return AdminForm::card()->addBody([
             AdminFormElement::text('number_task', 'Номер'),
             AdminFormElement::text('task', 'Задачи'),
             AdminFormElement::number('experience', 'Опыт'),
@@ -143,7 +147,7 @@ class TaskMaths extends Section
             AdminFormElement::select('section_id', 'Тема')
                 ->setModelForOptions(\App\Models\SectionsMath::class)
                 ->setDisplay('name')->required(),
-            AdminFormElement::multiselect('setOfTask', 'Набор задач', \App\Models\SetOfTaskMath::class)->setDisplay('name'),
+            AdminFormElement::multiselect('setOfTask', 'Набор задач', SetOfTaskMath::class)->setDisplay('name'),
             AdminFormElement::text('answer', 'Ответ'),
             AdminFormElement::wysiwyg('detail', 'Решение', 'simplemde'),
             //AdminFormElement::string('set_of_task_id', 'Set_of_task'),
@@ -153,10 +157,11 @@ class TaskMaths extends Section
 
     /**
      * @return FormInterface
+     * @throws SelectException
      */
-    public function onCreate()
+    public function onCreate(): FormInterface
     {
-        return $this->onEdit(null);
+        return $this->onEdit((int)null);
     }
 
     /**

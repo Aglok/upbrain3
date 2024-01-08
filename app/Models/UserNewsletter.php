@@ -20,6 +20,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserNewsletter whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserNewsletter whereUserId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|UserNewsletter newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserNewsletter newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserNewsletter query()
  */
 class UserNewsletter extends Model
 {

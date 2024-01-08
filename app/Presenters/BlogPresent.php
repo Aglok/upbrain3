@@ -2,8 +2,10 @@
 
 namespace App\Presenters;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use App\User;
+use LaravelIdea\Helper\App\_IH_User_C;
 
 class BlogPresent extends Present
 {
@@ -27,9 +29,10 @@ class BlogPresent extends Present
     }
 
     /**
-    *  Вывод имень автора статьи
+    *  Вывод имени автора статьи
      **/
-    public function author(){
+    public function author(): Model|User|Collection|_IH_User_C|array|null
+    {
         return User::find($this->model->user_id);
     }
 }

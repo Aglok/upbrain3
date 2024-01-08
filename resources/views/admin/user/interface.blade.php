@@ -3,7 +3,7 @@
      <b>
          {{$sum_res['surname']}} {{$sum_res['name']}}
      </b>
-     <span>[<b>{{$lvl}}</b>] {{$user_class->name}}</span>
+     <span>[<b>{{$user_level}}</b>] {{$user_class->name}}</span>
     </div>
     <div class="row">
             <div class="col-xs-3 t_row">
@@ -86,7 +86,7 @@
                     <hr>
                     <li>Опыт: {{$sum_res['sum_exp']}}</li>
                     <li>Монет: {{$sum_res['sum_gold']}}</li>
-                    <li>Уровень: {{$lvl}}</li>
+                    <li>Уровень: {{$user_level}}</li>
                     <hr>
                     <li><b>Класс</b>: {{$user_class->name}}</li>
                     <li>Атака: {{$user_class->attack}}</li>

@@ -8,7 +8,7 @@
             <div class="panel panel-default panel-floating panel-floating-inline">
                 <div class="panel-body">
                     <div class="panel-content">
-                        <h5 class="m-b-0"><strong>Оставьте заявку сделайте первый шаг на пути к успеху</strong></h5>
+                        <h5 class="m-b-0"><strong>Оставьте заявку - сделайте первый шаг</strong></h5>
                         {{--<p class="text-subscribe"><small>Полную инструкцию вы получите на почту</small></p>--}}
                     </div>
                     <div class="panel-actions">

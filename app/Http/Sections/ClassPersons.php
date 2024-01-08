@@ -2,6 +2,7 @@
 
 namespace App\Http\Sections;
 
+use AdminColumnEditable;
 use SleepingOwl\Admin\Contracts\Display\DisplayInterface;
 use SleepingOwl\Admin\Contracts\Form\FormInterface;
 use SleepingOwl\Admin\Section;
@@ -30,7 +31,7 @@ class ClassPersons extends Section
     /**
      * @var string
      */
-    protected $title;
+    protected $title = "Классы учеников";
 
     /**
      * @var string
@@ -46,27 +47,29 @@ class ClassPersons extends Section
         setHtmlAttribute('class', 'table-primary')
             ->setColumns([
                 AdminColumn::image('image', 'Образ'),
-                AdminColumn::link('name', 'Name'),
-                AdminColumn::text('description', 'Описание'),
-                AdminColumn::link('attack', 'Атака'),
-                AdminColumn::link('shield', 'Защита'),
-                AdminColumn::link('damage', 'Урон'),
-                AdminColumn::link('hp', 'HP'),
-                AdminColumn::link('mp', 'Магия'),
-                AdminColumn::link('energy', 'Энергия'),
-                AdminColumn::link('critical_damage', 'Критический Урон'),
-                AdminColumn::link('critical_chance', 'Вероятность крита'),
+                AdminColumnEditable::text('name', 'Name'),
+                AdminColumnEditable::text('description', 'Описание'),
+                AdminColumnEditable::text('attack', 'Атака'),
+                AdminColumnEditable::text('shield', 'Защита'),
+                AdminColumnEditable::text('damage_min', 'Мин. урон'),
+                AdminColumnEditable::text('damage_max', 'Макс. урон'),
+                AdminColumnEditable::text('hp', 'HP'),
+                AdminColumnEditable::text('mp', 'Магия'),
+                AdminColumnEditable::text('energy', 'Энергия'),
+                AdminColumnEditable::text('critical_damage', 'Критический Урон'),
+                AdminColumnEditable::text('critical_chance', 'Вероятность крита'),
+                AdminColumnEditable::select('type_id', 'Тип класса', \App\Models\ClassType::class)->setDisplay('name'),
+                AdminColumn::lists('progresses.name', 'Достижения')->setWidth('200px'),
+                AdminColumn::lists('skills.name', 'Навыки')->setWidth('200px')
         ]);
     }
 
     /**
      * @param int $id
-     *
+     * TODO::либо решить Observers метод creating()
      * @return FormInterface
      */
-    //TODO::либо решить Observers метод creating()
-    //
-    public function onEdit($id)
+    public function onEdit(int $id)
     {
         if($id){
             $class_person = \App\Models\ClassPerson::find($id);
@@ -74,7 +77,7 @@ class ClassPersons extends Section
         }else
             $dir = '';
 
-        return AdminForm::panel()->addBody([
+        return AdminForm::card()->addBody([
             AdminFormElement::image('image', 'Образ')
                 ->setUploadPath(function($file) use ($dir) {
                 return 'images/items/classes/'.$dir;
@@ -87,14 +90,27 @@ class ClassPersons extends Section
             AdminFormElement::wysiwyg('description', 'Описание')->setEditor('simplemde'),
             AdminFormElement::text('attack', 'Атака')->required()->setDefaultValue('10'),
             AdminFormElement::text('shield', 'Защита')->required()->setDefaultValue('10'),
-            AdminFormElement::text('damage', 'Урон')->required()->setDefaultValue('5'),
+            AdminFormElement::text('damage_min', 'Мин. урон')->required()->setDefaultValue('5'),
+            AdminFormElement::text('damage_max', 'Макс. урон')->required()->setDefaultValue('5'),
             AdminFormElement::text('hp', 'HP')->required()->setDefaultValue('500'),
             AdminFormElement::text('mp', 'Магия')->required()->setDefaultValue('5'),
             AdminFormElement::text('energy', 'Энергия')->required()->setDefaultValue('40'),
             AdminFormElement::text('critical_damage', 'Критический Урон')->required()->setDefaultValue('30'),
             AdminFormElement::text('critical_chance', 'Вероятность крита')->required()->setDefaultValue('0.3'),
-            AdminFormElement::select('sex', 'Пол')->setEnum(['M', 'W'])->required()
-
+            AdminFormElement::select('sex', 'Пол')->setEnum(['M', 'W'])->required(),
+            AdminFormElement::select('type_id', 'Тип', \App\Models\ClassType::class)->setDisplay('name'),
+            AdminFormElement::multiselect('subjects', 'Предметы', \App\Models\Subject::class)
+                ->setDisplay('name'),
+            AdminFormElement::multiselectajax('progresses', 'Достижения')
+                ->setModelForOptions(\App\Models\Progress::class)
+                ->setDataDepends(['subjects'])
+                ->setLoadOptionsQueryPreparer(function ($element, $query) {
+                    return $query->where('subject_id', $element->getDependValue('subjects'));
+                })
+                ->setDisplay('name')
+                ->setHelpText('Доступные достижения: основы, продвинутая, мастер'),
+            AdminFormElement::multiselect('skills', 'Навыки', \App\Models\Skill::class)
+                ->setDisplay('name'),
         ]);
     }
 

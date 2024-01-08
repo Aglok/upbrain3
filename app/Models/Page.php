@@ -57,6 +57,12 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Page whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Page whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string|null $subject
+ * @property-read int|null $menus_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Page newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Page newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Page query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Page whereSubject($value)
  */
 class Page extends Model
 {

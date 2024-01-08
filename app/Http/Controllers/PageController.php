@@ -18,26 +18,28 @@ class PageController extends Controller
         $menu = $this->buildMenu($arrMenu);
 
         $page = Page::where('id', '=', $id)->firstOrFail();
-        return view('subject', ['page' => $page, 'menu' => $menu]);
+        if($page->type == "junior_classes")
+            return view('site.page_junior_classes', ['page' => $page, 'menu' => $menu]);
+        return view('site.page_subject', ['page' => $page, 'menu' => $menu]);
     }
     /*
      * Формирование пунктов меню используя расширение
      * https://github.com/lavary/laravel-menu#installation
      */
     public function buildMenu ($arrMenu){
-        $mBuilder = LavMenu::make('menu', function($menu) use ($arrMenu){
+        return LavMenu::make('menu', function($menu) use ($arrMenu){
             foreach($arrMenu as $item){
                 /*
                  * Для родительского пункта меню формируем элемент меню в корне
                  * и с помощью метода id присваиваем каждому пункту идентификатор
-                 * создаёт роутеры с помощью метода add()
+                 * создаёт роутер с помощью метода add()
                  */
                 if($item->parent_id == 0){
                     /*
                      * Если в path ссылке есть символ #, то создаём линк на текущей странице
                      * Иначе делаем общий URL
                      */
-                    if(strstr($item->path, '#'))
+                    if(str_contains($item->path, '#'))
                         $menu->add($item->title, $item->path)->id($item->id)->link->href($item->path);
                     else
                         $menu->add($item->title, $item->path)->id($item->id);
@@ -52,7 +54,6 @@ class PageController extends Controller
                 }
             }
         });
-        return $mBuilder;
     }
 }
 

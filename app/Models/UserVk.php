@@ -28,6 +28,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserVk whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserVk whereVkId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|UserVk newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserVk newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserVk query()
  */
 class UserVk extends Model
 {

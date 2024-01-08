@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\TaskMath;
 use DB;
+use Illuminate\Database\Eloquent\Model;
 use function explode;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,7 +14,7 @@ use Maatwebsite\Excel\Concerns\WithChunkReading;
 class TasksImport implements ToModel, WithHeadingRow, WithChunkReading, ShouldQueue
 {
     /**
-     * @param string
+     * @var string
      * alias предмета math, physics
      */
     public $subject;
@@ -27,12 +28,13 @@ class TasksImport implements ToModel, WithHeadingRow, WithChunkReading, ShouldQu
     /**
     * @param array $row
     *
-    * @return \Illuminate\Database\Eloquent\Model|null
+    * @return Model|null
     */
-    public function model(array $row)
+    public function model(array $row): ?Model
     {
 
         //$_subject = Subjects::_Subject($subject);
+        $insert = [];
         $modelTask = 'App\Models\Task'.ucfirst($this->subject);
 
         //выбираем последнюю в таблице по номеру задачу
@@ -48,43 +50,38 @@ class TasksImport implements ToModel, WithHeadingRow, WithChunkReading, ShouldQu
 
                 //TODO::создать таблицу task_image MorphToMany, чтобы для размещения изображений задач
                 //TODO::использовать привязки
-                if($this->subject == 'math'){
-                    $insert = [
-                        'number_task' => $row['number_task'],
-                        'task' => $row['task'],
-                        'image' => $row['image'],
-                        'experience' => $row['experience'],
-                        'gold' => $row['gold'],
-                        'grade' => $row['grade'],
-                        'section_id' => $row['section_id'],
-                        'answer' => $row['answer'],
-                        'detail' => $row['detail'],
-                        'original_number' => $row['original_number'],
-                        'book' => $row['book']
-                    ];
-                }else{
-                    $insert = [
-                        'number_task' => $row['number_task'],
-                        'task' => $row['task'],
+                $insert_math = [
+                    'number_task' => $row['number_task'],
+                    'task' => $row['task'],
+                    'image' => $row['image'],
+                    'experience' => $row['experience'],
+                    'gold' => $row['gold'],
+                    'grade' => $row['grade'],
+                    'section_id' => $row['section_id'],
+                    'answer' => $row['answer'],
+                    'detail' => $row['detail'],
+                    'original_number' => $row['original_number'],
+                    'book' => $row['book']
+                ];
+
+                if($this->subject == 'physics'){
+
+                    $insert_add = [
                         'image_1' => $row['image_1'],
                         'image_2' => $row['image_2'],
                         'image_1_answer' => $row['image_1_answer'],
                         'image_2_answer' => $row['image_2_answer'],
-                        'experience' => $row['experience'],
-                        'gold' => $row['gold'],
-                        'grade' => $row['grade'],
-                        'section_id' => $row['section_id'],
-                        'answer' => $row['answer'],
-                        'detail' => $row['detail'],
-                        'original_number' => $row['original_number'],
-                        'book' => $row['book'],
                     ];
-                }
 
-                if (!empty($insert)) {
-                    return new $modelTask($insert);
+                    $insert = $insert_math + $insert_add;
                 }
             }
+
+
+            if (!empty($insert)) {
+                return new $modelTask($insert);
+            }
+
     }
 
 

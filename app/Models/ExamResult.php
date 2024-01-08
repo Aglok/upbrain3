@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * App\Models\ExamResult
@@ -32,6 +34,11 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExamResult whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExamResult whereUserId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamResult newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamResult newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamResult query()
+ * @property int|null $exam_answer_id
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamResult whereExamAnswerId($value)
  */
 class ExamResult extends Model
 {
@@ -41,17 +48,24 @@ class ExamResult extends Model
 //    protected $casts = [
 //        'images' => 'array'
 //    ];
-    public function exam(){
+    public function exam(): BelongsTo
+    {
         return $this->belongsTo(Exam::class);
     }
 
 
-    public function user(){
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function exam_answers()
+    public function exam_answers(): BelongsTo
     {
         return $this->belongsTo(ExamAnswer::class, 'exam_id', 'exam_id');
+    }
+
+    public function exam_examiners(): BelongsToMany
+    {
+        return $this->BelongsToMany(User::class, 'exam_examiners', 'exam_result_id', 'user_id');
     }
 }

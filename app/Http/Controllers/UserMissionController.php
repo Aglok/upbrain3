@@ -2,171 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Artifact;
 use App\Models\Mission;
 use App\Helpers\JoinSubjects as Subjects;
-use App\Models\TaskMath;
-use DB;
-use App\Models\SetOfTaskMath;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use AdminSection;
-use Illuminate\View\View;
 use PHPUnit\Util\Json;
 
 class UserMissionController extends Controller
 {
-    /**
-     * Получаем список всех существующих миссий
-     * @return \View $view
-     */
-    public function getMissions()
-    {
-        //Набор названия столбцов для таблицы: возможно брать список из таблицы и перевод включать в lang
-        $columns = [
-            'id' => '',
-            'name' => 'Название',
-            'description' => 'Описание',
-            'list_tasks_id' => 'Задачи',
-            'list_artifacts_id' => 'Артифакты',
-            'condition' => 'Условия',
-            'user_level' => 'Уровень',
-            '' => '',
-        ];
-
-        $list_missions = $this->getListMissions();
-        $missions = $list_missions[0];
-        $missions_param = $list_missions[1];
-
-        $view = view('admin.missions.list_missions', [
-            'columns' => $columns,
-            'missions' => $missions,
-            'missions_param' => $missions_param,
-        ]);
-
-        //Добавляем по умолчанию в шаблон общие переменные menu, adminTitle, pageTitle, user
-        $view = AdminSection::view($view->renderSections()["innerContent"], '');
-        //dd($view);
-        return $view;
-    }
-
-    /**
-     * Вспомогательная функция для получения данных mission, artifacts
-     * @return array
-     */
-    public function getListMissions()
-    {
-        //Массив содержит список артифактов и задач для каждого задания
-        $missions_param = [];
-        $missions = DB::table('missions')
-            ->select('id', 'name', 'description', 'list_tasks_id', 'list_artifacts_id', 'condition', 'user_level')
-            ->orderBy('id', 'ASC')
-            ->get();
-
-        foreach ($missions as $mission):
-            $artifacts = DB::table('artifacts as art')
-                ->leftJoin('artifacts_type as art_t', 'art.artifact_type_id', '=', 'art_t.id')
-                ->select('art.id', 'art.name', 'image', 'art.description', 'art_t.dir', 'image', 'artifact_type_id', 'attack', 'damage_min', 'damage_max', 'defense', 'magic', 'energy', 'increase_experience', 'increase_gold', 'rarity_id', 'weight', 'user_level', 'class_person_id', 'condition', 'durability', 'price')
-                ->whereIn('art.id', explode(',', $mission->list_artifacts_id))
-                ->orderBy('art.id', 'ASC')
-                ->get();
-
-//            $tasks = DB::table('tasks_math')
-//                ->select('id', 'task', 'image', 'experience', 'gold', 'grade', 'set_of_task_id')
-//                ->whereIn('id', explode(',', $mission->list_tasks_id))
-//                ->orderBy('id', 'ASC')
-//                ->get();
-
-            $tasks = TaskMath::all()->whereIn('id', $mission->list_tasks_id);
-            $missions_param[$mission->id]['artifacts'] = $artifacts;
-            $missions_param[$mission->id]['tasks'] = $tasks;
-        endforeach;
-
-        return [$missions, $missions_param];
-    }
-
-    /**
-     * Создаём форму для создания миссии
-     * @return \View $view
-     */
-    public function CreateFormMission()
-    {
-        $set_of_tasks = SetOfTaskMath::all();
-        $list_artifacts = DB::table('artifacts as art')
-            ->leftJoin('artifacts_type as art_type', 'art.artifact_type_id', '=', 'art_type.id')
-            ->select('art.id', 'art.name', 'art.description', 'art.image', 'art.user_level', 'art_type.dir')
-            ->get();
-
-        $view = view('admin.missions.create_mission', [
-            'set_of_tasks' => $set_of_tasks,
-            'list_artifacts' => $list_artifacts,
-        ]);
-
-        $view = AdminSection::view($view->renderSections()["innerContent"], '');
-
-        return $view->render();
-    }
-
-    /**
-     * Создаём форму для редактирования миссии
-     * @return \View $view
-     */
-    public function EditFormMission($mission_id)
-    {
-
-        $mission = Mission::select()->where('id', $mission_id)->first();
-        $set_of_tasks = SetOfTaskMath::select()->get();
-
-        $artifacts_checked = DB::table('artifacts as art')
-            ->leftJoin('artifacts_type as art_t', 'art.artifact_type_id', '=', 'art_t.id')
-            ->select('art.id', 'art.name', 'image', 'art.description', 'art_t.dir', 'image', 'artifact_type_id', 'attack', 'damage_min', 'damage_max', 'defense', 'magic', 'energy', 'increase_experience', 'increase_gold', 'rarity_id', 'weight', 'user_level', 'class_person_id', 'condition', 'durability', 'price')
-            ->whereIn('art.id', explode(',', $mission->list_artifacts_id))
-            ->orderBy('art.id', 'ASC')
-            ->get();
-
-
-        $list_artifacts = DB::table('artifacts as art')
-            ->leftJoin('artifacts_type as art_type', 'art.artifact_type_id', '=', 'art_type.id')
-            ->select('art.id', 'art.name', 'art.description', 'art.image', 'art.user_level', 'art_type.dir')
-            ->get();
-
-//        $tasks_checked = DB::table('tasks_math')
-//            ->select('id', 'task', 'image', 'experience', 'gold', 'grade')
-//            ->whereIn('id', explode(',', $mission->list_tasks_id))
-//            ->orderBy('id', 'ASC')
-//            ->get();
-        $tasks_checked = TaskMath::all()->whereIn('id', $mission->list_tasks_id);
-
-        $list_tasks = SetOfTaskMath::find($mission->set_of_tasks_id)->with('tasks')->get();
-
-        // dd($list_tasks[0]->id, $tasks_checked,$artifacts_checked);
-        $view = view('admin.missions.edit_mission', [
-            'mission' => $mission,
-            'set_of_tasks' => $set_of_tasks,
-            'artifacts_checked' => $artifacts_checked,
-            'list_artifacts' => $list_artifacts,
-            'tasks_checked' => $tasks_checked,
-            'list_tasks' => $list_tasks,
-        ]);
-
-        $view = AdminSection::view($view->renderSections()["innerContent"], '');
-
-        return $view;
-    }
 
     /**
      * @param string $subject
      * @param int $mission_id
-     * @return Json
+     * @return Application|Factory|View|JsonResponse|void
      * Принимаем ajax запрос из списка набора задач id, отправляем список задач из этого списка
-     * */
-    public function getTasks($subject, $mission_id)
+     */
+    public function getTasks(string $subject, int $mission_id)
     {
         if (request()->ajax()) {
             try {
                 $_subject = Subjects::_Subject($subject);
                 $tasks_function = 'task'.$_subject;
+                $mission = Mission::find($mission_id);
+                $list_tasks = $mission->$tasks_function()->with(['section'])->get()
+                    ->map(function ($item){
+                        $section = $item->section->name;
+                        $item->section = $section;
+                        $item->percent = $item->pivot['percent'];
+                        $item->done = $item->pivot['done'];
+                        //dd(collect($item));
+                        return collect($item->only(['answer', 'detail' ,'image', 'experience', 'gold', 'crystal', 'number_task', 'task', 'grade', 'section', 'percent', 'done']))->filter();
+                });
+                $monster = $mission->monster()->first();
 
-                $list_tasks = Mission::find($mission_id)->$tasks_function()->get();
             } catch (\Exception $e) {
                 return view('errors.request', ['error' => $e->getMessage()]);
             }
@@ -174,37 +45,13 @@ class UserMissionController extends Controller
 //            $view = view('admin.missions.list_tasks', [
 //                'list_tasks' => $list_tasks,
 //            ]);
-            return response()->json($list_tasks);
+            return response()->json(['tasks' => $list_tasks, 'monster' => $monster]);
         }
     }
-
-    /**
-     * @param \Request $request
-     * @return \View $view
-     * Принимаем ajax запрос из набора артов по lvl, отправляем список артифактов из этого списка
-     **/
-    public function getArtifacts(Request $request)
-    {
-        if ($request->ajax()) {
-            try {
-                //$id = $request->get('id');
-                $list_artifacts = Artifact::select(['id', 'name', 'image', 'user_level'])->get();
-            } catch (\Exception $e) {
-                return view('errors.request', ['error' => $e->getMessage()]);
-            }
-
-            $view = view('admin.missions.list_artifacts', [
-                'list_artifacts' => $list_artifacts,
-            ]);
-
-            return $view->render();
-        }
-    }
-
     /**
      * @param Request $request
-     * @return \Response
-     * Принимаем ajax запрос содержащий данные о миссии, задачах и артифактах
+     * @return Application|Factory|JsonResponse|View|void
+     * Принимаем ajax запрос содержащий данные о миссии, задачах и артефактах.
      * Добавить переменную condition
      * */
     public function saveMission(Request $request)

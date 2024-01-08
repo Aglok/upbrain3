@@ -4,11 +4,14 @@ use App\Presenters\TaskPresent;
 use App\User;
 use App\Models\Stage;
 use DB;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Routing\ResponseFactory as Response;
 use App\Helpers\UserInterface as UserI;
 use App\Helpers\JoinSubjects as Subjects;
 use AdminSection;
+use Throwable;
+use View;
 
 class ProcessController extends Controller
 {
@@ -27,12 +30,14 @@ class ProcessController extends Controller
 //    }
 
     /**
-     * @var integer
-     * @var string
-     * @return View
-     * */
+     * @return Factory|\Illuminate\View\View
+     *
+     * @throws Throwable
+     * @param string $subject
+     * @param int $set_id
 
-    public function getTable($subject, $set_id)
+     */
+    public function getTable(string $subject, int $set_id)
     {
 
         $_subject = Subjects::_Subject($subject);
@@ -83,11 +88,11 @@ class ProcessController extends Controller
 
     }
     /**
+     * Принимаем ajax запрос формат json - массив объектов и отправляем текст об успешном добавлении
      * @param Request $request
      * @param Response $response
      * @param string $subject параметр приходящий через роутер process/{phys}/save по ajax в process.js
      * @return Object
-     * Принимаем ajax запрос формат json - массив объектов и отправляем текст о успешном добавлении
      * */
     public function saveProcess(Request $request, Response $response, $subject)
     {
@@ -184,7 +189,7 @@ class ProcessController extends Controller
      * Возвращает массив из true/false и массив совпавших номеров задач
      * */
 
-    public function validateProcessesNumberTasks($user_id, $arr_tasks, $_subject){
+    public function validateProcessesNumberTasks(int $user_id, array $arr_tasks, string $_subject){
 
         $arr_number_tasks = [];//массив содержит задачи которые уже есть в БД ученика
         $bool = true;//ярлык для определения дубляжа задач
@@ -202,7 +207,7 @@ class ProcessController extends Controller
             foreach ($number_tasks_db as $obj):
 
                 if($obj->number_task == $number_task){
-                    array_push($arr_number_tasks, $number_task);
+                    $arr_number_tasks[] = $number_task;
                     $bool = false;
                 }
 

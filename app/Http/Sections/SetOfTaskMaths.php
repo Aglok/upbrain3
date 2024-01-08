@@ -2,6 +2,8 @@
 
 namespace App\Http\Sections;
 
+use App\Models\SetOfTaskType;
+use App\Models\TaskMath;
 use SleepingOwl\Admin\Contracts\Display\DisplayInterface;
 use SleepingOwl\Admin\Contracts\Form\FormInterface;
 use SleepingOwl\Admin\Section;
@@ -40,7 +42,7 @@ class SetOfTaskMaths extends Section
     /**
      * @return DisplayInterface
      */
-    public function onDisplay()
+    public function onDisplay(): DisplayInterface
     {
 
         $display = AdminDisplay::table()
@@ -81,19 +83,21 @@ class SetOfTaskMaths extends Section
      *
      * @return FormInterface
      */
-    public function onEdit($id)
+    public function onEdit(int $id): FormInterface
     {
 //        $this->updating(function($config, $model) {
 //            return false;
 //        });
-        return AdminForm::panel()->addBody([
+        return AdminForm::card()->addBody([
 
             AdminFormElement::text('name', 'Название'),
             AdminFormElement::text('alias', 'Кратко'),
             AdminFormElement::image('image', 'Рис'),
             AdminFormElement::text('description', 'Описание'),
-            AdminFormElement::select('type', 'Тип', \App\Models\SetOfTaskType::class)->setDisplay('name'),
-            AdminSection::getModel(\App\Models\TaskMath::class)
+            AdminFormElement::select('type', 'Тип', SetOfTaskType::class)->setDisplay('name'),
+
+            //Посылаем запрос в таблицу TaskMath для отображения задач, данной модели SetOfTask
+            AdminSection::getModel(TaskMath::class)
                 ->fireDisplay(
                     ['scopes' => ['withSetOfTask', $id]]
             )
@@ -103,9 +107,9 @@ class SetOfTaskMaths extends Section
     /**
      * @return FormInterface
      */
-    public function onCreate()
+    public function onCreate(): FormInterface
     {
-        return $this->onEdit(null);
+        return $this->onEdit((int)null);
     }
 
     /**

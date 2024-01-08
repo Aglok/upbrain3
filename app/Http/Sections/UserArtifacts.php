@@ -68,6 +68,9 @@ class UserArtifacts extends Section
             AdminFormElement::select('user_id', 'Образ')
                 ->setModelForOptions(\App\User::class)
                 ->setDisplay('full_name')->required()
+                ->setLoadOptionsQueryPreparer(function ($element, $query){
+                    return $query->where('active', 1);
+                })
         ]);
     }
 

@@ -9,11 +9,15 @@ class JoinSubjects{
      * @return string $_subject
      * Функция добавляет к названию предмета '_' => _physics
      **/
-    public static function _Subject($subject){
+    public static function _Subject($subject): string {
         return '_'.$subject;
     }
 
-    public static function listSubject(){
+    /**
+     * Функция возвращает список предметов
+     * @return array
+     **/
+    public static function listSubject(): array {
         return ['math', 'physics', 'russian', 'informatics', 'english', 'history', 'social_sciences', 'chemistry'];
     }
 
@@ -22,15 +26,24 @@ class JoinSubjects{
      * @return int
      * Функция возвращает по alias предмета, его id
      **/
-    public static function getSubjectId($subject){
+    public static function getSubjectId($subject): int{
         return Subject::whereAlias($subject)->value('id');
     }
     /**
      * @param string $subject
-     * @return int
+     * @return string
      * Функция возвращает по alias предмета, его name
      **/
-    public static function getSubjectName($subject){
+    public static function getSubjectName($subject): string{
         return Subject::whereAlias($subject)->value('name');
+    }
+
+    /**
+     * @param string $subject
+     * @return string
+     * Функция получает цвет кристалла по названию предмета
+     **/
+    public static function getSubjectColor($subject): string{
+        return Subject::whereAlias($subject)->value('color');
     }
 }

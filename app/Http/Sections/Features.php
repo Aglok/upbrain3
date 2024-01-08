@@ -75,7 +75,8 @@ class Features extends Section
             AdminFormElement::text('description', 'Описание'),
             AdminFormElement::text('upgrade', 'Улучшение'),
             AdminFormElement::text('value', 'Значение'),
-            AdminFormElement::select('type', 'Тип')->setEnum(['experience_increase', 'experience_decrease' ,'hp_increase', 'hp_decrease', 'condition']),
+            AdminFormElement::select('type', 'Тип')
+                ->setEnum(['experience_increase', 'experience_decrease' ,'hp_increase', 'hp_decrease', 'condition']),
             AdminFormElement::text('modification', 'Модификатор')
         ]);
     }

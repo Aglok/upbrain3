@@ -12,9 +12,9 @@
                 </div>
                 <div class="details">
                     <div class="stuff-box">
-                        <div v-for="(stat, key) in property"
-                           v-if="key !== 'created_at' && key !== 'updated_at' && key !== 'id' && key !== 'user_id' && key !== 'class'"
-                        ><p>{{$t('Inventory.'+key)}}:</p><p :class="key" class="icon">{{stat}}</p>
+                        <div v-for="(stat, key) in property.invariant" v-if="key !== 'name' && key !== 'description' && key !== 'image' && key !== 'sex' && key !== 'pivot' && key !== 'id' && key !== 'type_id'">
+                            <p>{{$t('Inventory.'+key)}}:</p>
+                            <p :class="key" :style="css()" class="icon">{{stat}}<span class="size-10" v-html="htmlAddStats(key, stat, property)"></span></p>
                         </div>
                     </div>
                 </div>
@@ -30,10 +30,32 @@
         name: "list-property",
         props:{
             property: {}
+        },
+        methods: {
+            htmlAddStats(key, stat, property) {
+                let property_artifact = property.artifact_stats;
+                if (property_artifact.hasOwnProperty(key)) {
+                    let prop = property_artifact[key];
+                    if (prop > 0)
+                        return ' <span class="green--text"><i class="fas fa-plus"></i>' + prop + '</span>';
+                    if (prop < 0)
+                        return ' <span class="red--text"><i class="fas fa-minus"></i>' + (-1) * prop + '</span>';
+                    if (prop === 0)
+                        return stat;
+                }
+            },
+            css: function () {
+                return {
+                    'width': '62px',
+                    //'z-index': 4
+                };
+            }
         }
     }
 </script>
 
 <style scoped>
-
+.size-10{
+    font-size: 10px;
+}
 </style>

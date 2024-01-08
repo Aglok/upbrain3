@@ -2,8 +2,12 @@
 
 namespace App\Http\Sections;
 
+use App\Models\Mission;
+use App\Models\UserMission;
+use App\User;
 use SleepingOwl\Admin\Contracts\Display\DisplayInterface;
 use SleepingOwl\Admin\Contracts\Form\FormInterface;
+use SleepingOwl\Admin\Exceptions\Form\Element\SelectException;
 use SleepingOwl\Admin\Section;
 use AdminDisplay;
 use AdminColumn;
@@ -13,7 +17,7 @@ use AdminColumnEditable;
 /**
  * Class UserMissions
  *
- * @property \App\Models\UserMission $model
+ * @property UserMission $model
  *
  * @see http://sleepingowladmin.ru/docs/model_configuration_section
  */
@@ -39,7 +43,7 @@ class UserMissions extends Section
     /**
      * @return DisplayInterface
      */
-    public function onDisplay()
+    public function onDisplay(): DisplayInterface
     {
         return AdminDisplay::table()
             ->setHtmlAttribute('class', 'table-primary')
@@ -53,26 +57,28 @@ class UserMissions extends Section
     /**
      * @param int $id
      * @return FormInterface
+     * @throws SelectException
      */
-    public function onEdit($id)
+    public function onEdit(int $id): FormInterface
     {
 
-        return AdminForm::panel()->addBody([
+        return AdminForm::card()->addBody([
             AdminFormElement::select('user_id', 'Ученик')
-                ->setModelForOptions(\App\User::class)
+                ->setModelForOptions(User::class)
                 ->setDisplay('full_name')->required(),
             AdminFormElement::select('mission_id', 'Задание')
-                ->setModelForOptions(\App\Models\Mission::class)
+                ->setModelForOptions(Mission::class)
                 ->setDisplay('name')->required()
         ]);
     }
 
     /**
      * @return FormInterface
+     * @throws SelectException
      */
-    public function onCreate()
+    public function onCreate(): FormInterface
     {
-        return $this->onEdit(null);
+        return $this->onEdit((int)null);
     }
 
     /**

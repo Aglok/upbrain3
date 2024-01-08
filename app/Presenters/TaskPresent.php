@@ -3,6 +3,7 @@
 namespace App\Presenters;
 
 use Illuminate\Database\Eloquent\Model;
+use Lavary\Menu\Collection;
 
 class TaskPresent extends Present
 {
@@ -10,15 +11,15 @@ class TaskPresent extends Present
     /**
      * Предмет
      **/
-    public $subject;
+    public string $subject;
     /**
      * Имя предметов
      **/
-    public $section_name;
+    public string $section_name;
     /**
      * Коллекции список задач
      **/
-    public $tasks;
+    public Collection $tasks;
 
     public function __construct(Model $model, $subject)
     {

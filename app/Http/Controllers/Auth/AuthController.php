@@ -5,12 +5,13 @@ use Illuminate\Contracts\Auth\Guard;
 
 class AuthController extends Controller
 {
+    private Guard $auth;
 
 
     /**
      * Create a new authentication controller instance.
      *
-     * @param  \Illuminate\Contracts\Auth\Guard $auth
+     * @param Guard $auth
      * @return void
      */
     

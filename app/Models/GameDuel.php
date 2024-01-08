@@ -24,6 +24,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GameDuel whereTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GameDuel whereUserId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|GameDuel newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|GameDuel newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|GameDuel query()
  */
 class GameDuel extends Model
 {

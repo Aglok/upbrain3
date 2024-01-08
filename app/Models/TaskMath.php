@@ -1,6 +1,12 @@
 <?php namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
  * App\Models\TaskMath
@@ -17,23 +23,33 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $detail
  * @property string|null $original_number
  * @property string|null $book
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Mission[] $missions
- * @property-read \App\Models\SectionsMath|null $section
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\SetOfTaskMath[] $setOfTask
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath whereAnswer($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath whereBook($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath whereDetail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath whereExperience($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath whereGold($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath whereGrade($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath whereImage($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath whereNumberTask($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath whereOriginalNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath whereSectionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath whereTask($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskMath withSetOfTask($set_of_task_id)
- * @mixin \Eloquent
+ * @property-read Collection|Mission[] $missions
+ * @property-read SectionsMath|null $section
+ * @property-read Collection|SetOfTaskMath[] $setOfTask
+ * @method static Builder|TaskMath whereAnswer($value)
+ * @method static Builder|TaskMath whereBook($value)
+ * @method static Builder|TaskMath whereDetail($value)
+ * @method static Builder|TaskMath whereExperience($value)
+ * @method static Builder|TaskMath whereGold($value)
+ * @method static Builder|TaskMath whereGrade($value)
+ * @method static Builder|TaskMath whereId($value)
+ * @method static Builder|TaskMath whereImage($value)
+ * @method static Builder|TaskMath whereNumberTask($value)
+ * @method static Builder|TaskMath whereOriginalNumber($value)
+ * @method static Builder|TaskMath whereSectionId($value)
+ * @method static Builder|TaskMath whereTask($value)
+ * @method static Builder|TaskMath withSetOfTask($set_of_task_id)
+ * @mixin Eloquent
+ * @property int|null $crystal
+ * @property int|null $verifiable
+ * @property-read Collection|Mission[] $mission
+ * @property-read int|null $mission_count
+ * @property-read int|null $set_of_task_count
+ * @method static Builder|TaskMath newModelQuery()
+ * @method static Builder|TaskMath newQuery()
+ * @method static Builder|TaskMath query()
+ * @method static Builder|TaskMath whereCrystal($value)
+ * @method static Builder|TaskMath whereVerifiable($value)
  */
 class TaskMath extends Model
 {
@@ -41,14 +57,14 @@ class TaskMath extends Model
     public $timestamps = false;
 
     protected $table = 'tasks_math';
-    protected $fillable = ['number_task','task', 'image', 'experience', 'gold', 'grade', 'answer', 'detail', 'section_id', 'set_of_task_id', 'original_number', 'book'];
+    protected $fillable = ['number_task','task', 'image', 'experience', 'gold', 'grade', 'answer', 'verifiable', 'detail', 'section_id', 'set_of_task_id', 'original_number', 'book'];
 
-    public function section()
+    public function section(): BelongsTo
     {
         return $this->belongsTo(SectionsMath::class);
     }
 
-    public function setOfTask()
+    public function setOfTask(): BelongsToMany
     {
         return $this->belongsToMany(SetOfTaskMath::class, 'set_of_task_math','task_id', 'set_of_task_id');
     }
@@ -56,18 +72,29 @@ class TaskMath extends Model
     /**
      * Получить миссию связанную с задачей.
      */
-    public function mission()
+    public function mission(): MorphToMany
     {
         return $this->morphToMany(Mission::class,'mission', 'mission_tasks', 'task_id','mission_id');
     }
 
     /**
      * @param $query
-     * @param $set_of_task_id
-     *
+     * @param int $set_of_task_id
      */
-    public function scopeWithSetOfTask($query, $set_of_task_id)
+    public function scopeWithSetOfTask($query, int $set_of_task_id): void
     {
-        $query->where('set_of_task_id', $set_of_task_id);
+        $tasks_ids = SetOfTaskMath::find($set_of_task_id)->tasks()->get()->pluck('id');
+        $query->whereIn('id', $tasks_ids);
+    }
+
+    /**
+     * @param $query
+     * @param int $mission_id
+     */
+    public function scopeWithMission($query, int $mission_id): void
+    {
+        //Список id задач
+        $tasks_ids = Mission::find($mission_id)->task_math()->get()->pluck('id');
+        $query->whereIn('id', $tasks_ids);
     }
 }

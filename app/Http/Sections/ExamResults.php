@@ -2,6 +2,8 @@
 
 namespace App\Http\Sections;
 
+use App\Models\ExamResult;
+use SleepingOwl\Admin\Exceptions\Form\Element\SelectException;
 use function request;
 use SleepingOwl\Admin\Contracts\Display\DisplayInterface;
 use SleepingOwl\Admin\Contracts\Form\FormInterface;
@@ -17,7 +19,7 @@ use Storage;
 /**
  * Class ExamResults
  *
- * @property \App\Models\ExamResult $model
+ * @property ExamResult $model
  *
  * @see http://sleepingowladmin.ru/docs/model_configuration_section
  */
@@ -44,7 +46,7 @@ class ExamResults extends Section
      * @return DisplayInterface
      */
 
-    public function onDisplay()
+    public function onDisplay(): DisplayInterface
     {
         return AdminDisplay::table()
             ->with(['user', 'exam'])
@@ -75,8 +77,9 @@ class ExamResults extends Section
      * @param int $id
      *
      * @return FormInterface
+     * @throws SelectException
      */
-    public function onEdit($id)
+    public function onEdit(int $id): FormInterface
     {
         if($id){
             $element_form_answers = AdminFormElement::html('<short-answers id='."$id".'></short-answers>', function ($model){
@@ -91,7 +94,7 @@ class ExamResults extends Section
                 $model->short_answers = request()->get('short_answers');
             });
         }
-        return AdminForm::panel()->addBody([
+        return AdminForm::card()->addBody([
 
             $element_form_answers,
             AdminFormElement::select('exam_id', 'Экзамен', \App\Models\Exam::class)->setDisplay('name')->required(),
@@ -103,8 +106,8 @@ class ExamResults extends Section
                 ->required(),
             AdminFormElement::images('images','Изображения')
                 ->setUploadPath(function($file) use ($id){
-                    $full_name = Common::translit(\App\Models\ExamResult::find($id)->user->full_name);
-                    $exam_id = \App\Models\ExamResult::find($id)->exam_id;
+                    $full_name = Common::translit(ExamResult::find($id)->user->full_name);
+                    $exam_id = ExamResult::find($id)->exam_id;
                     $dir = 'exams/math/v'.$exam_id.'/'.$full_name;
 
                     if (!Storage::disk('images')->exists($dir)) {

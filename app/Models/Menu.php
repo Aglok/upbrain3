@@ -16,6 +16,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Menu wherePath($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Menu whereTitle($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|Menu newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Menu newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Menu query()
  */
 class Menu extends Model
 {

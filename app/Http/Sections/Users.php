@@ -2,8 +2,12 @@
 
 namespace App\Http\Sections;
 
+use App\Models\ClassPerson;
+use App\Models\Subject;
+use App\Role;
 use SleepingOwl\Admin\Contracts\Display\DisplayInterface;
 use SleepingOwl\Admin\Contracts\Form\FormInterface;
+use SleepingOwl\Admin\Exceptions\Form\Element\SelectException;
 use SleepingOwl\Admin\Section;
 use AdminColumn;
 use AdminDisplay;
@@ -39,9 +43,10 @@ class Users extends Section
     protected $alias;
 
     /**
+     * @param null $scopes
      * @return DisplayInterface
      */
-    public function onDisplay($scopes = null)
+    public function onDisplay($scopes = null): DisplayInterface
     {
 
         $display = AdminDisplay::table()
@@ -51,7 +56,7 @@ class Users extends Section
             ->setHtmlAttribute('class', 'table-primary')
             ->setColumns([
                     AdminColumn::image('avatar')->setWidth('80px'),
-                    AdminColumn::link('fullname', 'Имя'),
+                    AdminColumn::link('full_name', 'Имя'),
                     AdminColumn::email('email', 'Email')->setWidth('150px'),
                     AdminColumn::lists('roles.label', 'Роли')->setWidth('200px'),
                     AdminColumn::lists('user_subjects.name', 'Предметы')->setWidth('200px'),
@@ -66,11 +71,12 @@ class Users extends Section
     }
 
     /**
-     * @param int $id
+     * @param int|null $id
      *
      * @return FormInterface
+     * @throws SelectException
      */
-    public function onEdit($id = null)
+    public function onEdit(int $id = null): FormInterface
     {
 
         if(is_null($id))
@@ -78,20 +84,20 @@ class Users extends Section
         else
             $formPassword = AdminFormElement::password('password', 'Password');
 
-        return AdminForm::panel()->addBody([
+        return AdminForm::card()->addBody([
             AdminFormElement::checkbox('active', 'Активировать'),
             AdminFormElement::text('name', 'Имя')->required(),
             AdminFormElement::text('surname', 'Фамилия')->required(),
             AdminFormElement::text('email', 'E-mail')->required()->addValidationRule('email'),
             $formPassword,
             AdminFormElement::text('description', 'О себе'),
-            AdminFormElement::multiselect('roles', 'Roles', \App\Role::class)->setDisplay('name'),
-            AdminFormElement::multiselect('user_subjects', 'Предметы', \App\Models\Subject::class)->setDisplay('name'),
+            AdminFormElement::multiselect('roles', 'Roles', Role::class)->setDisplay('name'),
+            AdminFormElement::multiselect('user_subjects', 'Предметы', Subject::class)->setDisplay('name'),
             AdminFormElement::image('avatar', 'Avatar'),
             AdminColumn::image('avatar')->setWidth('150px'),
             AdminFormElement::select('sex', 'Пол')->setEnum(['M', 'W']),
             AdminFormElement::multiselectajax('classes_person', 'Классы героя')
-                ->setModelForOptions(\App\Models\ClassPerson::class)
+                ->setModelForOptions(ClassPerson::class)
                 ->setDataDepends(['sex'])
                 ->setLoadOptionsQueryPreparer(function ($element, $query) {
                     return $query->where('sex', $element->getDependValue('sex'));
@@ -103,8 +109,9 @@ class Users extends Section
 
     /**
      * @return FormInterface
+     * @throws SelectException
      */
-    public function onCreate()
+    public function onCreate(): FormInterface
     {
         return $this->onEdit(null);
     }

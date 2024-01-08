@@ -11,7 +11,7 @@ use Ratchet\ConnectionInterface;
 use App\Models\Game_Duel;
 class GameDuel extends RatchetInterface
 {
-    protected $clients;
+    protected \SplObjectStorage $clients;
     /**
      * Общий список пользователей с открытым соединением
      */
@@ -90,7 +90,8 @@ class GameDuel extends RatchetInterface
      * @param  $count
      * @return array
      */
-    public function choosePlayersForGameDuel($array_players, $count){
+    public function choosePlayersForGameDuel($array_players, $count): array
+    {
         $i = 0;
         $found_players = [];
 
@@ -103,7 +104,7 @@ class GameDuel extends RatchetInterface
                 $players->date = $player->date;
                 $players->game_number = 0;
                 $i++;
-                array_push($found_players, $players);
+                $found_players[] = $players;
                 unset($this->players[$resId]);//Удаляем из основного массива ожидающего игрока
             }else
                 break;

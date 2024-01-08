@@ -39,6 +39,14 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskPhysics whereSectionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TaskPhysics whereTask($value)
  * @mixin \Eloquent
+ * @property int|null $crystal
+ * @property int|null $verifiable
+ * @property-read Model|\Eloquent $mission
+ * @method static \Illuminate\Database\Eloquent\Builder|TaskPhysics newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|TaskPhysics newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|TaskPhysics query()
+ * @method static \Illuminate\Database\Eloquent\Builder|TaskPhysics whereCrystal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TaskPhysics whereVerifiable($value)
  */
 class TaskPhysics extends Model
 {
@@ -46,7 +54,7 @@ class TaskPhysics extends Model
     public $timestamps = false;
 
     protected $table = 'tasks_physics';
-    protected $fillable = ['number_task', 'task', 'image_a' , 'image_b' ,'experience', 'gold', 'grade', 'answer', 'detail', 'section_id', 'set_of_task_id', 'original_number', 'book'];
+    protected $fillable = ['number_task', 'task', 'image_a' , 'image_b' ,'experience', 'gold', 'grade', 'answer', 'verifiable' ,'detail', 'section_id', 'set_of_task_id', 'original_number', 'book'];
 
     public function section()
     {

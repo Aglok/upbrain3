@@ -19,6 +19,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Permission whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Permission whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read int|null $roles_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Permission newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Permission newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Permission query()
  */
 class Permission extends Model
 {

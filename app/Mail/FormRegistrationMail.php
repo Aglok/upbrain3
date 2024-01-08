@@ -10,14 +10,16 @@ class FormRegistrationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $name;
     public $email;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($email)
+    public function __construct($name, $email)
     {
+        $this->name = $name;
         $this->email = $email;
     }
 
@@ -31,6 +33,6 @@ class FormRegistrationMail extends Mailable
         return $this->from('email@upbrain.ru')
             ->view('admin.email.form_registration')
             ->subject('Курсы подготовки Upbrain')
-            ->with(['email' => $this->email]);
+            ->with(['name' => $this->name, 'email' => $this->email]);
     }
 }

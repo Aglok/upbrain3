@@ -16,6 +16,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SetOfTaskType whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SetOfTaskType whereName($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|SetOfTaskType newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|SetOfTaskType newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|SetOfTaskType query()
  */
 class SetOfTaskType extends Model
 {

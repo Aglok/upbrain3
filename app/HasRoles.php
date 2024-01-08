@@ -2,15 +2,17 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 trait HasRoles
 {
 
     /**
      * A user may have multiple roles.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function roles()
+    public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class);
     }
@@ -18,10 +20,10 @@ trait HasRoles
     /**
      * Assign the given role to the user.
      *
-     * @param  string $role
+     * @param string $role
      * @return mixed
      */
-    public function assignRole($role)
+    public function assignRole(string $role): mixed
     {
         return $this->roles()->save(
             Role::whereName($role)->firstOrFail()

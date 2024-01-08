@@ -1,8 +1,19 @@
 
 const dataUserStore = {
     //Принимает 3 параметра url, функцию замыкания, параметр в виде строки json
-    getData(url ='/profile', callback, json){
+    getPostData(url ='/profile', callback, json){
         axios.post(url, json).then((response) => {
+            callback(response);//Функция замыкания чтобы сохранить переменную запроса response, иначе undefined
+        }).catch(function (error) {
+            console.log(error);
+            //swal(error.message);
+        });
+    },
+    //Принимает 3 параметра url, функцию замыкания, параметр param объект
+    getData(url ='/profile',callback, params){
+        axios.get(url, {
+            params: params
+        }).then((response) => {
             callback(response);//Функция замыкания чтобы сохранить переменную запроса response, иначе undefined
         }).catch(function (error) {
             console.log(error);

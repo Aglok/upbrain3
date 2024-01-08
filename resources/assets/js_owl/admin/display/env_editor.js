@@ -1,4 +1,3 @@
-
 Vue.component('env_editor', Vue.extend({
     props: {
         data: {
@@ -24,11 +23,28 @@ Vue.component('env_editor', Vue.extend({
             if (this.values[key].deletable)
                 this.values.splice(key, 1)
             else {
-                new Noty({
-                    type: 'error',
-                    layout: 'topRight',
-                    text: this.errorText
-                }).show();
+              const Toast = Swal.mixin({
+                      toast: true,
+                      position: 'top-end',
+                      showConfirmButton: false,
+                      timer: 3000,
+                      timerProgressBar: true,
+                      didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                      }
+                    })
+
+                    Toast.fire({
+                      icon: 'error',
+                      title: this.errorText
+                    })
+
+                // new Noty({
+                //     type: 'error',
+                //     layout: 'topRight',
+                //     text: this.errorText
+                // }).show();
             }
         }
     },

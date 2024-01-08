@@ -39,6 +39,13 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Progress whereListSectionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Progress whereSubjectId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Progress whereSuperProgressId($value)
+ * @property string|null $list_grade
+ * @property string|null $list_count_tasks
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Mission[] $mission
+ * @property-read int|null $mission_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Progress newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Progress newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Progress query()
  */
 class Progress extends Model
 {

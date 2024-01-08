@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
  * App\Models\Grade
  *
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|Grade newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Grade newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Grade query()
  */
 class Grade extends Model
 {

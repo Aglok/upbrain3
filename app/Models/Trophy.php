@@ -36,6 +36,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Trophy whereUserLevel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Trophy whereWeight($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|Trophy newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Trophy newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Trophy query()
  */
 class Trophy extends Model
 {

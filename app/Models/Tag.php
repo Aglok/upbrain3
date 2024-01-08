@@ -13,6 +13,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Tag whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Tag whereName($value)
  * @mixin \Eloquent
+ * @property-read int|null $posts_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Tag newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Tag newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Tag query()
  */
 class Tag extends Model
 {

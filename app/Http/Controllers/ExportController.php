@@ -1,6 +1,10 @@
 <?php namespace App\Http\Controllers;
 
 use App\Presenters\TaskPresent;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use DB;
 use App\Helpers\JoinSubjects as Subjects;
@@ -12,21 +16,20 @@ class ExportController extends Controller
      * @var object
      * Объект содержит характеристики задач
      **/
-    public $tasks;
+    public object $tasks;
 
 
     /**
      * @param Request $request
-     * @param integer $set_id
-     * @param string $subject строка содержит название предмет
-     * @return \View
-     * */
-    public function pdfView(Request $request, $subject, $set_id)
+     * @param string $subject Строка содержит название предмет
+     * @return Application|Factory|View|RedirectResponse|void
+     */
+    public function pdfView(Request $request, string $subject)
     {
 
         $_subject = Subjects::_Subject($subject);
 
-
+        $set_id = $request->get('id');
         $table_task = 'tasks'.$_subject;
         $table_subjects = 'sections'.$_subject;
         $modelSetOfTask = 'App\Models\SetOfTask'.ucfirst($subject);

@@ -11,21 +11,21 @@
   >
     <v-img :src="image" height="100%">
       <v-layout class="fill-height" tag="v-list" column>
-        <v-list-tile avatar>
-          <v-list-tile-avatar color="white">
+        <v-list-item avatar>
+          <v-list-item-avatar color="white">
             <v-img :src="logo" height="34" contain/>
-          </v-list-tile-avatar>
-          <v-list-tile-title class="title">Upbrain</v-list-tile-title>
-        </v-list-tile>
+          </v-list-item-avatar>
+          <v-list-item-title class="title">Upbrain</v-list-item-title>
+        </v-list-item>
         <v-divider/>
-        <v-list-tile v-if="responsive">
+        <v-list-item v-if="responsive">
           <v-text-field
             class="purple-input search-input"
             label="Search..."
             color="purple"
           />
-        </v-list-tile>
-        <v-list-tile
+        </v-list-item>
+        <v-list-item
           v-for="(link, i) in links"
           :key="i"
           :to=link.to
@@ -33,23 +33,23 @@
           avatar
           class="v-list-item"
         >
-          <v-list-tile-action>
+          <v-list-item-action>
             <v-icon>{{ link.icon }}</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-title v-text="link.text"/></v-list-tile>
-        <!--<v-list-tile-->
+          </v-list-item-action>
+          <v-list-item-title v-text="link.text"/></v-list-item>
+        <!--<v-list-item-->
           <!--disabled-->
           <!--active-class="primary"-->
-          <!--class="v-list-item v-list__tile&#45;&#45;buy"-->
+          <!--class="v-list-item v-list-item&#45;&#45;buy"-->
           <!--to="/upgrade"-->
         <!--&gt;-->
-          <!--<v-list-tile-action>-->
+          <!--<v-list-item-action>-->
             <!--<v-icon>mdi-package-up</v-icon>-->
-          <!--</v-list-tile-action>-->
-          <!--<v-list-tile-title class="font-weight-light">-->
+          <!--</v-list-item-action>-->
+          <!--<v-list-item-title class="font-weight-light">-->
             <!--Upgrade To PRO-->
-          <!--</v-list-tile-title>-->
-        <!--</v-list-tile>-->
+          <!--</v-list-item-title>-->
+        <!--</v-list-item>-->
       </v-layout>
     </v-img>
   </v-navigation-drawer>
@@ -145,7 +145,7 @@ export default {
 
 <style lang="scss">
   #app-drawer {
-    .v-list__tile {
+    .v-list-item {
       border-radius: 4px;
 
       &--buy {

@@ -1,3 +1,40 @@
+//Common: общие стили приложения
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+@media (max-width: 500px) {
+  table.v-table tr td{
+    padding: 0 10px !important;
+  }
+}
+.v-application {
+  font-family: "Open Sans Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-size: 17px;
+  font-weight: 400;
+  color: #000;
+}
+.v-tab{
+  text-transform: none !important;
+}
+.theme--light.v-application {
+  background: #46351d;
+}
+
+.theme--light.v-toolbar.v-sheet{
+  background-color: transparent !important;
+}
+
+.frame_line_horizonally{
+  background-image: url(/images/bg/profile/frame_line_horizonally.png);
+  background-repeat: repeat-x;
+  height: 6px;
+  background-size: 200px;
+}
 .position-relative{
   position: relative;
 }
@@ -5,6 +42,42 @@
   position: absolute;
   top: 50%;
   left: 50%;
+}
+
+.v-menu__content{
+  border-radius: 0;
+}
+.btn{
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: normal;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  min-width: 50px;
+}
+//Common: Модальное окно
+.v-dialog{
+  margin: 0;
+  overflow-y: visible;
+  max-width: 707px;
+  width: 100%;
+}
+@media screen and (max-width: 959px) {
+  .v-dialog{
+    max-width: 326px;
+  }
 }
 //Иконки
 .icon{
@@ -55,35 +128,7 @@
   background-image: url(/images/bg/profile/interface/quest.png);
 }
 
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  vertical-align: baseline;
-}
-@media (max-width: 500px) {
-  table.v-table tr td{
-    padding: 0 10px !important;
-  }
-}
-.application {
-  font-family: "Open Sans Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-size: 17px;
-  font-weight: 400;
-  color: #000;
-}
-.theme--light.application {
-  background: #46351d;
-}
-.frame_line_horizonally{
-  background-image: url(/images/bg/profile/frame_line_horizonally.png);
-  background-repeat: repeat-x;
-  height: 6px;
-  background-size: 200px;
-}
-//Сетка для инвентаря героя
+//Profile: Сетка для инвентаря героя
 .grid-slots .grid-inner{
   background-size: 64px 64px;
   background-image: url(/images/items/slots/slot_regular.png);
@@ -98,7 +143,6 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   background-position: center;
 }
 
-
 .wrapper-char-flag{
   position: absolute;
   background-image: url(/images/bg/profile/flag.png);
@@ -109,7 +153,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   width: 97%;
 }
 
-//Зарисовка окна героя
+//Profile: Зарисовка окна героя
 .wrapper-char-over{
   width: 100%;
   height: 100%;
@@ -141,7 +185,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 .grid-items{
   width: 100%;
   height: 100%;
-  padding: 0;
+  padding: 0 !important;
 }
 .grid-item{
   float: left;
@@ -180,28 +224,8 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   background-position: 50% 50%;
 }
 
-.btn{
-  display: inline-block;
-  margin-bottom: 0;
-  font-weight: normal;
-  text-align: center;
-  vertical-align: middle;
-  cursor: pointer;
-  background-image: none;
-  border: 1px solid transparent;
-  white-space: nowrap;
-  padding: 6px 12px;
-  font-size: 14px;
-  line-height: 1.42857;
-  border-radius: 4px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  min-width: 50px;
-}
 
-//Отображения модального окна действий
+//Window: Отображения модального окна действий
 .x-window .board{
   position: absolute;
   height: 100%;
@@ -218,6 +242,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   background-repeat: repeat;
   background-size: 100px;
   height: 100%;
+  padding-bottom: 1px;
 }
 .x-window > .t-board > .tl {
   background-image: url(/images/bg/profile/board_top_left.png);
@@ -256,7 +281,10 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   top: 22px;
   z-index: 1;
 }
-.x-window.item-details > .b-board > .bm{
+.x-window.item-details > .b-board > .bm,
+.x-window.item-sale > .b-board > .bm,
+.x-window.item-change > .b-board > .bm
+{
   top: 22px;
 }
 .x-window > .t-board > .br{
@@ -294,6 +322,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   font-weight: 700;
   color: #fff59d;
   font-size: 14px;
+  z-index: 1;
 
 }
 .x-window > .b-board > .bl{
@@ -311,7 +340,10 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   background-position: 0 100%, 100% 0, 0 100%;
   //z-index: 1;
 }
-.x-window.item-details > .b-board > .mm{
+.x-window.item-details > .b-board > .mm,
+.x-window.item-sale > .b-board > .mm,
+.x-window.item-change > .b-board > .mm
+{
   z-index: 0;
 }
 .x-window > .b-board > .br{
@@ -332,12 +364,17 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   background-repeat: no-repeat;
   background-size: 100%;
 }
-.x-window > .b-board > .x-info .header .image, .missions .x-info .header .image{
+.x-window > .b-board > .x-info .header .image,
+.missions .x-info .header .image{
   margin: 10px;
   position: relative;
   float: left;
 }
-.x-window > .b-board > .x-info .header .image img, .missions .x-info .header .image img{
+.x-window > .b-board > .x-info .header .image img,
+.missions .x-info .header .image img,
+.item-sale .x-info .details .image img,
+.item-change .x-info .details .change img
+{
   width: 64px;
   height: 64px;
 }
@@ -369,199 +406,30 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   text-align: center;
   padding: 6px 0;
 }
-
 .x-window .btn-tool.equip{
   width: 100%;
 }
-.x-window > .b-board > .x-toolbar > .btn-tool:hover, .items .btn-tool:hover, .missions .btn-tool:hover{
+.x-window .btn-tool .icon{
+  width: 30px;
+}
+.x-window > .b-board > .x-toolbar > .btn-tool:hover,
+.items .btn-tool:hover,
+.missions .btn-tool:hover,
+.item-change .btn-tool:hover{
   background-image: url(/images/bg/profile/btn_frame_2_light.png);
 }
-.v-menu__content{
-  border-radius: 0;
+.item-shop .btn-tool.not-active,
+.item-details .btn-tool.not-active,
+.item-change .btn-tool.not-active{
+  background-image: url(/images/bg/profile/btn_frame_2_not_active.png);
 }
-.v-dialog{
-  margin: 0;
-  overflow-y: visible;
-  max-width: 707px;
-}
-@media screen and (max-width: 959px) {
-  .v-dialog{
-    max-width: 326px;
-  }
+.item-shop .btn-tool.not-active:hover,
+.item-details .btn-tool.not-active:hover,
+.item-change .btn-tool.not-active:hover{
+  background-image: url(/images/bg/profile/btn_frame_2_light_not_active.png);
 }
 
-.game .theme--light.v-sheet{
-  margin-bottom: 24px;
-  margin-top: 48px;
-  background-image: url(/images/bg/profile/board_vertical_middle_left.png), url(/images/bg/profile/board_vertical_middle_right.png), url(/images/bg/profile/board_horizontal_middle_bottom.png);
-  background-repeat: repeat-y, repeat-y, repeat-x;
-  background-size: 6px, 6px, 94px;
-  background-position: 0 100%, 100% 0, 0 100%;
-  border-radius: 0;
-  background-color: #f3ddb0;
-}
-
-.game .v-offset{
-  background: url(/images/bg/profile/board_horizontal_middle_top.png) repeat-x;
-  background-size: 100px;
-  max-width: 100%;
-  position: initial
-}
-.game .v-card .v-offset .v-card--material__header.v-card {
-  padding: 15px 2px;
-  width: auto;
-  background: url(/images/bg/profile/plank_table_header.png) repeat-x;
-  background-size: 345px;
-  background-position-y: 6px;
-  background-position-x: 2px;
-  margin: 0 6px;
-  height: 81px;
-}
-//main графики для главной страницы
-
-.game .main.v-card {
-  //background: none;
-}
-.game .main.v-card .v-offset .v-card--material__header.v-card  {
-  height: 100%;
-  border-radius: 0;
-  background: none, #f3ddb0;
-  margin: 1px 10px;
-}
-.game .main.v-card .v-offset{
-  padding-top: 5px;
-}
-.game .theme--light.v-table{
-  background-color: transparent;
-}
-.game .theme--light.v-table tbody tr:hover:not(.v-datatable__expand-row) {
-  background: #f5d59c !important;
-}
-.game .v-card__text{
-  margin-top: 14px;
-}
-.game .theme--light.v-table tbody tr:not(:last-child), .theme--light.v-table thead tr:first-child {
-  border-bottom: 1px solid rgba(128, 92, 29, 0.88) !important;
-}
-.game .v-tabs{
-  margin-left: 25px;
-}
-.game .theme--light.v-list {
-  background: none;
-}
-.game .v-list__tile__title {
-  height: auto;
-}
-//Для графиков chartist
-.ct-series-a .ct-bar, .ct-series-a .ct-line, .ct-series-a .ct-point{
-  stroke: #d70206 !important;
-}
-
-.ct-series-b .ct-bar, .ct-series-b .ct-line, .ct-series-b .ct-point{
-  stroke: #4354d7 !important;
-}
-
-//Бейджи
-.game .badge {
-  border: 1px solid #fff59d;
-  border-radius: 50%;
-  cursor: pointer;
-  display: inline-block;
-  height: 23px;
-  margin-right: 5px;
-  position: relative;
-  width: 23px;
-}
-
-.game .badge-red {
-  background-color: #f44336;
-}
-.game .badge-blue {
-  background-color: #4354d7;
-}
-
-.game .list-badge .v-list__tile{
-  height: 25px;
-}
-
-.game .list-badge .v-list__tile__action, .v-list__tile__avatar {
-  min-width: 5px;
-}
-
-.game .border-right{
-  border-right: 1px #ccc;
-}
-.game .border-right:last-child{
-  border-right: none;
-}
-//Табы на главной
-.game .card-tabs .v-window-item .flex {
-   padding: 12px !important;
-}
-//Для достижений ученика
-.progresses .layout.row{
-  margin: 0 6px 6px 6px;
-}
-.progresses .v-list--three-line .v-list__tile__avatar {
-  margin-top: 0;
-}
-.progresses .v-list > div {
-  margin: 0 10px;
-  background-image: url(/images/bg/profile/plank_progress.png);
-  background-size: contain;
-  height: 136px;
-}
-.progresses .v-avatar, .v-responsive {
-  margin-top: 19px;
-  width: 100px;
-  height: 100px;
-}
-.progresses .v-list__tile__sub-title {
-  color: #fff59d !important;
-}
-@media screen and (max-width: 959px) {
-  .progresses .v-list > div {
-    margin: 0 10px;
-    background-image: url(/images/bg/profile/plank_progress.png);
-    background-size: contain;
-    height: 60px;
-  }
-  .progresses .v-avatar{
-    margin-top: 4px;
-    width: 40px;
-    height: 40px;
-  }
-  .progresses .v-list__tile__content {
-    margin-top: 7px;
-  }
-  .progresses .v-list__tile__title {
-    height: 15px;
-    line-height: 13px;
-    margin-top: 10px;
-  }
-  .progresses .v-list__tile__sub-title {
-    color: #fff59d;
-  }
-}
-.progresses .theme--light.v-subheader {
-  margin: 0 10px;
-  background-image: url(/images/bg/profile/board_title.png);
-  background-size: contain;
-  height: 60px;
-  background-position: center;
-  text-align: center;
-  display: block;
-  font-size: 23px;
-  color: #0b0b0b;
-}
-.progresses .v-list__tile__content {
-  margin-top: -4px;
-}
-.progresses .theme--light.v-list,.theme--light.v-sheet {
-  background: none;
-}
-
-// STYLE SCROLL
+//Window: Scroll
 
 .scroll::-webkit-scrollbar-track
 {
@@ -588,13 +456,213 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
           transparent)
 }
 
-//Для окна предметы
+//Главная страница
+.game .theme--light.v-sheet{
+  //margin-bottom: 24px;
+  //margin-top: 48px;
+  background-image: url(/images/bg/profile/board_vertical_middle_left.png), url(/images/bg/profile/board_vertical_middle_right.png), url(/images/bg/profile/board_horizontal_middle_bottom.png);
+  background-repeat: repeat-y, repeat-y, repeat-x;
+  background-size: 6px, 6px, 94px;
+  background-position: 0 100%, 100% 0, 0 100%;
+  border-radius: 0;
+  background-color: #f3ddb0;
+}
+
+.game .v-offset{
+  background: url(/images/bg/profile/board_horizontal_middle_top.png) repeat-x;
+  background-size: 100px;
+  max-width: 100%;
+  position: initial
+}
+.game .v-card .v-offset .v-card--material__header.v-card {
+  padding: 15px 2px;
+  width: auto;
+  background: url(/images/bg/profile/plank_table_header.png) repeat-x;
+  background-size: 345px;
+  background-position-y: 6px;
+  background-position-x: 2px;
+  margin: 0 6px;
+  height: 81px;
+}
+//Main графики для главной страницы
+
+.game .main.v-card {
+  //background: none;
+}
+.game .icon{
+  width: 50px !important;
+  height: 50px !important;
+  background-size: contain;
+}
+
+.game .v-list-item{
+  min-height: 0;
+}
+.game .v-list-item__icon{
+  margin: 0 10px 0 0 !important;
+}
+.game .main.v-card .v-offset .v-card--material__header.v-card  {
+  height: 100%;
+  border-radius: 0;
+  background: none, #f3ddb0;
+  margin: 1px 10px;
+}
+.game .main.v-card .v-offset{
+  padding-top: 5px;
+}
+.game .theme--light.v-data-table, .game .theme--light.v-tabs-items, .theme--light.v-tabs-items {
+  background-color: transparent;
+}
+.game .theme--light.v-data-table tbody tr:hover:not(.v-datatable__expand-row) {
+  background: #f5d59c !important;
+}
+.game .v-card__text{
+  margin-top: 14px;
+}
+.game .theme--light.v-data-table tbody tr:not(:last-child), .theme--light.v-table thead tr:first-child {
+  border-bottom: 1px solid rgba(128, 92, 29, 0.88) !important;
+}
+.game .v-tabs{
+  margin-left: 25px;
+}
+.game .theme--light.v-list {
+  background: none;
+}
+.game .v-list-item__title {
+  height: auto;
+}
+//Для графиков chartist
+.ct-series-a .ct-bar, .ct-series-a .ct-line, .ct-series-a .ct-point{
+  stroke: #d70206 !important;
+}
+
+.ct-series-b .ct-bar, .ct-series-b .ct-line, .ct-series-b .ct-point{
+  stroke: #4354d7 !important;
+}
+
+//Бейджи
+.theme--light.v-badge .v-icon{
+  color: #ffffff
+}
+.game .badge {
+  border: 1px solid #fff59d;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-block;
+  height: 23px;
+  margin-right: 5px;
+  position: relative;
+  width: 23px;
+}
+
+.game .badge-red {
+  background-color: #f44336;
+}
+.game .badge-blue {
+  background-color: #4354d7;
+}
+
+.game .list-badge .v-list-item{
+  height: 25px;
+}
+
+.game .list-badge .v-list-item__action, .v-list-item__avatar {
+  min-width: 5px;
+  margin: 0 !important;
+}
+.game .list-badge .v-list-item__content{
+  padding: 0;
+}
+
+.game .border-right{
+  border-right: 1px #ccc;
+}
+.game .border-right:last-child{
+  border-right: none;
+}
+
+//Табы на главной
+.game .card-tabs .v-window-item .flex {
+   padding: 12px !important;
+}
+
+//Battle: битва с монстром
+.game.battle .monster{
+
+}
+
+//Progresses: Для достижений ученика
+.progresses .layout.row{
+  margin: 0 6px 6px 6px;
+}
+.progresses .v-list--three-line .v-list-item__avatar {
+  margin-top: 0;
+}
+.progresses .v-list > div {
+  margin: 0 10px;
+  background-image: url(/images/bg/profile/plank_progress.png);
+  background-size: contain;
+  height: 136px;
+}
+.progresses .v-avatar{
+  max-width: 100px;
+  max-height: 100px;
+  margin-right: 5px;
+}
+.progresses .v-list-item__subtitle {
+  color: #fff59d !important;
+}
+@media screen and (max-width: 959px) {
+  .progresses .v-list > div {
+    margin: 0 10px;
+    background-image: url(/images/bg/profile/plank_progress.png);
+    background-size: contain;
+    height: 60px;
+  }
+  .progresses .v-avatar{
+    margin-top: 4px;
+    max-width: 40px;
+    max-height: 40px;
+    margin-bottom: 15px;
+  }
+  .progresses .v-list-item__content {
+    margin-top: 7px;
+  }
+  .progresses .v-list-item__title {
+    height: 15px;
+    line-height: 13px;
+    margin-top: 10px;
+  }
+  .progresses .v-list-item__subtitle {
+    color: #fff59d;
+  }
+}
+.progresses .theme--light.v-subheader {
+  margin: 0 10px;
+  background-image: url(/images/bg/profile/board_title.png);
+  background-size: contain;
+  height: 60px;
+  background-position: center;
+  text-align: center;
+  display: block;
+  font-size: 23px;
+  color: #0b0b0b;
+}
+.progresses .v-list-item__content {
+  margin-top: -21px;
+}
+.progresses .theme--light.v-list,.theme--light.v-sheet {
+  background: none;
+}
+
+
+//Items: Для окна предметы
 
 .items .subheading{
   text-align: center;
 }
 .items .v-image{
-  margin-top: 0;
+  margin-top: 12px;
   width: 100%;
   height: 125px;
 }
@@ -621,11 +689,20 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 .items .btn-tool{
   width: 100%;
   margin-top: 5px;
+  cursor: pointer;
 }
 .items .container.grid-list-md .item-shop .layout .flex {
   padding: 1px;
 }
-//Для окна миссии
+
+//Item Sale: Для диалогового окна продажи товара
+
+.item-sale .icon.icon-gold{
+  display: inline-block;
+  width: 22px;
+  margin: 0;
+}
+//Mission: Для окна миссии
 .missions .theme--light.v-sheet {
   overflow: hidden;
   background-image: url(/images/bg/profile/board_info.png);
@@ -649,44 +726,48 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   padding-top: 5px;
   height: 47px;
 }
-.missions .v-expansion-panel {
+.missions .v-expansion-panels {
   width: auto;
   margin: 0 6px 6px 7px;
   color: #bcac1b;
 }
-.missions .theme--light.v-expansion-panel .v-expansion-panel__container {
+.missions .theme--light.v-expansion-panels .v-expansion-panel {
   background-image: url(/images/bg/profile/over_the_char_1.png);
   background-size: 100%;
   border-top: 1px solid rgb(147, 135, 110);
+}
+.missions .theme--light.v-expansion-panels .v-expansion-panel .v-expansion-panel-content__wrap{
+  padding: 0;
 }
 .missions .v-card__text {
   padding: 7px 0;
   width: 99%;
   margin: 4px 5px;
 }
-.missions .theme--light.v-tabs__bar .v-tabs__div{
+.missions .theme--light.v-tabs-bar .v-tab{
   color: #fff59d;
 }
-.missions .v-expansion-panel__container--active>.v-expansion-panel__header .v-expansion-panel__header__icon .v-icon.icon-check,
-.missions .v-expansion-panel__container--active>.v-expansion-panel__header .v-expansion-panel__header__icon .v-icon.icon-quest{
+.missions .v-expansion-panel-header--active .v-expansion-panel-header__icon .v-icon.icon-check,
+.missions .v-expansion-panel-header--active .v-expansion-panel-header__icon .v-icon.icon-quest{
   transform: none;
 }
 //Инвентарь
 .profile .characteristics {
   position: absolute;
-  bottom: 55px;
+  bottom: 63px;
   left: 118px;
   color: #fff59d;
+  width: 120px;
 }
 .profile .characteristics .layout .flex {
   padding: 1px;
 }
 
-.profile .btn-tool{
+.profile .btn-tool-menu{
   position: absolute;
   z-index: 1;
-  top: 47px;
-  left: 79px;
+  top: 23px;
+  left: 80px;
   height: 39px;
   width: 50%;
   padding: 3px 0;
@@ -700,7 +781,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   background-image: url(/images/bg/profile/board_title_light.png);
 }
 
-//Отображение иконок стрелок
+//Инвентарь: Отображение иконок стрелок
 .profile .icon-tool{
   width: 9px;
   height: 9px;
@@ -709,11 +790,13 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   right: 22px;
   background-size: contain;
   background-image: url(/images/bg/profile/arrow_up.png);
+  cursor: pointer;
 }
 .profile .icon-tool.hide{
   background-image: url(/images/bg/profile/arrow_down.png);
 }
 
+//Инвентарь: вывод характеристик героя
 .property .x-info .header .image {
   margin: 3px 5px !important;
 }
@@ -726,33 +809,57 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   font-size: 11px !important;
   line-height: 1;
   margin-top: 2px;
+  margin-bottom: 0;
 }
-.property .icon, .item-details .icon{
+.property .icon, .item-details .icon, .item-sale .icon, .item-change .icon, .item-difference .icon
+{
   margin-bottom: 2px;
   height: 22px;
   text-align: right;
 }
-.property .details > .stuff-box > div, .item-details .details > .stuff-box > div{
+.property .details > .stuff-box > div,
+//.item-details .details > .stuff-box > div,
+.item-sale .details > .stuff-box > div,
+.item-change .details > .stuff-box > div,
+.item-info > div > div
+{
   display: -webkit-flex;
   display: flex;
   flex-direction: row;
 }
-.property .details > .stuff-box > div > p:first-child, .item-details .details > .stuff-box > div > p:first-child{
+.property .details > .stuff-box > div > p,
+//.item-details .details > .stuff-box > div > p,
+.item-sale .details > .stuff-box > div > p,
+.item-change .details > .stuff-box > div > img,
+.item-info > div > div > p
+{
+  margin-bottom: 2px;
+}
+.property .details > .stuff-box > div > p:first-child,
+//.item-details .details > .stuff-box > div > p:first-child,
+.item-sale .details > .stuff-box > div > p:first-child,
+.item-change .details > .stuff-box > div > img,
+.item-info > div > div > p:first-child
+{
   -webkit-flex-grow: 1;
   flex-grow: 1;
 }
-.property .details > .stuff-box > div > p:last-child, .item-details .details > .stuff-box > div > p:last-child{
+.property .details > .stuff-box > div > p:last-child,
+//.item-details .details > .stuff-box > div > p:last-child,
+.item-sale .details > .stuff-box > div > p:last-child,
+.item-change .details > .stuff-box > div > div.btn-tool,
+.item-info > div > div > p:last-child
+{
   -webkit-flex-grow: 0;
   flex-grow: 0;
 }
-
 .property .attack, .item-details .attack{
   background-image: url(/images/bg/profile/property/attack_256.png);
 }
 .property .shield, .item-details .shield{
   background-image: url(/images/bg/profile/property/shield_256.png);
 }
-.property .damage, .item-details .damage{
+.property .damage_min, .item-details .damage_min, .property .damage_max, .item-details .damage_max{
   background-image: url(/images/bg/profile/property/damage_256.png);
 }
 .property .hp, .item-details .hp{
@@ -769,4 +876,42 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 }
 .property .critical_chance, .item-details .critical_chance{
   background-image: url(/images/bg/profile/property/critical_chance_256.png);
+}
+//Таблица экзамены, задачи
+
+//Отображение закрытия кнопки
+.table #silentbox-overlay__close-button{
+  right: 33px;
+}
+.table .v-expansion-panels .v-expansion-panel {
+  background-color: #f3ddb0;
+}
+@media screen and (max-width: 959px) {
+  .table .v-card .title {
+    line-height: 1rem !important;
+    font-size: 0.9rem !important;
+  }
+}
+
+//Окно изменения предмета:
+.item-change > .b-board > .x-info .details{
+  position: relative;
+  margin: 4px 4px;
+}
+.item-change.details > .stuff-box > div > img,
+.item-change .details > .stuff-box > div > div.btn-tool{
+  margin-bottom: 2px;
+}
+.item-change .details > .stuff-box > div > img{
+  cursor: pointer;
+  -webkit-flex-grow: 0;
+  flex-grow: 0;
+}
+.item-change .details > .stuff-box > div > img:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+.item-change .details > .stuff-box > div > div.btn-tool{
+  -webkit-flex-grow: 0;
+  flex-grow: 0;
 }

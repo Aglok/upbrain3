@@ -16,6 +16,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Rarity whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Rarity whereType($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|Rarity newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Rarity newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Rarity query()
  */
 class Rarity extends Model
 {

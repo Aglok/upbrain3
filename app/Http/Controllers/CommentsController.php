@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\Comment;
 use App\Models\Post;
@@ -15,7 +16,7 @@ class CommentsController
          * @param $post_id integer
          * @return array Collection
      */
-    public function showComments($post_id){
+    public function showComments(int $post_id){
 
         $post = Post::where('id', $post_id)->first();
         $count = 0;
@@ -29,11 +30,11 @@ class CommentsController
         }
         return [$commentsGroupById, $count];
     }
+
     /**
      * Сохраняет комментарии в БД
-     * @param $request
-     * @param $response
-     * @return array
+     * @param Request $request
+     * @return RedirectResponse
      */
     public function saveComment(Request $request){
 //        if($request->ajax()) {

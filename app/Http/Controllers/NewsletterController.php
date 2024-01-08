@@ -7,18 +7,22 @@ use App\Models\Contact;
 use App\Models\Newsletter;
 use App\Models\UserNewsletter;
 use App\User;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\View\View;
 use Request;
 use Response;
 use AdminSection;
 use Mail;
 use Illuminate\Support\Facades\Input;
+use Throwable;
 
 class NewsletterController extends Controller
 {
     /**
      * Выводит в вид данные о пользователях
      *
-     * @return \View
+     * @return Factory|View
+     * @throws Throwable
      */
     public function index()
     {

@@ -12,15 +12,18 @@
   import {mapMutations, mapState} from 'vuex'
   export default {
     beforeCreate(){
-      this.$dataUser.getData('/profile/all', (response) => {
+      this.$dataUser.getPostData('/profile/all', (response) => {
         this.setUser(response.data);
-        this.setReady(true)
+        this.setSlots(response.data.slots);
+        this.setItems(response.data.items_bag);
+        this.setBattles(response.data.battles);
+        this.setReady(true);
       }, '');
 
     },
     methods: {
       //...mapState('app', ['user']),
-      ...mapMutations('app', ['setUser', 'setReady']),
+      ...mapMutations('app', ['setUser', 'setReady', 'setSlots', 'setItems', 'setBattles']),
     }
   }
 </script>

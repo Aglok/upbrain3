@@ -1,32 +1,22 @@
 <template>
     <div class="faq-container">
-        <div class="faq-question" :class="{show: isOpen}" v-for="(item, index) in contents">
+        <div class="faq-question" :class="{show: isOpen}">
             <div class="faq-description"
                  aria-haspopup="true"
                  :aria-expanded="isOpen"
                  @click="toggleDropDown"
                  v-click-outside="closeDropDown"
                 >
-                <span class="faq-number">{{index + 1}}</span>{{item.title}}<span>+</span>
+                <!-- Слот для отображения кнопки -->
+                <slot name="button"></slot>
             </div>
-            <div class="faq-content" v-show="isOpen">
-                <!--<p>{{item.msg}}</p>-->
-                <p class="my-2"><b>Результаты с кратким ответом</b></p>
-                <p>
-                    <span class="short_answers" v-for="(ball, index) in item.result_short_answers">
-                        <span>{{ball}}</span>
-                    </span>
-                </p>
-                <p class="my-2"><b>Результаты с развёрнутым ответом</b></p>
-                <p>
-                    <span class="expanded_answers" v-for="(ball, index) in item.result_expanded_answers">
-                        <span v-if="index < 3">{{ball}}(2)</span>
-                        <span v-else-if="index > 2 && index < 5">{{ball}}(3)</span>
-                        <span v-else>{{ball}}(4)</span>
-                    </span>
-                </p>
-                <router-link :to="{ name: 'Table Exam Result', params: { id: item.exam_id }}">Подробнее</router-link>
-            </div>
+
+
+            <v-card class="faq-content" v-show="isOpen">
+                <div class="v-offset"></div>
+                <!-- Слот для отображения контента в раскрывающемся блоке -->
+                <slot name="content"></slot>
+            </v-card>
         </div>
     </div>
 </template>
@@ -39,18 +29,6 @@
             return {
                 isOpen: false
             }
-        },
-        props: {
-            contents: {
-                type: Array,
-                default: [
-                    {
-                        exam_id: 1,
-                        title: 'How are you?',
-                        msg: 'I am fine thank you.',
-                    },
-                ],
-            },
         },
         methods: {
             toggleDropDown () {
@@ -69,6 +47,7 @@
     .faq-container {
         width: 100%;
         margin: 0 auto;
+        position: relative;
     }
     .faq-question {
         padding: 0px;
@@ -76,12 +55,14 @@
     }
     .faq-content {
         padding: 20px 40px;
+        position: absolute;
+        z-index: 2;
     }
     .faq-description {
         font-size: 18px;
         color: #4a4a4a;
         letter-spacing: -1.03px;
-        padding: 23px 100px 20px 40px;
+        padding: 0 52px 0 30px;
         border-top: none;
         position: relative;
         -webkit-transition: all 0.3s;
@@ -127,7 +108,7 @@
         font-weight: normal;
     }
     .faq-question.show {
-        background: #f7f7f7;
+        /*background: #f7f7f7;*/
     }
     .faq-question.show .faq-description {
         font-weight: 600;
@@ -183,7 +164,7 @@
             padding: 0 10px;
         }
         .faq-content{
-            padding: 20px 0px;
+            padding: 20px 10px;
         }
     }
     @media (max-width: 375px) {

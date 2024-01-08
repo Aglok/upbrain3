@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExamSubject whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ExamSubject whereName($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamSubject newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamSubject newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamSubject query()
  */
 class ExamSubject extends Model
 {

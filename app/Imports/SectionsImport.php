@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use Illuminate\Database\Eloquent\Model;
 use function explode;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,16 +13,16 @@ use Maatwebsite\Excel\Concerns\WithChunkReading;
 class SectionsImport implements ToModel, WithHeadingRow, WithChunkReading, ShouldQueue
 {
     /**
-     * @param string
+     * @var string
      * Название таблицы
      */
-    public $table;
+    public string $table;
 
     /**
-     * @param string
+     * @var string
      * alias предмета math, physics
      */
-    public $subject;
+    public string $subject;
 
 
     public function __construct($table_name)
@@ -35,9 +36,9 @@ class SectionsImport implements ToModel, WithHeadingRow, WithChunkReading, Shoul
     /**
     * @param array $row
     *
-    * @return \Illuminate\Database\Eloquent\Model|null
+    * @return Model|null
     */
-    public function model(array $row)
+    public function model(array $row): ?Model
     {
 
         if($this->table == 'sections'){
@@ -67,6 +68,7 @@ class SectionsImport implements ToModel, WithHeadingRow, WithChunkReading, Shoul
             }
         }
 
+        return null;
     }
 
 

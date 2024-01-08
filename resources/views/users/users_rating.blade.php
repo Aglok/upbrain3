@@ -38,6 +38,7 @@
                         $user_progresses = UserI::getUserProgress($tasks->user_id, $subject);
                     ?>
                     {{--Отображение образов учеников--}}
+                        {{--{{dd($images_char->image)}}--}}
                         <td>
                             <img src="{!! asset($images_char->image) !!}" title="Рождение" width="40" height="68">
                         </td>
@@ -46,7 +47,7 @@
                     {{--Отображение трофеев учеников--}}
                     <td>
                         @foreach ($artifacts as $artifact)
-                            <img src="{!! asset($artifact->image) !!}"
+                            <img src="{!! asset($artifact->images->info) !!}"
                                  alt="{{$artifact->name}}" title="{{$artifact->info}}"
                                  data-toggle="tooltip" data-html="true" data-placement="bottom" width="40" height="40">
                         @endforeach

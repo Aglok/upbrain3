@@ -1,61 +1,56 @@
 <template>
-  <v-container fill-height fluid grid-list-xl game>
-    <v-layout justify-center wrap>
-      <v-flex md12>
+  <v-container fluid game table>
+    <v-row>
+      <v-col cols="12">
         <material-card
           title="Экзамены"
           text="Список экзаменов"
         >
-          <v-data-table :headers="headers" :items="exam.data" hide-actions :expand="expand" item-key="name">
+          <v-data-table
+                  :disable-sort="true"
+                  :headers="headers"
+                  :items="exam.data"
+                  hide-default-footer
+                  item-key="exam_name"
+          >
 
-            <template v-slot:headers="props">
-              <tr>
-                <th v-for="header in props.headers" :class="(header.value == 'images') ? 'hidden-sm-and-down': 'hidden-xs-only'">
-                  <span class="subheading font-weight-light black--text" v-text="header.text"/>
-                </th>
-              </tr>
+            <template v-slot:item.exam_name="{ item }">
+                <accordion-menu-exam :contents="[
+                        {
+                          exam_id: item.exam_id,
+                          title: item.exam_name,
+                          msg: 'Результаты экзаменов',
+                          result_short_answers: item.result_short_answers,
+                          result_expanded_answers: item.result_expanded_answers
+                        },
+                    ]">
+              </accordion-menu-exam>
             </template>
-            <template slot="items" slot-scope="{item}">
-              <tr @click="item.expanded = !item.expanded">
-                <td>
-                  <accordion-menu :contents="[
-                          {
-                            exam_id: item.exam_id,
-                            title: item.exam_name,
-                            msg: 'Результаты экзаменов',
-                            result_short_answers: item.result_short_answers,
-                            result_expanded_answers: item.result_expanded_answers
-                          },
-                      ]">
-                  </accordion-menu>
-                </td>
-                <td class="hidden-xs-only">{{moment(item.start_date).format('DD.MM.YYYY', 'h:mm')}}</td>
-                <td class="hidden-xs-only">{{item.total_primary}}</td>
-                <td class="hidden-xs-only">{{item.total_test}}</td>
-                <td class="hidden-sm-and-down">
-                  <silentbox-single v-for="(image, index) in item.images"
-                                    :src=image
-                                    :key=index
-                                    :description="index+1+' Часть'">
-                    <img :src=image width="100px">
-                  </silentbox-single>
-                </td>
-              </tr>
+
+            <template v-slot:item.start_date="{ item }">
+              {{moment(item.start_date).format('DD.MM.YYYY h:mm')}}
             </template>
-            <template slot="expand" slot-scope="{item}">
-              <v-card flat>
-                <v-card-text>Дата: {{moment(item.start_date).format('DD.MM.YYYY', 'h:mm')}}</v-card-text>
-                <v-card-text>Первичный балл: {{item.total_primary}}</v-card-text>
-                <v-card-text>Тестовый балл:{{item.total_test}}</v-card-text>
-                <v-card-text>
-                  <silentbox-single v-for="(image, index) in item.images"
-                           :src=image
-                           :key=index
-                           :description="index+1+' Часть'">
-                    <img :src=image width="50px">
-                  </silentbox-single>
-                </v-card-text>
-              </v-card>
+
+            <template v-slot:item.images="{ item }">
+              <silentbox-single class="hidden-sm-and-down" v-for="(image, index) in item.images"
+                                :src=image
+                                :key=index
+                                :description="index+1+' Часть'">
+                <img :src=image width="100px">
+              </silentbox-single>
+              <v-expansion-panels class="hidden-md-and-up mb-2">
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>Изображения</v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <silentbox-single v-for="(image, index) in item.images"
+                                        :src=image
+                                        :key=index
+                                        :description="index+1+' Часть'">
+                          <img :src=image width="50px">
+                      </silentbox-single>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+              </v-expansion-panels>
             </template>
           </v-data-table>
         </material-card>
@@ -65,15 +60,15 @@
             <i class="fa fa-history"></i> Последнее обновление {{moment(date.updated_at).fromNow()}}
           </div>
         </div>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script>
 export default {
   data: () => ({
-    expand: true,
+    expanded: [],
     content:[
           {
               exam_id: 1,
@@ -85,27 +80,22 @@ export default {
       ],
       headers:[
         {
-          sortable: false,
           text: 'Экзамен',
           value: 'exam_name',
         },
         {
-          sortable: false,
           text: 'Дата',
           value: 'start_date',
         },
         {
-          sortable: false,
           text: 'Первичный балл',
           value: 'total_primary',
         },
         {
-          sortable: false,
           text: 'Тестовый балл',
           value: 'total_test',
         },
         {
-          sortable: false,
           text: 'Файлы',
           value: 'images',
         }
@@ -148,7 +138,7 @@ export default {
   created(){
       let app = this;
 
-      this.$dataUser.getData('/profile/exam', (response) => {
+      this.$dataUser.getPostData('/profile/exam', (response) => {
 
           app.date.updated_at = response.data.data[response.data.data.length-1].updated_at;
 

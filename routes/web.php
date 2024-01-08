@@ -1,17 +1,21 @@
 <?php
+//Если названия роутеров совпадают as pages, то вызвает ошибку совпадения роутеров по имени
 //Lp
+use App\Http\Controllers\PageController;
+use App\Models\Page;
+
+Route::get('egorperl', function () {
+    return view('egorperl');
+});
+
 Route::get('/', function () {
     return view('main');
 });
 
-$pages = \App\Models\Page::all();
+$pages = Page::all();
 
 foreach ($pages as $page) {
-
-    Route::get($page->link, [
-        'as' => 'pages',
-        'uses' => 'PageController@showPage'
-    ]);
+    Route::get($page->link, [PageController::class, 'showPage']);
 }
 
 Route::get('master_class', function () {
@@ -51,15 +55,15 @@ Route::group(['prefix' => 'blog'], function(){
 
 //Регистрация
 Route::group(['middleware' => 'auth'], function(){
-    Route::get('home_users', function(){
+    Route::get('v2', function(){
         return view('test');
     });
 
-    Route::get('test', function(){
+    Route::get('v3', function(){
         return view('test1');
     });
 
-    Route::group(['middleware' => 'admin'], function(){
+    Route::group(['middleware' => ['admin']], function(){
         //тут роуты только для админа + авторизация
     });
 });
@@ -67,7 +71,7 @@ Route::group(['middleware' => 'auth'], function(){
 Auth::routes();
 
 //Messenger - chat
-Route::get('/home/messages', ['as' => 'messages', 'uses' => 'MessagesController@index']);
+Route::get('/home/messages', ['as' => 'messages.home', 'uses' => 'MessagesController@index']);
 Route::group(['prefix' => 'messages', 'before' => 'auth'], function () {
     Route::get('/', ['as' => 'messages', 'uses' => 'MessagesController@index']);
     Route::get('create', ['as' => 'messages.create', 'uses' => 'MessagesController@create']);
@@ -82,13 +86,14 @@ Route::group(['prefix' => 'messages', 'before' => 'auth'], function () {
 //New education game
 Route::post('profile/exam/{id?}', ['as' => 'exam', 'uses' => 'ExamsController@examUserInfo']);
 Route::post('profile/interface/{subject}', ['as' => 'interface', 'uses' => 'UserHomeController@userProfileBuild']);
-Route::post('profile/table_tasks/{subject}/{mission_id}', ['as' => 'mission_id', 'uses' => 'UserMissionController@getTasks']);
-Route::post('profile/all', ['as' => 'complete_profile', 'uses' => 'UserHomeController@userProfileBuildAllSubjects']);
+Route::get('profile/table_tasks/{subject}/{mission_id}', ['as' => 'mission_id', 'uses' => 'UserMissionController@getTasks']);
+Route::post('profile/all', ['as' => 'complete_profile', 'uses' => 'UserHomeController@userProfile']);
 Route::post('profile/item', ['as' => 'equip', 'uses' => 'UserHomeController@userEquipArtifact']);
+Route::post('profile/shop_items', ['as' => 'shop', 'uses' => 'UserHomeController@userBuyArtifact']);
 
 Route::get('home/users_rating/{subject}', ['as' => 'users_rating', 'uses' => 'UserHomeController@userTableRating']);
 Route::get('home/user_solved_tasks', ['as' => 'user_solved_tasks', 'uses' => 'UserHomeController@userShowTasksSolved']);
-Route::get('home/user_home/{subject}/{user_id}', ['as' => 'rating_math/{user_id}','uses'=>'\App\Http\Controllers\UserHomeController@userProfileRating']);
+Route::get('home/user_home/{subject}/{user_id}', ['as' => 'rating_math/{user_id}','uses'=>'UserHomeController@userProfileRating']);
 Route::get('home/game_duel', ['as' => 'game_duel', 'uses' => 'GameDuelController@index']);
 
 //Form регистрация школьников и родителей

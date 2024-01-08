@@ -1,9 +1,8 @@
 <template>
-  <v-container fill-height fluid grid-list-xl>
-    <v-layout justify-center wrap>
-      <v-flex md12>
+  <v-container fluid game table>
+    <v-row>
+      <v-col cols="12">
         <material-card
-                color="green"
                 title="Результаты выполнения заданий с кратким ответом"
                 text="Максимальный балл 12"
         >
@@ -13,45 +12,58 @@
                   <div>Общее количество первичных баллов: <span class="text-success">{{table1.data.total + table2.data.total}}</span></div>
                   <div>Тестовый балл: <span class="text-success">{{this.$dataUser.getTestBalls(table1.data.total + table2.data.total)}}</span></div>
               </div>
-              <v-data-table :headers="table1.headers" :items="table1.data.items" :total-items ="12" hide-actions>
-                <template slot="items" slot-scope="{ item }">
-                  <td>{{ item.id }}</td>
-                  <td>{{ item.short_answer }}</td>
-                  <td>{{ item.exam_answer }}</td>
-                  <td>{{ item.result_short_answer }}</td>
-                  <td>{{ item.ball }}</td>
-                </template>
-                <template slot="footer">
-                    <td :colspan="3">Общая сумма</td>
-                    <td class="text-danger">{{table1.data.total}}</td>
-                    <td>12</td>
+              <v-data-table
+                      :headers="table1.headers"
+                      :items="table1.data.items"
+                      :disable-sort="true"
+                      :server-items-length ="12"
+                      hide-default-footer
+              >
+                  <template v-slot:body.append>
+                      <tr class="hidden-sm-and-down">
+                        <td :colspan="3">Общая сумма</td>
+                        <td class="text-danger">{{table1.data.total}}</td>
+                        <td>12</td>
+                      </tr>
+                      <tr class="hidden-md-and-up">
+                          <td class="v-data-table__mobile-row">
+                              <div class="v-data-table__mobile-row__wrapper">
+                                  <div class="v-data-table__mobile-row__header">Общий балл</div>
+                                  <div class="v-data-table__mobile-row__cell"><span class="text-danger">{{table1.data.total}}</span>/12</div>
+                              </div>
+                          </td>
+                      </tr>
                 </template>
               </v-data-table>
       </material-card>
-      </v-flex>
+      </v-col>
 
-      <v-flex md12>
+      <v-col cols="12">
           <material-card
-              color="green"
               title="Результаты выполнения заданий с развёрнутым ответом"
               text="Максимальный балл 20"
           >
-          <v-data-table :headers="table2.headers" :items="table2.data.items" :total-items ="7" hide-actions>
-              <template slot="items" slot-scope="{ item }">
-                  <td>{{ item.id }}</td>
-                  <td>{{ item.result_expanded_answer }}</td>
-                  <td>{{ item.ball }}</td>
-              </template>
-              <template slot="footer">
-                  <td>Общая сумма</td>
-                  <td class="text-danger">{{table2.data.total}}</td>
-                  <td>20</td>
+          <v-data-table :headers="table2.headers" :items="table2.data.items" :server-items-length ="7" hide-default-footer>
+              <template v-slot:body.append>
+                  <tr class="hidden-sm-and-down">
+                      <td>Общая сумма</td>
+                      <td class="text-danger">{{table2.data.total}}</td>
+                      <td>20</td>
+                  </tr>
+                  <tr class="hidden-md-and-up">
+                      <td class="v-data-table__mobile-row">
+                          <div class="v-data-table__mobile-row__wrapper">
+                              <div class="v-data-table__mobile-row__header">Общий балл</div>
+                              <div class="v-data-table__mobile-row__cell"><span class="text-danger">{{table2.data.total}}</span>/20</div>
+                          </div>
+                      </td>
+                  </tr>
               </template>
           </v-data-table>
           </material-card>
-          <div>Комментарии к работе: {{comments}}</div>
-      </v-flex>
-    </v-layout>
+          <div class="white--text">Комментарии к работе: {{comments}}</div>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 <script>
@@ -64,31 +76,26 @@
         table1: {
             headers:[
               {
-                  sortable: false,
                   text: 'Номер',
                   value: 'id',
                   aline: 'center'
               },
               {
-                  sortable: false,
                   text: 'Ваш ответ',
                   value: 'short_answer',
                   aline: 'center'
               },
               {
-                  sortable: false,
                   text: 'Правильный ответ',
                   value: 'exam_answer',
                   aline: 'center'
               },
               {
-                  sortable: false,
                   text: 'Ваш балл',
                   value: 'result_short_answer',
                   aline: 'center'
               },
               {
-                  sortable: false,
                   text: 'Максимальный балл',
                   value: 'ball',
                   aline: 'center'
@@ -165,7 +172,7 @@
     },
     created(){
 
-        this.$dataUser.getData('/profile/exam/'+this.$route.params.id, (response) => {
+        this.$dataUser.getPostData('/profile/exam/'+this.$route.params.id, (response) => {
             this.setData(response.data.data[0]);
         });
     }
