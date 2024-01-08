@@ -1,0 +1,20 @@
+{
+  "all_items": "Все",
+  "books": "Книги",
+  "swords": "Мечи",
+  "axes": "Топоры",
+  "staffs" :"Посохи",
+  "bows": "Луки",
+  "crossbows": "Арбалеты",
+  "armors": "Броня",
+  "cloaks": "Плащи",
+  "shields": "Щиты",
+  "rings": "Кольца",
+  "boots": "Ботинки",
+  "helmets": "Шлема",
+  "necklaces": "Амулеты",
+  "knives": "Кинжалы",
+  "progresses": "Достижения",
+  "level": "Уровень",
+  "class_type": "Класс"
+}
